@@ -8,20 +8,24 @@
 *.sln
 **/*.sln
 
-#ignore vsxproj files
+# ignore vsxproj files
 *.vsxproj
 **/*.vsxproj
 
-#ignore vsxproj.user files
+# ignore vsxproj.user files
 *.vsxproj.user
 **/*.vsxproj.user
 
-#ignore vsxproj.filters files
+# ignore vsxproj.filters files
 *.vsxproj.filters
 **/*.vsxproj.filters
 
-#ignore vsxproj.cache files
+# ignore vsxproj.cache files
 *.vsxproj.cache
 **/*.vsxproj.cache
+
+# ignore makefiles
+Makefile
+**/Makefile
 
 
