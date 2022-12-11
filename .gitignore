@@ -27,6 +27,22 @@
 *.vsxproj.cache
 **/*.vsxproj.cache
 
+# ignore vcxproj files
+*.vcxproj
+**/*.vcxproj
+
+# ignore vcxproj.user files
+*.vcxproj.user
+**/*.vcxproj.user
+
+# ignore vcxproj.filters files
+*.vcxproj.filters
+**/*.vcxproj.filters
+
+# ignore vcxproj.cache files
+*.vcxproj.cache
+**/*.vcxproj.cache
+
 # ignore makefiles
 Makefile
 **/Makefile
