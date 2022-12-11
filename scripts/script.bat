@@ -46,9 +46,14 @@ if exist include\glad\glad.vcxproj rm -r include\glad\glad.vcxproj
 if exist include\glad\glad.vcxproj.filters rm -r include\glad\glad.vcxproj.filters
 if exist include\glad\glad.vcxproj.user rm -r include\glad\glad.vcxproj.user
 
+if exist include\stb_image\stb_image.vcxproj rm -r include\stb_image\stb_image.vcxproj
+if exist include\stb_image\stb_image.vcxproj.filters rm -r include\stb_image\stb_image.vcxproj.filters
+if exist include\stb_image\stb_image.vcxproj.user rm -r include\stb_image\stb_image.vcxproj.user
+
 if exist app\Makefile rm -r app\Makefile
 if exist include\imgui\Makefile rm -r include\imgui\Makefile
 if exist include\glad\Makefile rm -r include\glad\Makefile
+if exist include\stb_image\Makefile rm -r include\stb_image\Makefile
 
 if exist app\bin rm -r app\bin
 if exist app\bin-int rm -r app\bin-int
@@ -56,6 +61,11 @@ if exist include\imgui\bin rm -r include\imgui\bin
 if exist include\imgui\bin-int rm -r include\imgui\bin-int
 if exist include\glad\bin rm -r include\glad\bin
 if exist include\glad\bin-int rm -r include\glad\bin-int
+if exist include\stb_image\bin rm -r include\stb_image\bin
+if exist include\stb_image\bin-int rm -r include\stb_image\bin-int
+
+if exist ./Makefile rm -r ./Makefile
+if exist ./*.sln rm -r ./*.sln
 exit /b
 
 :HELP

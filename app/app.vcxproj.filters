@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="classes">
+      <UniqueIdentifier>{138F8ECB-7F6E-0D67-8886-983DF4E473C8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes\headers">
+      <UniqueIdentifier>{DE98553A-4A24-C3FE-5335-46F3BF3F1FFF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\classes\headers\IndexBuffer.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\Renderer.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\Shader.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\Texture.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\VertexArray.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\VertexBuffer.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\classes\headers\VertexBufferLayout.h">
+      <Filter>classes\headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\classes\IndexBuffer.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\Renderer.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\Shader.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\Texture.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\VertexArray.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\VertexBuffer.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\classes\VertexBufferLayout.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+</Project>

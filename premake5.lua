@@ -6,4 +6,5 @@ startproject "app"
 
 include "include/glad"
 include "include/imgui"
+include "include/stb_image"
 include "app"
