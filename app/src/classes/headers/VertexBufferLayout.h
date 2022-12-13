@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <glad/glad.h>
-#include "Renderer.h"
+#include <stdlib.h>
 
 struct VertexBufferElement
 {
@@ -39,7 +39,7 @@ public:
 	template <typename T>
 	void Push(unsigned int count)
 	{
-		exit(1);
+		std::exit(-1);
 	}
 
 	inline const std::vector<VertexBufferElement> GetElements() const

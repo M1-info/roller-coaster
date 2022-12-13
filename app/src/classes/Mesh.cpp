@@ -41,11 +41,6 @@ void Mesh::SetUp()
     m_Shader->Bind();
 }
 
-void Mesh::Render()
-{
-    glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
-}
-
 void Mesh::Clear()
 {
     m_VAO->Unbind();

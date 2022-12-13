@@ -19,7 +19,6 @@ public:
     ~Mesh();
 
     void SetUp();
-    void Render();
     void Clear();
 
     void SetVertices(float *vertices);

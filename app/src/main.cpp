@@ -1,3 +1,4 @@
+#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
@@ -12,37 +13,17 @@
 
 int main(void)
 {
-    GLFWwindow *window;
-
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    /* Init glad */
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        return -1;
-    }
+    Renderer renderer;
+    renderer.Init();
 
     /* init imgui */
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
-    (void)io;
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    // IMGUI_CHECKVERSION();
+    // ImGui::CreateContext();
+    // ImGuiIO &io = ImGui::GetIO();
+    // (void)io;
+    // ImGui::StyleColorsDark();
+    // ImGui_ImplGlfw_InitForOpenGL(renderer.GetWindow(), true);
+    // ImGui_ImplOpenGL3_Init("#version 460");
 
     std::vector<float> vertices = {
         -0.50, -0.50,  0.50,
@@ -82,39 +63,26 @@ int main(void)
     mesh->GetShader()->SetUniformMat4f("u_view", view);
     mesh->GetShader()->SetUniformMat4f("u_model", model);
 
+    std::vector<Mesh*> meshes;
+    meshes.push_back(mesh);
+
     mesh->Clear();
 
-    Renderer renderer;
+        // ImGui_ImplOpenGL3_NewFrame();
+        // ImGui_ImplGlfw_NewFrame();
+        // ImGui::NewFrame();
 
-    /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
-        renderer.Clear();
+        // ImGui::Begin("Hello, world!");
+        // ImGui::Text("This is some useful text.");
+        // ImGui::End();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    renderer.Render(meshes);
 
-        ImGui::Begin("Hello, world!");
-        ImGui::Text("This is some useful text.");
-        ImGui::End();
+        // ImGui::Render();
+        // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-        renderer.Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-
-        /* Poll for and process events */
-        glfwPollEvents();
-    }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
-
-    glfwTerminate();
+    // ImGui_ImplOpenGL3_Shutdown();
+    // ImGui_ImplGlfw_Shutdown();
+    // ImGui::DestroyContext();
     return 0;
 }
