@@ -1,7 +1,7 @@
 #include "headers/Shader.h"
 #include "headers/Renderer.h"
 
-Shader::Shader(const std::string &filepath) : m_FilePath(filepath), m_RendererID(0)
+Shader::Shader(const std::string &filename) : m_Filename(filename), m_RendererID(0)
 {
     ShaderProgramSource source = ParseShader();
     m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
@@ -25,50 +25,29 @@ void Shader::Unbind() const
 ShaderProgramSource Shader::ParseShader()
 {
     std::string filepath;
-    #if VISUAL_STUDIO
-        filepath = "src/assets/shaders/" + m_FilePath;
-    #elif MINGW
-        filepath ="app\\src\\assets\\shaders\\" + m_FilePath;
-    #endif
-	
-    std::ifstream stream(filepath);
+#if VISUAL_STUDIO
+    filepath = "src/assets/shaders/" + m_Filename;
+#elif MINGW
+    filepath = "app\\src\\assets\\shaders\\" + m_Filename;
+#endif
 
-
-    // check if file is open
-    if (!stream.is_open())
-    {
-        std::cout << "Failed to open file: " << m_FilePath << std::endl;
-        exit(1);
-    }
-
-    enum class ShaderType
-    {
-        NONE = -1,
-        VERTEX = 0,
-        FRAGMENT = 1
-    };
-
-    std::string line;
     std::stringstream ss[2];
-    ShaderType type = ShaderType::NONE;
-    while (getline(stream, line))
+    for (int i = 0; i < 2; i++)
     {
-        if (line.find("#shader") != std::string::npos)
+        std::ifstream stream(filepath + (i == 0 ? ".vert" : ".frag"));
+        if (!stream.is_open())
         {
+            std::cerr << "Failed to open file: " << m_Filename << std::endl;
+            exit(1);
+        }
 
-            if (line.find("vertex") != std::string::npos)
-            {
-                type = ShaderType::VERTEX;
-            }
-            else if (line.find("fragment") != std::string::npos)
-            {
-                type = ShaderType::FRAGMENT;
-            }
-        }
-        else
+        std::string line;
+        while (getline(stream, line))
         {
-            ss[(int)type] << line << "\n";
+            ss[i] << line << "\n";
         }
+
+        stream.close();
     }
 
     return {ss[0].str(), ss[1].str()};

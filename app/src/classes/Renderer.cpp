@@ -2,10 +2,11 @@
 
 void GLClearError()
 {
-	while (glGetError() != GL_NO_ERROR);
+	while (glGetError() != GL_NO_ERROR)
+		;
 }
 
-bool GLLogCall(const char* function, const char* file, int line)
+bool GLLogCall(const char *function, const char *file, int line)
 {
 	while (GLenum error = glGetError())
 	{
@@ -22,10 +23,11 @@ void Renderer::Clear() const
 
 void Renderer::Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader& shader) const
 {
+
 	shader.Bind();
 	vao.Bind();
 	ibo.Bind();
-
 	GLCall(glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr));
-
+	vao.Unbind();
+	ibo.Unbind();
 }

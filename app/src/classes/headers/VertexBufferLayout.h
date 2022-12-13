@@ -36,15 +36,26 @@ private:
 public:
 	VertexBufferLayout() : m_Stride(0){};
 
+	template <typename T>
 	void Push(unsigned int count)
 	{
-		VertexBufferElement element = {GL_FLOAT, count, GL_FALSE};
-		m_Elements.push_back(element);
-		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+		exit(1);
 	}
 
-	inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
+	inline const std::vector<VertexBufferElement> GetElements() const
+	{
+		return m_Elements;
+	}
 	inline unsigned int GetStride() const { return m_Stride; }
 };
+
+template <>
+void VertexBufferLayout::Push<float>(unsigned int count);
+
+template <>
+void VertexBufferLayout::Push<unsigned int>(unsigned int count);
+
+template <>
+void VertexBufferLayout::Push<unsigned char>(unsigned int count);
 
 #endif // VERTEXBUFFERLAYOUT_H

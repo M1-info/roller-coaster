@@ -66,6 +66,8 @@ if exist include\stb_image\bin-int rm -r include\stb_image\bin-int
 
 if exist ./Makefile rm -r ./Makefile
 if exist ./*.sln rm -r ./*.sln
+
+echo Clean complete !
 exit /b
 
 :HELP

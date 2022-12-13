@@ -8,6 +8,7 @@
 #include "classes/headers/VertexArray.h"
 #include "classes/headers/Shader.h"
 #include "classes/headers/Renderer.h"
+#include "classes/headers/Mesh.h"
 
 int main(void)
 {
@@ -41,47 +42,53 @@ int main(void)
     (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 330");
+    ImGui_ImplOpenGL3_Init("#version 460");
 
-    float positions[] = {
-        -50.0f, -50.0f, // 0
-        50.0f, -50.0f,  // 1
-        50.0f, 50.0f,   // 2
-        -50.0f, 50.0f   // 3
+    std::vector<float> vertices = {
+        -0.50, -0.50,  0.50,
+        -0.50,  0.50,  0.50,
+         0.50,  0.50,  0.50,
+         0.50, -0.50,  0.50,
+        -0.50, -0.50, -0.50,
+        -0.50,  0.50, -0.50,
+         0.50,  0.50, -0.50,
+         0.50, -0.50, -0.50,
     };
 
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0};
+    std::vector<unsigned int> indices = {
+         0, 1, 2, 
+         0, 2, 3, 
+         4, 5, 6, 
+         4, 6, 7, 
+         0, 1, 4, 
+         4, 5, 1, 
+         2, 3, 7, 
+         2, 7, 6,
+         1, 2, 6, 
+         1, 6, 5,
+         0, 3, 7, 
+         0, 7, 4,
+    };
 
-    VertexArray vao;
-    VertexBuffer vbo(positions, 4 * 2 * sizeof(float));
-    VertexBufferLayout layout;
-    layout.Push(2);
-    vao.AddBuffer(vbo, layout);
 
-    IndexBuffer ibo(indices, 6);
+    glm::mat4 projection = glm::perspective(45.0f, 960.f / 540.f, 0.1f, 100.f);
+    glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
-    glm::mat4 projection = glm::ortho(0.0f, 960.0f, 0.0f, 540.0f, -1.0f, 1.0f);
-    glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+    Mesh *mesh = new Mesh(vertices.data(), indices.data(), vertices.size() * sizeof(float), indices.size());
+    mesh->AddShader("basic");
+    mesh->SetUp();
+    mesh->GetShader()->SetUniformMat4f("u_projection", projection);
+    mesh->GetShader()->SetUniformMat4f("u_view", view);
+    mesh->GetShader()->SetUniformMat4f("u_model", model);
 
-    Shader shader("basic.shader");
-    shader.Bind();
-    shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-
-    vao.Unbind();
-    ibo.Unbind();
-    vbo.Unbind();
-    shader.Unbind();
-
-    glm::vec3 translation(200, 200, 0);
+    mesh->Clear();
 
     Renderer renderer;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        /* Render here */
         renderer.Clear();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -92,14 +99,7 @@ int main(void)
         ImGui::Text("This is some useful text.");
         ImGui::End();
 
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
-        glm::mat4 mvp = projection * view * model;
-        shader.Bind();
-        shader.SetUniformMat4f("u_MVP", mvp);
-        renderer.Draw(vao, ibo, shader);
-
-        vao.Unbind();
-        ibo.Unbind();
+        renderer.Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
