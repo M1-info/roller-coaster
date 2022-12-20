@@ -55,16 +55,13 @@ int main(void)
     };
 
 
-    glm::mat4 projection = glm::perspective(45.0f, 960.f / 540.f, 0.1f, 100.f);
-    glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-
     Mesh *mesh = new Mesh("Cube", vertices, indices);
     mesh->AddShader("basic");
     mesh->Translate(glm::vec3(-1, 0, 0));
     mesh->SetUp();
     mesh->GetShader()->SetUniform4f("u_color", 1.0, 1.0, 0.0, 1.0);
-    mesh->GetShader()->SetUniformMat4f("u_projection", projection);
-    mesh->GetShader()->SetUniformMat4f("u_view", view);
+    mesh->GetShader()->SetUniformMat4f("u_projection", renderer->GetCamera()->GetProjection());
+    mesh->GetShader()->SetUniformMat4f("u_view", renderer->GetCamera()->GetView());
     mesh->GetShader()->SetUniformMat4f("u_model", mesh->GetMatrix());
     mesh->Clear();
 
@@ -73,8 +70,8 @@ int main(void)
     mesh2->Translate(glm::vec3(1, 0, 0));
     mesh2->SetUp();
     mesh2->GetShader()->SetUniform4f("u_color", 0.0, 1.0, 0.0, 1.0);
-    mesh2->GetShader()->SetUniformMat4f("u_projection", projection);
-    mesh2->GetShader()->SetUniformMat4f("u_view", view);
+    mesh2->GetShader()->SetUniformMat4f("u_projection", renderer->GetCamera()->GetProjection());
+    mesh2->GetShader()->SetUniformMat4f("u_view", renderer->GetCamera()->GetView());
     mesh2->GetShader()->SetUniformMat4f("u_model", mesh2->GetMatrix());
     mesh2->Clear();
 

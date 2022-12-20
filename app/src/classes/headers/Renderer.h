@@ -9,7 +9,9 @@
 #include <vector>
 #include <memory>
 
+#include "Window.h"
 #include "Scene.h"
+#include "Camera.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
@@ -26,13 +28,13 @@ class VertexArray;
 class Renderer
 {
 private:
-	GLFWwindow* m_Window;
-	float m_Width, m_Height;
+	Window* m_Window;
 	Scene* m_Scene;
+	std::shared_ptr<Camera> m_Camera;
 
 public:
 	Renderer() = default;
-	Renderer(Scene *scene, float width, float height);
+	Renderer(Scene *scene);
 	~Renderer();
 
 	void Clear() const;
@@ -42,7 +44,8 @@ public:
 
 	inline void SetScene(Scene *scene) { m_Scene = scene; }
 	inline Scene* GetScene() const { return m_Scene; }
-	inline GLFWwindow* GetWindow() const { return m_Window; }
+	inline std::shared_ptr<Camera> GetCamera() const { return m_Camera; }
+	inline Window* GetWindow() const { return m_Window; }
 };
 
 

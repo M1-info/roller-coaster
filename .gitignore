@@ -1,6 +1,8 @@
 .vs
 .vscode
 
+build
+
 # ignore build folders
 **/bin/
 **/bin-int/
