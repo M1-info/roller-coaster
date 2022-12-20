@@ -30,7 +30,7 @@ Renderer::~Renderer()
 
 void Renderer::Clear() const
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
@@ -71,20 +71,29 @@ void Renderer::Init()
 
 void Renderer::Render() const
 {
+
+	auto *skybox = m_Scene->GetSkybox();
+
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
 		// clear scene
 		Clear();
-
+		
 		// draw scene
 		for (auto mesh : m_Scene->GetObjects())
 		{
 			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+			mesh->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
+			mesh->GetVAO()->Unbind();
+			mesh->GetShader()->Unbind();
 		}
 
 		// draw UI
 		m_UI->Render();
+
+		// draw skybox
+		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
 
 		// Swap front and back buffers
 		glfwSwapBuffers(m_Window->GetWindow());

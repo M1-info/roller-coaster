@@ -8,8 +8,10 @@ Scene::~Scene()
 {
 }
 
-void Scene::init()
+void Scene::Init()
 {
+    m_Skybox = new Skybox();
+    m_Skybox->Init();
 }
 
 void Scene::Add(Mesh *mesh)
@@ -38,4 +40,9 @@ std::vector<Mesh *> Scene::GetObjects() const
 std::map<std::string, Mesh *> Scene::GetObjectsMap() const
 {
     return m_Objects_map;
+}
+
+Skybox *Scene::GetSkybox() const
+{
+    return m_Skybox;
 }

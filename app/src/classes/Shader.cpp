@@ -99,7 +99,7 @@ unsigned int Shader::CompileShader(unsigned int type, const std::string &source)
 void Shader::SetUniform1i(const std::string &name, int value)
 {
     GLint location = GetUniformLocation(name);
-    glUniform1f(location, value);
+    glUniform1i(location, value);
 }
 
 void Shader::SetUniform1f(const std::string &name, float value)

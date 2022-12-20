@@ -63,6 +63,7 @@ int main(void)
     mesh2->Clear();
 
     Scene* scene = new Scene();
+    scene->Init();
     scene->Add(mesh);
     scene->Add(mesh2);
 
