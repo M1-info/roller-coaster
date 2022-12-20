@@ -17,11 +17,6 @@ struct ShaderProgramSource
 
 class Shader
 {
-private:
-	std::string m_Filename;
-	unsigned int m_RendererID;
-	mutable std::unordered_map<std::string, int> m_UniformLocationCache;
-
 public:
 	Shader(const std::string &filepath);
 	~Shader();
@@ -39,6 +34,11 @@ private:
 	ShaderProgramSource ParseShader();
 	unsigned int CompileShader(unsigned int type, const std::string &source);
 	int GetUniformLocation(const std::string &name) const;
+
+private:
+	std::string m_Filename;
+	unsigned int m_RendererID;
+	mutable std::unordered_map<std::string, int> m_UniformLocationCache;
 };
 
 #endif // SHADER_H

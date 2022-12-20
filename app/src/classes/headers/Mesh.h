@@ -13,21 +13,6 @@
 
 class Mesh
 {
-private:
-    std::string m_Name;
-    std::vector<float> m_Vertices;
-    std::vector<unsigned int> m_Indices;
-
-    size_t m_Vertices_size;
-    size_t m_Indices_size;
-
-    VertexArray *m_VAO;
-    VertexBuffer *m_VBO;
-    IndexBuffer *m_IBO;
-    Shader *m_Shader;
-
-    glm::mat4x4 m_Matrix;
-
 public:
     Mesh();
     Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices);
@@ -50,11 +35,26 @@ public:
     std::vector<unsigned int> GetIndices() const;
     glm::mat4 GetMatrix() const;
     Shader *GetShader() const;
+    void AddShader(std::string shader_name);
 
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
     void Scale(glm::vec3 scale);
-    void AddShader(std::string filename);
+
+private:
+    std::string m_Name;
+    std::vector<float> m_Vertices;
+    std::vector<unsigned int> m_Indices;
+
+    size_t m_Vertices_size;
+    size_t m_Indices_size;
+
+    VertexArray *m_VAO;
+    VertexBuffer *m_VBO;
+    IndexBuffer *m_IBO;
+    Shader *m_Shader;
+
+    glm::mat4x4 m_Matrix;
 };
 
 #endif // MESH_H

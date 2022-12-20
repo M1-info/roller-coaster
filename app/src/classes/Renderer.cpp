@@ -47,9 +47,11 @@ void Renderer::Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader
 
 void Renderer::Init()
 {
+	// init window
 	m_Window = new Window();
 	m_Window->Init();
 
+	// init camera
 	float fov = 45.0f;
 	float aspect = (float)m_Window->GetWidth() / (float)m_Window->GetHeight();
 	float near = 0.1f;
@@ -62,6 +64,9 @@ void Renderer::Init()
 	m_Camera->Init(position, target, up);
 
 	m_Window->SetCamera(m_Camera);
+
+	// init UI
+	m_UI = new UI();
 }
 
 void Renderer::Render() const
@@ -77,6 +82,9 @@ void Renderer::Render() const
 			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
 		}
+
+		// draw UI
+		m_UI->Render();
 
 		// Swap front and back buffers
 		glfwSwapBuffers(m_Window->GetWindow());

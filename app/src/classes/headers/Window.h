@@ -12,11 +12,6 @@
 
 class Window
 {
-private:
-    GLFWwindow* m_Window;
-    float m_Width, m_Height;
-    std::shared_ptr<Camera> m_Camera;
-
 public:
     Window() = default;
     Window(float width, float height);
@@ -32,6 +27,11 @@ public:
     inline float GetHeight() const { return m_Height; }
 
     inline void SetCamera(std::shared_ptr<Camera> camera) { m_Camera = camera; }
+
+private:
+    GLFWwindow* m_Window;
+    float m_Width, m_Height;
+    std::shared_ptr<Camera> m_Camera;
 };
 
 #endif // WINDOW_H

@@ -8,22 +8,6 @@
 
 class Camera
 {
-private:
-    float m_Fov;
-    float m_AspectRatio;
-    float m_NearPlane;
-    float m_FarPlane;
-
-    glm::vec3 m_Position;
-    glm::vec3 m_Direction;
-    glm::vec3 m_Target;
-
-    float m_Yaw;
-    float m_Pitch;
-
-    glm::mat4 m_Projection;
-    glm::mat4 m_View;
-
 public:
     Camera() = default;
     Camera(float fov, float aspectRatio, float nearPlane, float farPlane);
@@ -60,6 +44,22 @@ public:
     glm::vec3 Up();
 
     void LookAt(glm::vec3 target);
+
+private:
+    float m_Fov;
+    float m_AspectRatio;
+    float m_NearPlane;
+    float m_FarPlane;
+
+    glm::vec3 m_Position;
+    glm::vec3 m_Direction;
+    glm::vec3 m_Target;
+
+    float m_Yaw;
+    float m_Pitch;
+
+    glm::mat4 m_Projection;
+    glm::mat4 m_View;
 };
 
 #endif // CAMERA_H

@@ -3,10 +3,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_glfw.h>
-#include <imgui/imgui_impl_opengl3.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -18,15 +14,6 @@ int main(void)
 {
     Renderer* renderer = new Renderer();
     renderer->Init();
-
-    /* init imgui */
-    // IMGUI_CHECKVERSION();
-    // ImGui::CreateContext();
-    // ImGuiIO &io = ImGui::GetIO();
-    // (void)io;
-    // ImGui::StyleColorsDark();
-    // ImGui_ImplGlfw_InitForOpenGL(renderer.GetWindow(), true);
-    // ImGui_ImplOpenGL3_Init("#version 460");
 
     std::vector<float> vertices = {
         -0.50, -0.50,  0.50,
@@ -80,23 +67,11 @@ int main(void)
     scene->Add(mesh2);
 
     renderer->SetScene(scene);
-
-
-        // ImGui_ImplOpenGL3_NewFrame();
-        // ImGui_ImplGlfw_NewFrame();
-        // ImGui::NewFrame();
-
-        // ImGui::Begin("Hello, world!");
-        // ImGui::Text("This is some useful text.");
-        // ImGui::End();
+    renderer->GetUI()->SetScene(scene);
+    renderer->GetUI()->SetWindow(renderer->GetWindow());
+    renderer->GetUI()->Init();
 
     renderer->Render();
 
-        // ImGui::Render();
-        // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    // ImGui_ImplOpenGL3_Shutdown();
-    // ImGui_ImplGlfw_Shutdown();
-    // ImGui::DestroyContext();
     return 0;
 }
