@@ -1,20 +1,23 @@
 #include <vector>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "classes/headers/VertexArray.h"
-#include "classes/headers/Shader.h"
+
 #include "classes/headers/Renderer.h"
 #include "classes/headers/Mesh.h"
+#include "classes/headers/Scene.h"
 
 int main(void)
 {
-    Renderer renderer;
-    renderer.Init();
+    Renderer* renderer = new Renderer();
+    renderer->Init();
 
     /* init imgui */
     // IMGUI_CHECKVERSION();
@@ -54,19 +57,33 @@ int main(void)
 
     glm::mat4 projection = glm::perspective(45.0f, 960.f / 540.f, 0.1f, 100.f);
     glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 
-    Mesh *mesh = new Mesh(vertices.data(), indices.data(), vertices.size() * sizeof(float), indices.size());
+    Mesh *mesh = new Mesh("Cube", vertices, indices);
     mesh->AddShader("basic");
+    mesh->Translate(glm::vec3(-1, 0, 0));
     mesh->SetUp();
+    mesh->GetShader()->SetUniform4f("u_color", 1.0, 1.0, 0.0, 1.0);
     mesh->GetShader()->SetUniformMat4f("u_projection", projection);
     mesh->GetShader()->SetUniformMat4f("u_view", view);
-    mesh->GetShader()->SetUniformMat4f("u_model", model);
-
-    std::vector<Mesh*> meshes;
-    meshes.push_back(mesh);
-
+    mesh->GetShader()->SetUniformMat4f("u_model", mesh->GetMatrix());
     mesh->Clear();
+
+    Mesh *mesh2 = new Mesh("Cube2", vertices, indices);
+    mesh2->AddShader("basic");
+    mesh2->Translate(glm::vec3(1, 0, 0));
+    mesh2->SetUp();
+    mesh2->GetShader()->SetUniform4f("u_color", 0.0, 1.0, 0.0, 1.0);
+    mesh2->GetShader()->SetUniformMat4f("u_projection", projection);
+    mesh2->GetShader()->SetUniformMat4f("u_view", view);
+    mesh2->GetShader()->SetUniformMat4f("u_model", mesh2->GetMatrix());
+    mesh2->Clear();
+
+    Scene* scene = new Scene();
+    scene->Add(mesh);
+    scene->Add(mesh2);
+
+    renderer->SetScene(scene);
+
 
         // ImGui_ImplOpenGL3_NewFrame();
         // ImGui_ImplGlfw_NewFrame();
@@ -76,7 +93,7 @@ int main(void)
         // ImGui::Text("This is some useful text.");
         // ImGui::End();
 
-    renderer.Render(meshes);
+    renderer->Render();
 
         // ImGui::Render();
         // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

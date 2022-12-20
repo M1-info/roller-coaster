@@ -1,16 +1,26 @@
 #include "headers/Mesh.h"
 
 Mesh::Mesh()
-    : m_Vertices(nullptr), m_Indices(nullptr), m_VAO(nullptr), m_VBO(nullptr), m_IBO(nullptr), m_Shader(nullptr), m_Matrix(glm::mat4(1.0f))
+    : m_Vertices(), m_Indices(), m_VAO(nullptr), m_VBO(nullptr), m_IBO(nullptr),
+      m_Shader(nullptr), m_Matrix(glm::mat4(1.0f))
 {
+    // unique name
+    m_Name = std::to_string(rand());
 }
 
-Mesh::Mesh(float *vertices, unsigned int *indices, const unsigned int vertices_size, const unsigned int indices_size)
+Mesh::Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices)
+    : m_Matrix(glm::mat4(1.0f))
 {
+
+    m_Name = name;
+
     m_Vertices = vertices;
     m_Indices = indices;
+    m_Vertices_size = m_Vertices.size() * sizeof(float);
+    m_Indices_size = m_Indices.size() * sizeof(unsigned int);
+
     m_VAO = new VertexArray();
-    m_VBO = new VertexBuffer(m_Vertices, vertices_size);
+    m_VBO = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
 
     // create vertex buffer layout
     VertexBufferLayout layout;
@@ -19,15 +29,16 @@ Mesh::Mesh(float *vertices, unsigned int *indices, const unsigned int vertices_s
     // add vertex buffer layout to vertex array
     m_VAO->AddBuffer(*m_VBO, layout);
 
-    m_IBO = new IndexBuffer(m_Indices, indices_size); 
+    m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
 
     Clear();
 }
 
 Mesh::~Mesh()
 {
-    delete m_Vertices;
-    delete m_Indices;
+    m_Vertices.clear();
+    m_Indices.clear();
+
     delete m_VAO;
     delete m_VBO;
     delete m_IBO;
@@ -49,14 +60,19 @@ void Mesh::Clear()
     m_Shader->Unbind();
 }
 
-void Mesh::SetVertices(float *vertices)
+void Mesh::SetName(std::string name)
 {
-    m_Vertices = &vertices[0];
+    m_Name = name;
 }
 
-void Mesh::SetIndices(unsigned int *indices)
+void Mesh::SetVertices(std::vector<float> vertices)
 {
-    m_Indices = &indices[0];
+    m_Vertices = vertices;
+}
+
+void Mesh::SetIndices(std::vector<unsigned int> indices)
+{
+    m_Indices = indices;
 }
 
 void Mesh::SetMatrix(glm::mat4x4 matrix)
@@ -67,6 +83,11 @@ void Mesh::SetMatrix(glm::mat4x4 matrix)
 void Mesh::SetShader(Shader *shader)
 {
     m_Shader = shader;
+}
+
+std::string Mesh::GetName() const
+{
+    return m_Name;
 }
 
 VertexArray *Mesh::GetVAO() const
@@ -84,17 +105,17 @@ IndexBuffer *Mesh::GetIBO() const
     return m_IBO;
 }
 
-float *Mesh::GetVertices() const
+std::vector<float> Mesh::GetVertices() const
 {
     return m_Vertices;
 }
 
-unsigned int *Mesh::GetIndices() const
+std::vector<unsigned int> Mesh::GetIndices() const
 {
     return m_Indices;
 }
 
-glm::mat4x4 Mesh::GetMatrix() const
+glm::mat4 Mesh::GetMatrix() const
 {
     return m_Matrix;
 }

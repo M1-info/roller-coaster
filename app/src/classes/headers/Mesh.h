@@ -13,35 +13,13 @@
 
 class Mesh
 {
-public:
-    Mesh();
-    Mesh(float *vertices, unsigned int *indices, const unsigned int vertices_size, const unsigned int indices_size);
-    ~Mesh();
-
-    void SetUp();
-    void Clear();
-
-    void SetVertices(float *vertices);
-    void SetIndices(unsigned int *indices);
-    void SetMatrix(glm::mat4x4 matrix);
-    void SetShader(Shader *shader);
-
-    VertexArray *GetVAO() const;
-    VertexBuffer *GetVBO() const;
-    IndexBuffer *GetIBO() const;
-    float *GetVertices() const;
-    unsigned int *GetIndices() const;
-    glm::mat4x4 GetMatrix() const;
-    Shader *GetShader() const;
-
-    void Translate(glm::vec3 translation);
-    void Rotate(GLfloat angle, glm::vec3 axis);
-    void Scale(glm::vec3 scale);
-    void AddShader(std::string filename);
-
 private:
-    float *m_Vertices;
-    unsigned int *m_Indices;
+    std::string m_Name;
+    std::vector<float> m_Vertices;
+    std::vector<unsigned int> m_Indices;
+
+    size_t m_Vertices_size;
+    size_t m_Indices_size;
 
     VertexArray *m_VAO;
     VertexBuffer *m_VBO;
@@ -49,6 +27,34 @@ private:
     Shader *m_Shader;
 
     glm::mat4x4 m_Matrix;
+
+public:
+    Mesh();
+    Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices);
+    ~Mesh();
+
+    void SetUp();
+    void Clear();
+
+    void SetName(std::string name);
+    void SetVertices(std::vector<float> vertices);
+    void SetIndices(std::vector<unsigned int> indices);
+    void SetMatrix(glm::mat4 matrix);
+    void SetShader(Shader *shader);
+
+    std::string GetName() const;
+    VertexArray *GetVAO() const;
+    VertexBuffer *GetVBO() const;
+    IndexBuffer *GetIBO() const;
+    std::vector<float> GetVertices() const;
+    std::vector<unsigned int> GetIndices() const;
+    glm::mat4 GetMatrix() const;
+    Shader *GetShader() const;
+
+    void Translate(glm::vec3 translation);
+    void Rotate(GLfloat angle, glm::vec3 axis);
+    void Scale(glm::vec3 scale);
+    void AddShader(std::string filename);
 };
 
 #endif // MESH_H

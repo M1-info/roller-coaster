@@ -16,7 +16,8 @@ bool GLLogCall(const char *function, const char *file, int line)
 	return true;
 }
 
-Renderer::Renderer(float width, float height): m_Width(width), m_Height(height), m_Window(nullptr)
+Renderer::Renderer(Scene *scene, float width, float height)
+:m_Scene(scene), m_Width(width), m_Height(height), m_Window(nullptr)
 {
 }
 
@@ -76,22 +77,23 @@ void Renderer::Init()
 	GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 }
 
-void Renderer::Render(std::vector<Mesh*> &meshes) const
+void Renderer::Render() const
 {
 	while (!glfwWindowShouldClose(m_Window))
 	{
-		/* Render here */
+		// clear scene
 		Clear();
 
-		for (auto mesh : meshes)
+		// draw scene
+		for (auto mesh : m_Scene->GetObjects())
 		{
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
 		}
 
-		/* Swap front and back buffers */
+		// Swap front and back buffers
 		glfwSwapBuffers(m_Window);
 
-		/* Poll for and process events */
+		// Poll for and process events
 		glfwPollEvents();
 	}
 }
