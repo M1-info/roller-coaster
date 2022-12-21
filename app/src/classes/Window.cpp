@@ -2,7 +2,7 @@
 
 
 Window::Window(float width, float height) 
-: m_Width(width), m_Height(height), m_Camera(nullptr), m_Window(nullptr), m_IsMousePressed(0), m_MouseSensitivity(0.1f)
+: m_Width(width), m_Height(height), m_Camera(nullptr), m_Window(nullptr), m_IsMousePressed(0)
 {
 }
 
@@ -27,9 +27,6 @@ void Window::Init()
         m_Height = mode->height;
     }
 
-    if(m_MouseSensitivity == 0.0f)
-        m_MouseSensitivity = 0.01f;
-
     /* Create a windowed mode window and its OpenGL context */
     m_Window = glfwCreateWindow(m_Width, m_Height, "Roaller Coaster", NULL, NULL);
     if (!m_Window)
@@ -47,7 +44,7 @@ void Window::Init()
 
     // set resize callback with user pointer
     glfwSetWindowSizeCallback(m_Window, OnResize);
-    glfwSetScrollCallback(m_Window, OnMouseScroll);
+    // glfwSetScrollCallback(m_Window, OnMouseScroll);
     glfwSetCursorPosCallback(m_Window, OnMouseMove);
     glfwSetMouseButtonCallback(m_Window, OnMouseClick);
     glfwSetKeyCallback(m_Window, OnKeyPress);
@@ -95,25 +92,19 @@ void Window::OnMouseMove(GLFWwindow* window, double xpos, double ypos)
 {
     Window* win = (Window*)glfwGetWindowUserPointer(window);
 
+    float x = static_cast<float>(xpos);
+    float y = static_cast<float>(ypos);
+
+    float offsetX = x - win->GetCamera()->GetLastX();
+    float offsetY = win->GetCamera()->GetLastY() - y;
+
+    win->GetCamera()->SetLastX(x);
+    win->GetCamera()->SetLastY(y);    
+
     if(!win->GetIsMousePressed())
         return;
 
-    float x = static_cast<float>(xpos);
-    float y = static_cast<float>(ypos);
-        
-
-    xpos *= win->m_MouseSensitivity;
-    ypos *= win->m_MouseSensitivity;
-
-    float yaw = win->GetCamera()->GetYaw() + xpos;
-    float pitch = win->GetCamera()->GetPitch() + ypos;
-
-    pitch = std::clamp(pitch, -89.0f, 89.0f);
-
-    win->GetCamera()->SetYaw(yaw);
-    win->GetCamera()->SetPitch(pitch);
-
-    win->GetCamera()->Update();
+    win->GetCamera()->OnMouseMove(offsetX, offsetY);
 }
 
 void Window::OnMouseClick(GLFWwindow* window, int button, int action, int mods)

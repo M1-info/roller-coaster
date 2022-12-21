@@ -91,6 +91,8 @@ void Skybox::SetupCubeMap()
 
 void Skybox::Draw(glm::mat4 projection, glm::mat4 view)
 {
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
     glDepthFunc(GL_LEQUAL);
     m_Shader->Bind();
     m_VAO->Bind();
@@ -100,6 +102,8 @@ void Skybox::Draw(glm::mat4 projection, glm::mat4 view)
     m_Shader->Unbind();
     m_VAO->Unbind();
     m_Texture->Unbind();
-    glDepthFunc(GL_LESS); 
+    glDepthFunc(GL_LESS);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
 }
 

@@ -2,7 +2,8 @@
 #include <iostream>
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
-    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane), m_MoveSpeed(2.5f)
+    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane), 
+    m_MoveSpeed(2.5f), m_MoveSensitivity(0.1f)
 {
 
     if(m_Fov == 0.0f)
@@ -57,10 +58,6 @@ glm::mat4 Camera::GetOrientation()
 
 void Camera::Update()
 {
-    // m_Front = glm::normalize(m_Target - m_Position);
-    // m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
-    // m_Up = glm::normalize(glm::cross(m_Right, m_Front));
-
     m_Front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
     m_Front.y = sin(glm::radians(m_Pitch));
     m_Front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
@@ -70,6 +67,19 @@ void Camera::Update()
     m_Up = glm::normalize(glm::cross(m_Right, m_Front));
 
     m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
+}
+
+void Camera::OnMouseMove(float x, float y)
+{
+    x *= m_MoveSensitivity;
+    y *= m_MoveSensitivity;
+
+    m_Yaw += x;
+    m_Pitch += y;
+
+    std::clamp(m_Pitch, -89.0f, 89.0f);
+
+    Update();
 }
 
 void Camera::Move(CameraMovement direction, float deltaTime)

@@ -5,6 +5,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <algorithm> 
 
 enum class CameraMovement
 {
@@ -39,6 +40,10 @@ public:
     inline float GetYaw() const { return m_Yaw; };
     inline float GetPitch() const { return m_Pitch; };
 
+    inline float GetLastX() const { return m_lastX; };
+    inline float GetLastY() const { return m_lastY; };
+
+    inline float GetMoveSensitivity() const { return m_MoveSensitivity; };
     inline float GetMoveSpeed() const { return m_MoveSpeed; };
     inline CameraMovement GetCurrentMouvementDirection() const { return m_CurrentMouvementDirection; };
 
@@ -61,6 +66,10 @@ public:
     inline void SetYaw(float yaw) { m_Yaw = yaw; };
     inline void SetPitch(float pitch) { m_Pitch = pitch; };
 
+    inline void SetLastX(float lastX) { m_lastX = lastX; };
+    inline void SetLastY(float lastY) { m_lastY = lastY; };
+
+    inline void SetMoveSensitivity(float moveSensitivity) { m_MoveSensitivity = moveSensitivity; };
     inline void SetMoveSpeed(float moveSpeed) { m_MoveSpeed = moveSpeed; };
     inline void SetCurrentMovementDirection(CameraMovement direction) { m_CurrentMouvementDirection = direction; };
 
@@ -69,6 +78,8 @@ public:
     inline void SetUp(glm::vec3 up) { m_Up = up; };
 
     glm::mat4 GetOrientation();
+
+    void OnMouseMove(float x, float y);
 
     void LookAt(glm::vec3 target);
     void Move(CameraMovement direction, float deltaTime);
@@ -86,12 +97,13 @@ private:
 
     float m_Yaw;
     float m_Pitch;
-    float m_MoveSpeed;
 
     float m_lastX;
     float m_lastY;
 
+    float m_MoveSensitivity;
     CameraMovement m_CurrentMouvementDirection;
+    float m_MoveSpeed;
 
     glm::vec3 m_Front;
     glm::vec3 m_Right;

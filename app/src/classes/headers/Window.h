@@ -21,19 +21,19 @@ public:
     Window() = default;
     Window(float width, float height);
     ~Window();
-
+    
     void Init();
     void Destroy() const;
 
+    // getters
     inline GLFWwindow* GetWindow() const { return m_Window; }
     inline std::shared_ptr<Camera> GetCamera() const { return m_Camera; }
     inline float GetWidth() const { return m_Width; }
     inline float GetHeight() const { return m_Height; }
-    inline float GetMouseSensitivity() const { return m_MouseSensitivity; }
     inline float GetIsMousePressed() const { return m_IsMousePressed; }
 
+    // setters
     inline void SetCamera(std::shared_ptr<Camera> camera) { m_Camera = camera; }
-
 
     // events callbacks
     static void OnResize(GLFWwindow* window, int width, int height);
@@ -48,7 +48,6 @@ private:
     std::shared_ptr<Camera> m_Camera;
 
     bool m_IsMousePressed;
-    float m_MouseSensitivity;
 };
 
 #endif // WINDOW_H
