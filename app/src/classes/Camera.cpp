@@ -1,7 +1,8 @@
 #include "headers/Camera.h"
+#include <iostream>
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
-    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane)
+    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane), m_MoveSpeed(2.5f)
 {
 
     if(m_Fov == 0.0f)
@@ -19,6 +20,11 @@ Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
     m_Yaw = -90.0f;
     m_Pitch = 0.0f;
 
+    m_Front = glm::vec3(0.0f, 0.0f, -1.0f);
+    m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
+    m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
+    m_WorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
     m_Projection = glm::perspective(m_Fov, m_AspectRatio, m_NearPlane, m_FarPlane);
 }
 
@@ -30,16 +36,15 @@ void Camera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up)
 {
     m_Position = position;
     m_Target = target;
-    m_Direction = glm::normalize(m_Position - m_Target);
+    m_Up = up;
 
-    m_View = glm::lookAt(m_Position, m_Target, up);
+    m_View = glm::lookAt(m_Position, m_Target, m_Up);
 }
 
 void Camera::LookAt(glm::vec3 target)
 {
     m_Target = target;
-    m_Direction = glm::normalize(m_Position - m_Target);
-    m_View = glm::lookAt(m_Position, m_Target, glm::vec3(0.0f, 1.0f, 0.0f));
+    m_View = glm::lookAt(m_Position, m_Target, m_Up);
 }
 
 glm::mat4 Camera::GetOrientation()
@@ -50,22 +55,41 @@ glm::mat4 Camera::GetOrientation()
     return orientation;
 }
 
-glm::vec3 Camera::Forward()
+void Camera::Update()
 {
-    glm::vec4 forward = glm::inverse(GetOrientation()) * glm::vec4(0,0,-1,1);
-    return glm::vec3(forward);
+    m_Front = glm::normalize(m_Target - m_Position);
+    m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
+    m_Up = glm::normalize(glm::cross(m_Right, m_Front));
+
+    m_View = glm::lookAt(m_Position, m_Target, m_Up);
 }
 
-glm::vec3 Camera::Right()
+void Camera::Move(CameraMovement direction, float deltaTime)
 {
-    glm::vec4 right = glm::inverse(GetOrientation()) * glm::vec4(1,0,0,1);
-    return glm::vec3(right);
+    float velocity = m_MoveSpeed * deltaTime;
+    
+    std::cout << "Velocity: " << velocity << std::endl;
+
+    if(direction == CameraMovement::FORWARD)
+        m_Position += m_Front * velocity;
+    if(direction == CameraMovement::BACKWARD)
+        m_Position -= m_Front * velocity;
+    if(direction == CameraMovement::LEFT)
+        m_Position -= m_Right * velocity;
+    if(direction == CameraMovement::RIGHT)
+        m_Position += m_Right * velocity;
+
+    Update();
 }
 
-glm::vec3 Camera::Up()
+
+void Camera::Render(float deltaTime)
 {
-    glm::vec4 up = glm::inverse(GetOrientation()) * glm::vec4(0,1,0,1);
-    return glm::vec3(up);
+    if(m_CurrentMouvementDirection == CameraMovement::NOMOVE)
+        return;
+
+    Move(m_CurrentMouvementDirection, deltaTime);
 }
+
 
 

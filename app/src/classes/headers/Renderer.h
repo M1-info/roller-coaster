@@ -44,6 +44,7 @@ public:
 	inline Window* GetWindow() const { return m_Window; }
 	inline UI* GetUI() const { return m_UI; }
 
+
 private:
 	Window* m_Window;
 	Scene* m_Scene;

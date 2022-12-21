@@ -73,27 +73,40 @@ void Renderer::Render() const
 {
 
 	auto *skybox = m_Scene->GetSkybox();
+	skybox->GetShader()->Bind();
+	skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+    skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
+    skybox->GetShader()->SetUniform1i("u_texture", 0);
+	skybox->GetShader()->Unbind();
+
+	float lastTime = 0.0f;
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
+		float currentTime = glfwGetTime();
+		float deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+
+		// update camera
+		m_Camera->Render(deltaTime);
+
 		// clear scene
 		Clear();
+
+		// draw skybox
+		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
 		
 		// draw scene
 		for (auto mesh : m_Scene->GetObjects())
 		{
+			mesh->GetShader()->Bind();
 			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 			mesh->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
-			mesh->GetVAO()->Unbind();
-			mesh->GetShader()->Unbind();
 		}
 
 		// draw UI
 		m_UI->Render();
-
-		// draw skybox
-		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
 
 		// Swap front and back buffers
 		glfwSwapBuffers(m_Window->GetWindow());

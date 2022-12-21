@@ -20,10 +20,11 @@ void Scene::Add(Mesh *mesh)
     m_Objects_map[mesh->GetName()] = mesh;
 }
 
-void Scene::Pop(Mesh *mesh)
+void Scene::Pop()
 {
-    m_Objects.pop_back();
-    m_Objects_map.erase(mesh->GetName());
+    // !TODO: Fix this
+    // m_Objects.pop_back();
+    // m_Objects_map.erase(mesh->GetName());
 }
 
 void Scene::Clear()

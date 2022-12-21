@@ -17,7 +17,7 @@ public:
 
     void Init();
     void Add(Mesh *mesh);
-    void Pop(Mesh *mesh);
+    void Pop();
     void Clear();
 
     std::vector<Mesh *> GetObjects() const;

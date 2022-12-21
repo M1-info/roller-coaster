@@ -54,6 +54,8 @@ void UI::Render() const
 
     // frame rate window
     FrameRate(viewport);
+
+    // scene infos window
     SceneInfo(viewport);
     
     ImGui::End();
@@ -65,12 +67,8 @@ void UI::Render() const
 void UI::FrameRate(ImGuiViewport* viewport) const
 {
 
-    // set position and size
-    ImGui::SetNextWindowPos(ImVec2(viewport->Size.x - 200, 0));
-
-
     ImGui::Begin("Frame Rate", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
-    ImGui::Text("Frame Rate: %.1f FPS", ImGui::GetIO().Framerate);
+        ImGui::Text("Frame Rate: %.1f FPS", ImGui::GetIO().Framerate);
     ImGui::End();
 }
 

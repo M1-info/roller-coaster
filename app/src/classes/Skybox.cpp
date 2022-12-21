@@ -89,13 +89,10 @@ void Skybox::SetupCubeMap()
     m_Texture = new CubeTexture(faces);   
 }
 
-void Skybox::Draw(const glm::mat4 projection, const glm::mat4 view)
+void Skybox::Draw(glm::mat4 projection, glm::mat4 view)
 {
     glDepthFunc(GL_LEQUAL);
     m_Shader->Bind();
-    m_Shader->SetUniformMat4f("u_projection", projection);
-    m_Shader->SetUniformMat4f("u_view", glm::mat4(glm::mat3(view)));
-    m_Shader->SetUniform1i("u_texture", 0);
     m_VAO->Bind();
     glActiveTexture(GL_TEXTURE0);
     m_Texture->Bind();
