@@ -88,6 +88,9 @@ private:
     float m_Pitch;
     float m_MoveSpeed;
 
+    float m_lastX;
+    float m_lastY;
+
     CameraMovement m_CurrentMouvementDirection;
 
     glm::vec3 m_Front;

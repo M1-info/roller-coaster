@@ -43,6 +43,7 @@ void Renderer::Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader
 	GLCall(glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr));
 	vao.Unbind();
 	ibo.Unbind();
+	shader.Unbind();
 }
 
 void Renderer::Init()
@@ -94,6 +95,9 @@ void Renderer::Render() const
 		Clear();
 
 		// draw skybox
+		skybox->GetShader()->Bind();
+ 		skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
+		skybox->GetShader()->Unbind();
 		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
 		
 		// draw scene

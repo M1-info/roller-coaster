@@ -38,13 +38,13 @@ void Camera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up)
     m_Target = target;
     m_Up = up;
 
-    m_View = glm::lookAt(m_Position, m_Target, m_Up);
+    Update();
 }
 
 void Camera::LookAt(glm::vec3 target)
 {
     m_Target = target;
-    m_View = glm::lookAt(m_Position, m_Target, m_Up);
+    Update();
 }
 
 glm::mat4 Camera::GetOrientation()
@@ -57,29 +57,47 @@ glm::mat4 Camera::GetOrientation()
 
 void Camera::Update()
 {
-    m_Front = glm::normalize(m_Target - m_Position);
+    // m_Front = glm::normalize(m_Target - m_Position);
+    // m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
+    // m_Up = glm::normalize(glm::cross(m_Right, m_Front));
+
+    m_Front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+    m_Front.y = sin(glm::radians(m_Pitch));
+    m_Front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+
     m_Right = glm::normalize(glm::cross(m_Front, m_WorldUp));
+
     m_Up = glm::normalize(glm::cross(m_Right, m_Front));
 
-    m_View = glm::lookAt(m_Position, m_Target, m_Up);
+    m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
 void Camera::Move(CameraMovement direction, float deltaTime)
 {
     float velocity = m_MoveSpeed * deltaTime;
-    
-    std::cout << "Velocity: " << velocity << std::endl;
 
-    if(direction == CameraMovement::FORWARD)
+    if(direction == CameraMovement::FORWARD){
         m_Position += m_Front * velocity;
-    if(direction == CameraMovement::BACKWARD)
-        m_Position -= m_Front * velocity;
-    if(direction == CameraMovement::LEFT)
-        m_Position -= m_Right * velocity;
-    if(direction == CameraMovement::RIGHT)
-        m_Position += m_Right * velocity;
+        Update();
+        return;
+    }
 
-    Update();
+    if(direction == CameraMovement::BACKWARD){
+        m_Position -= m_Front * velocity;
+        Update();
+        return;
+    }
+
+    if(direction == CameraMovement::LEFT){
+        m_Position -= m_Right * velocity;
+        Update();
+        return;
+    }
+
+    if(direction == CameraMovement::RIGHT){
+        m_Position += m_Right * velocity;
+        Update();
+    }
 }
 
 

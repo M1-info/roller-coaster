@@ -42,7 +42,7 @@ int main(void)
     };
 
 
-    Mesh *mesh = new Mesh("Cube", vertices, indices);
+    Mesh *mesh = new Mesh("Cube yellow", vertices, indices);
     mesh->AddShader("basic");
     mesh->Translate(glm::vec3(-1, 0, 0));
     mesh->SetUp();
@@ -52,7 +52,7 @@ int main(void)
     mesh->GetShader()->SetUniformMat4f("u_model", mesh->GetMatrix());
     mesh->Clear();
 
-    Mesh *mesh2 = new Mesh("Cube2", vertices, indices);
+    Mesh *mesh2 = new Mesh("Cube vert", vertices, indices);
     mesh2->AddShader("basic");
     mesh2->Translate(glm::vec3(1, 0, 0));
     mesh2->SetUp();
@@ -62,10 +62,22 @@ int main(void)
     mesh2->GetShader()->SetUniformMat4f("u_model", mesh2->GetMatrix());
     mesh2->Clear();
 
+
+    Mesh *mesh3 = new Mesh("Cube Blue", vertices, indices);
+    mesh3->AddShader("basic");
+    mesh3->Translate(glm::vec3(1, 0, 2));
+    mesh3->SetUp();
+    mesh3->GetShader()->SetUniform4f("u_color", 0.0, 0.0, 1.0, 1.0);
+    mesh3->GetShader()->SetUniformMat4f("u_projection", renderer->GetCamera()->GetProjection());
+    mesh3->GetShader()->SetUniformMat4f("u_view", renderer->GetCamera()->GetView());
+    mesh3->GetShader()->SetUniformMat4f("u_model", mesh3->GetMatrix());
+    mesh3->Clear();
+
     Scene* scene = new Scene();
     scene->Init();
     scene->Add(mesh);
     scene->Add(mesh2);
+    scene->Add(mesh3);
 
     renderer->SetScene(scene);
     renderer->GetUI()->SetScene(scene);

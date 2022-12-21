@@ -13,7 +13,7 @@ Window::~Window()
 
 void Window::Init()
 {
-    	/* Initialize the library */
+    /* Initialize the library */
     if (!glfwInit()){
 		std::cerr << "Failed to initialize GLFW" << std::endl;
         exit(-1);
@@ -95,35 +95,25 @@ void Window::OnMouseMove(GLFWwindow* window, double xpos, double ypos)
 {
     Window* win = (Window*)glfwGetWindowUserPointer(window);
 
-    if (win->GetIsMousePressed())
-    {;
-        xpos *= win->m_MouseSensitivity;
-        ypos *= win->m_MouseSensitivity;
+    if(!win->GetIsMousePressed())
+        return;
 
-        float yaw = win->GetCamera()->GetYaw() + xpos;
-        float pitch = win->GetCamera()->GetPitch() + ypos;
+    float x = static_cast<float>(xpos);
+    float y = static_cast<float>(ypos);
+        
 
-        pitch = std::clamp(pitch, -89.0f, 89.0f);
+    xpos *= win->m_MouseSensitivity;
+    ypos *= win->m_MouseSensitivity;
 
-        win->GetCamera()->SetYaw(yaw);
-        win->GetCamera()->SetPitch(pitch);
+    float yaw = win->GetCamera()->GetYaw() + xpos;
+    float pitch = win->GetCamera()->GetPitch() + ypos;
 
-        glm::vec3 front;
-        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        front.y = sin(glm::radians(pitch));
-        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        win->GetCamera()->SetFront(glm::normalize(front));
+    pitch = std::clamp(pitch, -89.0f, 89.0f);
 
-        glm::vec3 right = glm::normalize(glm::cross(front, win->GetCamera()->GetWorldUp()));
-        win->GetCamera()->SetRight(right);
+    win->GetCamera()->SetYaw(yaw);
+    win->GetCamera()->SetPitch(pitch);
 
-        glm::vec3 up = glm::normalize(glm::cross(right, front));
-        win->GetCamera()->SetUp(up);
-
-        win->GetCamera()->SetView(glm::lookAt(win->GetCamera()->GetPosition(), 
-                                              win->GetCamera()->GetPosition() + front, 
-                                              up));
-    }
+    win->GetCamera()->Update();
 }
 
 void Window::OnMouseClick(GLFWwindow* window, int button, int action, int mods)
@@ -147,7 +137,6 @@ void Window::OnMouseScroll(GLFWwindow* window, double xoffset, double yoffset)
     float fov = win->GetCamera()->GetFov() + yoffset;
 
     fov = std::clamp(fov, 1.0f, 45.0f);
-    std::cout << fov << std::endl;
 
     win->m_Camera->SetFov(fov);
     float aspect = win->GetCamera()->GetAspectRatio();

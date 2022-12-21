@@ -47,7 +47,7 @@ private:
     float m_Width, m_Height;
     std::shared_ptr<Camera> m_Camera;
 
-    unsigned int m_IsMousePressed;
+    bool m_IsMousePressed;
     float m_MouseSensitivity;
 };
 
