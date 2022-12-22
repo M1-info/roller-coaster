@@ -43,7 +43,7 @@ int main(void)
 
     Mesh *mesh = new Mesh("Cube yellow", vertices, indices);
     mesh->AddShader("basic");
-    mesh->Translate(glm::vec3(-1, 0, 0));
+    mesh->Translate(glm::vec3(1, 0, 0));
     mesh->SetUp();
     mesh->GetShader()->SetUniform4f("u_color", 1.0, 1.0, 0.0, 1.0);
     mesh->GetShader()->SetUniformMat4f("u_projection", renderer->GetCamera()->GetProjection());
@@ -53,7 +53,7 @@ int main(void)
 
     // Mesh *mesh2 = new Mesh("Cube vert", vertices, indices);
     // mesh2->AddShader("basic");
-    // mesh2->Translate(glm::vec3(1, 0, 0));
+    //mesh2->Translate(glm::vec3(-1, 0, 0));
     // mesh2->SetUp();
     // mesh2->GetShader()->SetUniform4f("u_color", 0.0, 1.0, 0.0, 1.0);
     // mesh2->GetShader()->SetUniformMat4f("u_projection", renderer->GetCamera()->GetProjection());

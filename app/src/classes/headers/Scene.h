@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <algorithm>
+#include <memory>
 
 #include "Skybox.h"
 #include "Mesh.h"
@@ -17,17 +19,17 @@ public:
 
     void Init();
     void Add(Mesh *mesh);
-    void Pop();
+    void Remove(std::shared_ptr<Mesh> mesh);
     void Clear();
 
-    std::vector<Mesh *> GetObjects() const;
-    std::map<std::string, Mesh *> GetObjectsMap() const;
+    std::vector<std::shared_ptr<Mesh>> GetObjects() const;
+    std::map<std::string, std::shared_ptr<Mesh>> GetObjectsMap() const;
     Skybox *GetSkybox() const;
 
 private:
     Skybox *m_Skybox;
-    std::vector<Mesh *> m_Objects;
-    std::map<std::string, Mesh *> m_Objects_map;
+    std::vector<std::shared_ptr<Mesh>> m_Objects;
+    std::map<std::string, std::shared_ptr<Mesh>> m_Objects_map;
 };
 
 #endif // SCENE_H

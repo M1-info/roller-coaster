@@ -12,48 +12,47 @@ void Skybox::Init()
 {
 
     std::vector<float> vertices = {
-        -1.0f,  1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, 1.0f,
         -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
 
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
 
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        -1.0f, -1.0f, 1.0f,
 
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
+        -1.0f, 1.0f, -1.0f,
+        1.0f, 1.0f, -1.0f,
+        1.0f, 1.0f, 1.0f,
+        1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, -1.0f,
 
         -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-    };
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, -1.0f,
+        1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f};
 
     m_VAO = new VertexArray();
     m_VBO = new VertexBuffer(vertices.data(), vertices.size() * sizeof(float));
@@ -76,7 +75,7 @@ void Skybox::SetupCubeMap()
 #elif MINGW
     filepath = "app\\src\\assets\\images\\skybox\\";
 #endif
-    
+
     std::vector<std::string> faces = {
         filepath + "right.jpg",
         filepath + "left.jpg",
@@ -86,14 +85,13 @@ void Skybox::SetupCubeMap()
         filepath + "front.jpg",
     };
 
-    m_Texture = new CubeTexture(faces);   
+    m_Texture = new CubeTexture(faces);
 }
 
 void Skybox::Draw(glm::mat4 projection, glm::mat4 view)
 {
     glDisable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
-    glDepthFunc(GL_LEQUAL);
     m_Shader->Bind();
     m_VAO->Bind();
     glActiveTexture(GL_TEXTURE0);
@@ -102,8 +100,6 @@ void Skybox::Draw(glm::mat4 projection, glm::mat4 view)
     m_Shader->Unbind();
     m_VAO->Unbind();
     m_Texture->Unbind();
-    glDepthFunc(GL_LESS);
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 }
-

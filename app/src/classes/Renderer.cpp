@@ -17,7 +17,7 @@ bool GLLogCall(const char *function, const char *file, int line)
 }
 
 Renderer::Renderer(Scene *scene)
-:m_Scene(scene), m_Window(nullptr)
+	: m_Scene(scene), m_Window(nullptr)
 {
 }
 
@@ -34,7 +34,7 @@ void Renderer::Clear() const
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-void Renderer::Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader& shader) const
+void Renderer::Draw(const VertexArray &vao, const IndexBuffer &ibo, const Shader &shader) const
 {
 
 	shader.Bind();
@@ -76,8 +76,8 @@ void Renderer::Render() const
 	auto *skybox = m_Scene->GetSkybox();
 	skybox->GetShader()->Bind();
 	skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-    skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
-    skybox->GetShader()->SetUniform1i("u_texture", 0);
+	skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
+	skybox->GetShader()->SetUniform1i("u_texture", 0);
 	skybox->GetShader()->Unbind();
 
 	float lastTime = 0.0f;
@@ -96,16 +96,17 @@ void Renderer::Render() const
 
 		// draw skybox
 		skybox->GetShader()->Bind();
- 		skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
+		skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
 		skybox->GetShader()->Unbind();
 		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
-		
+
 		// draw scene
 		for (auto mesh : m_Scene->GetObjects())
 		{
 			mesh->GetShader()->Bind();
 			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 			mesh->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
+			mesh->GetShader()->SetUniformMat4f("u_model", mesh->ComputeMatrix());
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
 		}
 

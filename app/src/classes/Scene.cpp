@@ -16,15 +16,18 @@ void Scene::Init()
 
 void Scene::Add(Mesh *mesh)
 {
-    m_Objects.push_back(mesh);
-    m_Objects_map[mesh->GetName()] = mesh;
+    m_Objects.push_back(std::make_shared<Mesh>(*mesh));
+    m_Objects_map[mesh->GetName()] = std::make_shared<Mesh>(*mesh);
 }
 
-void Scene::Pop()
+void Scene::Remove(std::shared_ptr<Mesh> mesh)
 {
-    // !TODO: Fix this
-    // m_Objects.pop_back();
-    // m_Objects_map.erase(mesh->GetName());
+    std::vector<std::shared_ptr<Mesh>>::iterator it = std::find(m_Objects.begin(), m_Objects.end(), mesh);
+    if (it != m_Objects.end()){
+        m_Objects.erase(it);
+        m_Objects_map.erase(mesh->GetName());
+    }
+    
 }
 
 void Scene::Clear()
@@ -33,12 +36,12 @@ void Scene::Clear()
     m_Objects_map.clear();
 }
 
-std::vector<Mesh *> Scene::GetObjects() const
+std::vector<std::shared_ptr<Mesh>> Scene::GetObjects() const
 {
     return m_Objects;
 }
 
-std::map<std::string, Mesh *> Scene::GetObjectsMap() const
+std::map<std::string, std::shared_ptr<Mesh>> Scene::GetObjectsMap() const
 {
     return m_Objects_map;
 }

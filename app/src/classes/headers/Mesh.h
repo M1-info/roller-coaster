@@ -6,6 +6,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -25,21 +27,25 @@ public:
     void SetVertices(std::vector<float> vertices);
     void SetIndices(std::vector<unsigned int> indices);
     void SetMatrix(glm::mat4 matrix);
-    void SetShader(Shader *shader);
 
-    std::string GetName() const;
     VertexArray *GetVAO() const;
     VertexBuffer *GetVBO() const;
     IndexBuffer *GetIBO() const;
+    Shader *GetShader() const;
+    glm::mat4 GetMatrix() const;
+
+    std::string GetName() const;
     std::vector<float> GetVertices() const;
     std::vector<unsigned int> GetIndices() const;
-    glm::mat4 GetMatrix() const;
-    Shader *GetShader() const;
-    void AddShader(std::string shader_name);
+    glm::vec3 GetPosition() const;
+    glm::vec3 GetScale() const;
+    glm::vec3 GetRotation() const;
 
+    void AddShader(std::string shader_name);
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
     void Scale(glm::vec3 scale);
+    glm::mat4 ComputeMatrix();
 
 private:
     std::string m_Name;
@@ -54,7 +60,12 @@ private:
     IndexBuffer *m_IBO;
     Shader *m_Shader;
 
-    glm::mat4x4 m_Matrix;
+    glm::mat4 m_Matrix;
+
+public: 
+   glm::vec3 m_Position;
+   glm::vec3 m_Scale;
+   glm::vec3 m_Rotation;
 };
 
 #endif // MESH_H
