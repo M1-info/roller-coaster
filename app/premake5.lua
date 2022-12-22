@@ -10,6 +10,7 @@ project "app"
     links { "glad", "glfw3", "stb_image", "imgui", "opengl32", "gdi32", "user32", "shell32" }
 
     filter "action:vs*"
+        cppdialect "C++17"
         systemversion "latest"
         ignoredefaultlibraries { "libmct" }
         defines {"VISUAL_STUDIO"}
