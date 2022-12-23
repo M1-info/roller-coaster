@@ -1,7 +1,6 @@
 #include "headers/OBJLoader.h"
 
-#include <fstream>
-#include <string>
+
 
 OBJLoader::OBJLoader(const std::string& obj_filename) {
     std::string line;
@@ -114,4 +113,46 @@ std::vector<Face> OBJLoader::GetFaces() {
 
 std::vector<Material> OBJLoader::GetMaterials() {
   return materials_;
+}
+
+OBJLoader::~OBJLoader() {
+  // Clear the vectors
+  vertices_.clear();
+  texture_coordinates_.clear();
+  normals_.clear();
+  faces_.clear();
+  materials_.clear();
+}
+
+std::string OBJLoader::ToString() {
+    std::stringstream str;
+    str << "Vertices:\n";
+    for (const auto& v : vertices_) {
+        str << "  " << v.x << ", " << v.y << ", " << v.z << "\n";
+    }
+    str << "Texture coordinates:\n";
+    for (const auto& tc : texture_coordinates_) {
+        str << "  " << tc.u << ", " << tc.v << "\n";
+    }
+    str << "Normals:\n";
+    for (const auto& n : normals_) {
+        str << "  " << n.x << ", " << n.y << ", " << n.z << "\n";
+    }
+    str << "Faces:\n";
+    for (const auto& f : faces_) {
+        str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << f.vt1 << ", " << f.vt2 << ", " << f.vt3 << ", " << f.vn1 << ", " << f.vn2 << ", " << f.vn3 << "\n";
+    }
+    str << "Materials:\n";
+    for (const auto& m : materials_) {
+        str << "  Name: " << m.name << "\n"
+            << "  Ambient color: " << m.ambient_color.r << ", " << m.ambient_color.g << ", " << m.ambient_color.b << "\n"
+            << "  Diffuse color: " << m.diffuse_color.r << ", " << m.diffuse_color.g << ", " << m.diffuse_color.b << "\n"
+            << "  Specular color: " << m.specular_color.r << ", " << m.specular_color.g << ", " << m.specular_color.b << "\n"
+            << "  Emissive color: " << m.emissive_color.r << ", " << m.emissive_color.g << ", " << m.emissive_color.b << "\n"
+            << "  Shininess: " << m.shininess << "\n"
+            << "  Transparency: " << m.transparency << "\n"
+            << "  Optical density: " << m.optical_density << "\n"
+            << "  Diffuse texture map: " << m.diffuse_texture_map << "\n";
+    }
+    return str.str();
 }
