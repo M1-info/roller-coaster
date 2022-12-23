@@ -9,6 +9,7 @@
 #include "classes/headers/Renderer.h"
 #include "classes/headers/Mesh.h"
 #include "classes/headers/Scene.h"
+#include "classes/headers/Material.h"
 
 int main(void)
 {
@@ -92,6 +93,10 @@ int main(void)
     renderer->GetUI()->SetScene(scene);
     renderer->GetUI()->SetWindow(renderer->GetWindow());
     renderer->GetUI()->Init();
+
+
+    //test material
+    Material* mat = new Material();
 
     renderer->Render();
 
