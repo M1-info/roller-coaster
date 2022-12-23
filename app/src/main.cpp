@@ -49,7 +49,8 @@ int main(void)
         0, 4, 7, // bottom
     };
 
-    OBJLoader obj("assets/obj/chariot.obj");
+    string s = "chariot.obj";
+    OBJLoader obj(s);
     cout << obj.ToString() << endl;
     
 

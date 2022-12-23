@@ -6,12 +6,16 @@
 #include <sstream>
 #include <fstream>
 #include <string>
+#include <iostream>
+#include <map>
 
 #include "Struct.h"
 
+
+
 class OBJLoader {
  public:
-  OBJLoader(const std::string& obj_filename);
+  OBJLoader(std::string& obj_filename);
   ~OBJLoader();
 
   std::string OBJLoader::ToString();
@@ -20,6 +24,11 @@ class OBJLoader {
   std::vector<Normal> GetNormals();
   std::vector<Face> GetFaces();
   std::vector<Material> GetMaterials();
+  Material GetMaterialsFromFaceId(int faceId);
+  Material GetMaterialsFromFace(Face& face);
+
+
+  
 
  private:
   std::vector<Vertex> vertices_;
@@ -27,6 +36,11 @@ class OBJLoader {
   std::vector<Normal> normals_;
   std::vector<Face> faces_;
   std::vector<Material> materials_;
+  
+  std::map<int, std::string> face_id_to_material_map;
+  std::map<Face, std::string> face_to_material_map;
+  std::map<std::string, Material> material_name_to_material_map;
+  
 };
 
 #endif  // OBJ_LOADER_H

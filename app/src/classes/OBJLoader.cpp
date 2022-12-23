@@ -1,14 +1,24 @@
 #include "headers/OBJLoader.h"
+#include <iostream>
+#include <string>
 
+using namespace std;
 
-
-OBJLoader::OBJLoader(const std::string& obj_filename) {
+OBJLoader::OBJLoader(std::string& obj_filename) {
     std::string line;
     Material material;
     std::string current_material;
+    int face_index = 0;
+
+    #if VISUAL_STUDIO
+    obj_filename = "src/assets/obj/" + obj_filename;
+    #elif MINGW
+    obj_filename = "app\\src\\assets\\obj\\" + obj_filename;
+    #endif
 
     std::ifstream obj_file(obj_filename);
     if (obj_file.is_open()) {
+        cout<<"Loading "<<obj_filename<<"..."<<endl;
         while (std::getline(obj_file, line)) {
             if (line.substr(0, 2) == "v ") {
                 // Vertex
@@ -45,16 +55,35 @@ OBJLoader::OBJLoader(const std::string& obj_filename) {
                     }
                 }
                 faces_.push_back(face);
+
+                face_id_to_material_map[face_index] = current_material;
+                face_to_material_map[face] = current_material;
+                face_index++;
             } else if (line.substr(0, 7) == "usemtl ") {
                 // Material
                 current_material = line.substr(7);
             } else if (line.substr(0, 7) == "mtllib ") {
                 // Material library
                 std::string mtl_filename = line.substr(7);
+
+                #if VISUAL_STUDIO
+                mtl_filename = "src/assets/obj/" + mtl_filename;
+                #elif MINGW
+                mtl_filename = "app\\src\\assets\\obj\\" + mtl_filename;
+                #endif
+
                 std::ifstream mtl_file(mtl_filename);
                 if (mtl_file.is_open()) {
-                while (std::getline(mtl_file, line)) {
+                    cout<<"Loading "<< mtl_filename<<"..."<<endl;
+                    int i = 0;
+                    while (std::getline(mtl_file, line)) {
                         if (line.substr(0, 7) == "newmtl ") {
+                        cout<<"Loading "<< line<<"..."<<endl;
+                        if(i!=0){
+                            materials_.push_back(material);
+                            material_name_to_material_map[material.name] = material;
+                        }
+                        i++;
                         // New material
                         material = Material();
                         material.name = line.substr(7);
@@ -79,16 +108,28 @@ OBJLoader::OBJLoader(const std::string& obj_filename) {
                         } else if (line.substr(0, 2) == "d ") {
                         // Transparency
                         sscanf(line.c_str(), "d %f", &material.transparency);
+                        } else if (line.substr(0, 5) == "illum") {
+                        // Transparency
+                        sscanf(line.c_str(), "illum %d", &material.illumination_model);
                         } else if (line.substr(0, 6) == "map_Kd") {
                         // Diffuse texture map
                         material.diffuse_texture_map = line.substr(7);
                         }
+                        
                     }
                     materials_.push_back(material);
                 }
+                else{
+                    std::cout << "Could not open file " << mtl_filename << std::endl;
+                }
+                mtl_file.close();
             }
-        obj_file.close();
+        
         }
+        obj_file.close();
+    }
+    else{
+        cout << "Could not open file " << obj_filename << endl;
     }
 }
 
@@ -152,7 +193,48 @@ std::string OBJLoader::ToString() {
             << "  Shininess: " << m.shininess << "\n"
             << "  Transparency: " << m.transparency << "\n"
             << "  Optical density: " << m.optical_density << "\n"
+            << "  illumination model: " << m.illumination_model << "\n"
             << "  Diffuse texture map: " << m.diffuse_texture_map << "\n";
     }
     return str.str();
 }
+
+
+Material OBJLoader::GetMaterialsFromFaceId(int face_id) {
+  // Look up the material name for the face index
+  auto it = face_id_to_material_map.find(face_id);
+  if (it != face_id_to_material_map.end()) {
+    std::string material_name = it->second;
+    // Look up the full Material object for the material name
+    auto it2 = material_name_to_material_map.find(material_name);
+    if (it2 != material_name_to_material_map.end()) {
+      return it2->second;
+    } else {
+      // The material name was not found in the map
+      return Material();
+    }
+  } else {
+    // The face index was not found in the map
+    return Material();
+  }
+}
+
+Material OBJLoader::GetMaterialsFromFace(Face& face) {
+  // Look up the material name for the face
+  auto it = face_to_material_map.find(face);
+  if (it != face_to_material_map.end()) {
+    std::string material_name = it->second;
+    // Look up the full Material object for the material name
+    auto it2 = material_name_to_material_map.find(material_name);
+    if (it2 != material_name_to_material_map.end()) {
+      return it2->second;
+    } else {
+      // The material name was not found in the map
+      return Material();
+    }
+  } else {
+    // The face was not found in the map
+    return Material();
+  }
+}
+

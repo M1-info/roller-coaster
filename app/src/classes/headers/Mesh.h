@@ -13,13 +13,10 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Struct.h"
-
-
 class Mesh
 {
 public:
     Mesh();
-    Mesh(std::string name, std::vector<Vertex> vertices,std::vector<Face> indices);
     Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices);
     ~Mesh();
 
@@ -54,9 +51,6 @@ private:
     std::string m_Name;
     std::vector<float> m_Vertices;
     std::vector<unsigned int> m_Indices;
-
-    std::vector<Vertex> v_Vertices;
-    std::vector<Face> v_Indices;
 
     size_t m_Vertices_size;
     size_t m_Indices_size;

@@ -40,6 +40,18 @@ struct Face {
   int vn1;
   int vn2;
   int vn3;
+
+  bool operator<(const Face& other) const {
+    if (v1 != other.v1) return v1 < other.v1;
+    if (v2 != other.v2) return v2 < other.v2;
+    if (v3 != other.v3) return v3 < other.v3;
+    if (vt1 != other.vt1) return vt1 < other.vt1;
+    if (vt2 != other.vt2) return vt2 < other.vt2;
+    if (vt3 != other.vt3) return vt3 < other.vt3;
+    if (vn1 != other.vn1) return vn1 < other.vn1;
+    if (vn2 != other.vn2) return vn2 < other.vn2;
+    return vn3 < other.vn3;
+  }
 };
 
 struct Material {
@@ -51,6 +63,7 @@ struct Material {
   float shininess;
   float transparency;
   float optical_density;
+  int illumination_model;
   std::string diffuse_texture_map;
 };
 

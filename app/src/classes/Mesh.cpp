@@ -37,34 +37,6 @@ Mesh::Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned i
     Clear();
 }
 
-Mesh::Mesh(std::string name, std::vector<Vertex> vertices,std::vector<Face> indices)
-    : m_Matrix(glm::mat4(1.0f)), m_Position(glm::vec3(0.0f)), m_Scale(glm::vec3(1.0f)), m_Rotation(glm::vec3(0.0f))
-{
-
-    m_Name = name;
-
-    v_Vertices = vertices;
-    v_Indices = indices;
-    m_Vertices_size = v_Vertices.size() * sizeof(Vertex);
-    m_Indices_size = v_Indices.size() * sizeof(Face);
-
-    // create vertex array and vertex buffer
-    m_VAO = new VertexArray();
-    m_VBO = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
-
-    // create vertex buffer layout to pass components to shader
-    VertexBufferLayout layout;
-    layout.Push<float>(3); // position
-
-    // add vertex buffer layout to vertex array
-    m_VAO->AddBuffer(*m_VBO, layout);
-
-    // create index buffer
-    m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
-
-    Clear();
-}
-
 Mesh::~Mesh()
 {
     m_Vertices.clear();
