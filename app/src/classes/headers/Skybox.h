@@ -25,7 +25,7 @@ public:
     inline Shader *GetShader() const { return m_Shader; }
     inline CubeTexture *GetTexture() const { return m_Texture; }
 
-    void Draw(glm::mat4 projection, glm::mat4 view);
+    void Draw();
 
 private:
     VertexArray *m_VAO;

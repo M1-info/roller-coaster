@@ -10,6 +10,7 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "FrameBuffer.h"
 #include "Window.h"
 #include "Scene.h"
 #include "Mesh.h"
@@ -29,7 +30,7 @@ public:
     void SceneInfo();
     void SceneGraph();
     void MeshInfo();
-    void MeshTransform(std::string component, glm::vec3 &value);
+    void MeshTransform(std::string component, glm::vec3 &value, float resetValue = 0.0f);
 
     inline void SetWindow(Window *window) { m_Window = window; }
     inline void SetScene(Scene *scene) { m_Scene = scene; }

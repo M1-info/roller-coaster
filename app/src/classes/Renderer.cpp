@@ -68,6 +68,7 @@ void Renderer::Init()
 
 	// init UI
 	m_UI = new UI();
+
 }
 
 void Renderer::Render() const
@@ -84,9 +85,12 @@ void Renderer::Render() const
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
+
 		float currentTime = glfwGetTime();
 		float deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
+
+		// m_FrameBuffer->Bind();
 
 		// update camera
 		m_Camera->Render(deltaTime);
@@ -96,9 +100,13 @@ void Renderer::Render() const
 
 		// draw skybox
 		skybox->GetShader()->Bind();
+		skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 		skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
 		skybox->GetShader()->Unbind();
-		skybox->Draw(m_Camera->GetProjection(), m_Camera->GetView());
+		glDisable(GL_DEPTH_TEST);
+		skybox->Draw();
+		glEnable(GL_DEPTH_TEST);
+	
 
 		// draw scene
 		for (auto mesh : m_Scene->GetObjects())
@@ -107,16 +115,19 @@ void Renderer::Render() const
 			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 			mesh->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
 			mesh->GetShader()->SetUniformMat4f("u_model", mesh->ComputeMatrix());
+			mesh->GetShader()->Unbind();
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
 		}
 
 		// draw UI
 		m_UI->Render();
 
+
 		// Swap front and back buffers
 		glfwSwapBuffers(m_Window->GetWindow());
 
 		// Poll for and process events
 		glfwPollEvents();
+
 	}
 }

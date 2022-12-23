@@ -57,6 +57,7 @@ void Window::Init()
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Window::Destroy() const
@@ -77,7 +78,12 @@ void Window::OnResize(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 
     // update camera
-    float aspect = (float)width / (float)height;
+    float aspect;
+    if(width == 0 || height == 0)
+        aspect = 1;
+    else
+        aspect = (float)width / (float)height;
+
     win->GetCamera()->SetAspectRatio(aspect);
 
     float fov = win->GetCamera()->GetFov();

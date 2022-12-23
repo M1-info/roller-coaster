@@ -100,24 +100,23 @@ void UI::MeshInfo()
         ImGui::Text("No mesh selected");
     else
     {
-        // Object name
         ImGui::Text(m_SelectedMesh->GetName().c_str());
         ImGui::Separator();
         ImGui::Text("Transform");
         ImGui::Separator();
         MeshTransform("Position", m_SelectedMesh->m_Position);
+        ImGui::Separator();
         MeshTransform("Rotation", m_SelectedMesh->m_Rotation);
-        MeshTransform("Scale", m_SelectedMesh->m_Scale);
+        ImGui::Separator();
+        MeshTransform("Scale", m_SelectedMesh->m_Scale, 1.0f);
     }
     ImGui::End();
 }
 
-void UI::MeshTransform(std::string component, glm::vec3 &value)
+void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue)
 {
 
     ImGui::PushID(component.c_str());
-
-    float reset = 0.0f;
 
     ImGui::Columns(2);
     ImGui::Text(component.c_str());
@@ -130,7 +129,7 @@ void UI::MeshTransform(std::string component, glm::vec3 &value)
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     if(ImGui::Button("X"))
-        value.x = reset;
+        value.x = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -144,7 +143,7 @@ void UI::MeshTransform(std::string component, glm::vec3 &value)
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
     if(ImGui::Button("Y"))
-        value.y = reset;
+        value.y = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -158,7 +157,7 @@ void UI::MeshTransform(std::string component, glm::vec3 &value)
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
     if(ImGui::Button("Z"))
-        value.z = reset;
+        value.z = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
