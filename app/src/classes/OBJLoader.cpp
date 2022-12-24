@@ -23,32 +23,32 @@ OBJLoader::OBJLoader(std::string& obj_filename) {
             if (line.substr(0, 2) == "v ") {
                 // Vertex
                 Vertex vertex;
-                sscanf(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+                sscanf_s(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
                 vertices_.push_back(vertex);
             } else if (line.substr(0, 3) == "vt ") {
                 // Texture coordinate
                 TextureCoordinate tex_coord;
-                sscanf(line.c_str(), "vt %f %f", &tex_coord.u, &tex_coord.v);
+                sscanf_s(line.c_str(), "vt %f %f", &tex_coord.u, &tex_coord.v);
                 texture_coordinates_.push_back(tex_coord);
             } else if (line.substr(0, 3) == "vn ") {
                 // Normal
                 Normal normal;
-                sscanf(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
+                sscanf_s(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
                 normals_.push_back(normal);
             } else if (line.substr(0, 2) == "f ") {
                 // Face
                 Face face;
-                int matches = sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &face.vt1, &face.vn1, &face.v2, &face.vt2, &face.vn2, &face.v3, &face.vt3, &face.vn3);
+                int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &face.vt1, &face.vn1, &face.v2, &face.vt2, &face.vn2, &face.v3, &face.vt3, &face.vn3);
                 if (matches != 9) {
                     // Normals are optional
-                    matches = sscanf(line.c_str(), "f %d/%d %d/%d %d/%d", &face.v1, &face.vt1, &face.v2, &face.vt2, &face.v3, &face.vt3);
+                    matches = sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &face.v1, &face.vt1, &face.v2, &face.vt2, &face.v3, &face.vt3);
                     if (matches != 6) {
                         // Texture coordinates and normals are optional
-                        matches = sscanf(line.c_str(), "f %d %d %d", &face.v1, &face.v2, &face.v3);
+                        matches = sscanf_s(line.c_str(), "f %d %d %d", &face.v1, &face.v2, &face.v3);
                     }
                     if (matches == 3) {
                         // Only vertices are specified
-                        sscanf(line.c_str(), "f %d//%d %d//%d %d//%d", &face.v1, &face.vn1, &face.v2, &face.vn2, &face.v3, &face.vn3);
+                        sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &face.v1, &face.vn1, &face.v2, &face.vn2, &face.v3, &face.vn3);
                         face.vt1 = 0;
                         face.vt2 = 0;
                         face.vt3 = 0;
@@ -89,28 +89,28 @@ OBJLoader::OBJLoader(std::string& obj_filename) {
                         material.name = line.substr(7);
                         } else if (line.substr(0, 3) == "Ka ") {
                         // Ambient color
-                        sscanf(line.c_str(), "Ka %f %f %f", &material.ambient_color.r, &material.ambient_color.g, &material.ambient_color.b);
+                        sscanf_s(line.c_str(), "Ka %f %f %f", &material.ambient_color.r, &material.ambient_color.g, &material.ambient_color.b);
                         } else if (line.substr(0, 3) == "Kd ") {
                         // Diffuse color
-                        sscanf(line.c_str(), "Kd %f %f %f", &material.diffuse_color.r, &material.diffuse_color.g, &material.diffuse_color.b);
+                        sscanf_s(line.c_str(), "Kd %f %f %f", &material.diffuse_color.r, &material.diffuse_color.g, &material.diffuse_color.b);
                         } else if (line.substr(0, 3) == "Ks ") {
                         // Specular color
-                        sscanf(line.c_str(), "Ks %f %f %f", &material.specular_color.r, &material.specular_color.g, &material.specular_color.b);
+                        sscanf_s(line.c_str(), "Ks %f %f %f", &material.specular_color.r, &material.specular_color.g, &material.specular_color.b);
                         } else if (line.substr(0, 3) == "Ke ") {
                         // Emissive color
-                        sscanf(line.c_str(), "Ke %f %f %f", &material.emissive_color.r, &material.emissive_color.g, &material.emissive_color.b);
+                        sscanf_s(line.c_str(), "Ke %f %f %f", &material.emissive_color.r, &material.emissive_color.g, &material.emissive_color.b);
                         } else if (line.substr(0, 2) == "Ns") {
                         // Shininess
-                        sscanf(line.c_str(), "Ns %f", &material.shininess);
+                        sscanf_s(line.c_str(), "Ns %f", &material.shininess);
                         } else if (line.substr(0, 2) == "Ni") {
                         // Optical density
-                        sscanf(line.c_str(), "Ni %f", &material.optical_density);
+                        sscanf_s(line.c_str(), "Ni %f", &material.optical_density);
                         } else if (line.substr(0, 2) == "d ") {
                         // Transparency
-                        sscanf(line.c_str(), "d %f", &material.transparency);
+                        sscanf_s(line.c_str(), "d %f", &material.transparency);
                         } else if (line.substr(0, 5) == "illum") {
                         // Transparency
-                        sscanf(line.c_str(), "illum %d", &material.illumination_model);
+                        sscanf_s(line.c_str(), "illum %d", &material.illumination_model);
                         } else if (line.substr(0, 6) == "map_Kd") {
                         // Diffuse texture map
                         material.diffuse_texture_map = line.substr(7);
