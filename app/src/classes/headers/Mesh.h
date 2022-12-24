@@ -13,7 +13,6 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-
 class Mesh
 {
 public:

@@ -10,6 +10,9 @@
 #include "classes/headers/Mesh.h"
 #include "classes/headers/Scene.h"
 #include "classes/headers/Material.h"
+#include "classes/headers/OBJLoader.h"
+
+using namespace std;
 
 int main(void)
 {
@@ -57,27 +60,30 @@ int main(void)
     mesh->GetMaterial()->SetDiffuseColor(glm::vec3(1.0, 1.0, 0.0));
     mesh->GetMaterial()->SetSpecularColor(glm::vec3(0.0, 0.0, 1.0));
     mesh->GetMaterial()->SetSpecularExponent(32.0);
-    mesh->Translate(glm::vec3(1, 0, 0));
+    
+    // test object loader
+    OBJLoader obj("chariot.obj");
+    std::cout << obj.ToString() << std::endl;
 
-    Mesh *mesh2 = new Mesh("Cube Red", vertices, indices, normals);
-    mesh2->CreateMaterial("phong");
-    mesh2->GetMaterial()->SetAmbientColor(glm::vec3(1.0, 1.0, 0.0));
-    mesh2->GetMaterial()->SetDiffuseColor(glm::vec3(1.0, 1.0, 0.0));
-    mesh2->GetMaterial()->SetSpecularColor(glm::vec3(0.0, 0.0, 1.0));
-    mesh2->GetMaterial()->SetSpecularExponent(32.0);
-    mesh2->Translate(glm::vec3(-1, 0, 0));
+    // Mesh *mesh2 = new Mesh("Cube Red", vertices, indices, normals);
+    // mesh2->CreateMaterial("phong");
+    // mesh2->GetMaterial()->SetAmbientColor(glm::vec3(1.0, 1.0, 0.0));
+    // mesh2->GetMaterial()->SetDiffuseColor(glm::vec3(1.0, 1.0, 0.0));
+    // mesh2->GetMaterial()->SetSpecularColor(glm::vec3(0.0, 0.0, 1.0));
+    // mesh2->GetMaterial()->SetSpecularExponent(32.0);
+    // mesh2->Translate(glm::vec3(-1, 0, 0));
 
-    Scene* scene = new Scene();
-    scene->Init();
-    scene->Add(mesh);
-    scene->Add(mesh2);
+    // Scene* scene = new Scene();
+    // scene->Init();
+    // scene->Add(mesh);
+    // scene->Add(mesh2);
 
-    renderer->SetScene(scene);
-    renderer->GetUI()->SetScene(scene);
-    renderer->GetUI()->SetWindow(renderer->GetWindow());
-    renderer->GetUI()->Init();
+    // renderer->SetScene(scene);
+    // renderer->GetUI()->SetScene(scene);
+    // renderer->GetUI()->SetWindow(renderer->GetWindow());
+    // renderer->GetUI()->Init();
 
-    renderer->Render();
+    // renderer->Render();
 
     return 0;
 }
