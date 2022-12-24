@@ -192,6 +192,7 @@ void Mesh::Translate(glm::vec3 translation)
 
 void Mesh::Rotate(GLfloat angle, glm::vec3 axis)
 {
+    m_Rotation = axis * angle;
     m_Matrix = glm::rotate(m_Matrix, angle, axis);
 }
 

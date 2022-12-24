@@ -23,8 +23,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
     return;
   }
 
-  std::cout << "Loading " << obj_filename << "..." << std::endl;
-
   while (std::getline(obj_file, line))
   {
     if (line.substr(0, 2) == "v ")
@@ -54,7 +52,7 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       IndexesFace face;
       unsigned vt1, vt2, vt3, vn1, vn2, vn3;
       int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &vt1, &vn1, &face.v2, &vt2, &vn2, &face.v3, &vt3, &vn3);
-      std::cout << "matches: " << matches << std::endl;
+  
       if (matches != 9)
       {
         // Normals are optional
@@ -102,7 +100,7 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       std::ifstream mtl_file(mtl_filepath);
       if (mtl_file.is_open())
       {
-        std::cout << "Loading " << mtl_filename << "..." << std::endl;
+
         int i = 0;
         while (std::getline(mtl_file, line))
         {

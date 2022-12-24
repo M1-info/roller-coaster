@@ -19,16 +19,17 @@ int main(void)
     Renderer* renderer = new Renderer();
     renderer->Init();
 
-    // Mesh *mesh = new Mesh("Cube yellow", vertices, indices, normals);
-    Mesh *mesh = Mesh::FromOBJ("rail.obj");
-    Mesh *mesh2 = Mesh::FromOBJ("chariot.obj");
+    // Mesh *mesh = Mesh::FromOBJ("rail.obj");
+    // Mesh *mesh2 = Mesh::FromOBJ("chariot.obj");
+    Mesh *mesh3 = Mesh::FromOBJ("cube.obj");
 
-    mesh2->Translate(glm::vec3(3.0f, 0.0f, 0.0f));
+    // mesh2->Translate(glm::vec3(3.0f, 0.0f, 0.0f));
 
     Scene* scene = new Scene();
     scene->Init();
-    scene->Add(mesh);
-    scene->Add(mesh2);
+    // scene->Add(mesh);
+    // scene->Add(mesh2);
+    scene->Add(mesh3);
 
     renderer->SetScene(scene);
     renderer->GetUI()->SetScene(scene);

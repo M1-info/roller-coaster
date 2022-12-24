@@ -125,9 +125,8 @@ void Renderer::Render()
 
 			shader->Unbind();
 
-			// mesh->Draw();
-
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *shader);
+
 		}
 
 		// draw UI
