@@ -56,6 +56,7 @@ ShaderProgramSource Shader::ParseShader()
 unsigned int Shader::CreateShader(const std::string &vertexShader, const std::string &fragmentShader)
 {
     unsigned int program = glCreateProgram();
+
     unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
@@ -106,6 +107,12 @@ void Shader::SetUniform1f(const std::string &name, float value)
 {
     GLint location = GetUniformLocation(name);
     glUniform1f(location, value);
+}
+
+void Shader::SetUniform3f(const std::string &name, float v0, float v1, float v2)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform3f(location, v0, v1, v2);
 }
 
 void Shader::SetUniform4f(const std::string &name, float v0, float v1, float v2, float v3)

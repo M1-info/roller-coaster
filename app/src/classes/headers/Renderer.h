@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <vector>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -12,12 +13,15 @@
 #include "Window.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "Light.h"
 #include "UI.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Mesh.h"
 #include "FrameBuffer.h"
+#include "Skybox.h"
+#include "OBJLoader.h"
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError(); x; ASSERT(GLLogCall(#x, __FILE__, __LINE__))
@@ -37,7 +41,8 @@ public:
 	void Clear() const;
 	void Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader& shader) const;
 	void Init();
-	void Render() const;
+	void Render();
+	void SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> meshes);
 
 	inline void SetScene(Scene *scene) { m_Scene = scene; }
 	inline Scene* GetScene() const { return m_Scene; }
@@ -50,6 +55,7 @@ private:
 	Window* m_Window;
 	Scene* m_Scene;
 	std::shared_ptr<Camera> m_Camera;
+	Light * m_Light;
 	UI* m_UI;
 };
 

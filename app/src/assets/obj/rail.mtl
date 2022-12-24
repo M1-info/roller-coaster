@@ -1,8 +1,8 @@
-# Blender 3.3.0 MTL File: 'first_rail.blend'
-# www.blender.org
+# Blender MTL File: 'None'
+# Material Count: 2
 
 newmtl Material.001
-Ns 250.000000
+Ns 249.999987
 Ka 1.000000 1.000000 1.000000
 Kd 0.318543 0.122731 0.061887
 Ks 0.500000 0.500000 0.500000
@@ -12,7 +12,7 @@ d 1.000000
 illum 2
 
 newmtl Material.002
-Ns 250.000000
+Ns 249.999987
 Ka 1.000000 1.000000 1.000000
 Kd 0.132866 0.132866 0.132866
 Ks 0.500000 0.500000 0.500000
