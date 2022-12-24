@@ -1,6 +1,6 @@
 # Blender 3.3.0
 # www.blender.org
-mtllib first_rail.mtl
+mtllib rail.mtl
 o Cube
 v -0.200000 -0.050000 1.000000
 v -0.200000 0.050000 1.000000

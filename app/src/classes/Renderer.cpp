@@ -69,17 +69,18 @@ void Renderer::Init()
 	// init UI
 	m_UI = new UI();
 
+	// init lights
+	m_Light = new Light(glm::vec3(5.0f, 10.0f, 0.0f), glm::vec3(0.0), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f);
+
+	m_UI->SetLight(m_Light);
 }
 
-void Renderer::Render() const
+void Renderer::Render()
 {
 
-	auto *skybox = m_Scene->GetSkybox();
-	skybox->GetShader()->Bind();
-	skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-	skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
-	skybox->GetShader()->SetUniform1i("u_texture", 0);
-	skybox->GetShader()->Unbind();
+	Skybox *skybox = m_Scene->GetSkybox();
+	std::vector<std::shared_ptr<Mesh>> meshes = m_Scene->GetObjects();
+	SetUpScene(skybox, meshes);
 
 	float lastTime = 0.0f;
 
@@ -89,8 +90,6 @@ void Renderer::Render() const
 		float currentTime = glfwGetTime();
 		float deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
-
-		// m_FrameBuffer->Bind();
 
 		// update camera
 		m_Camera->Render(deltaTime);
@@ -107,21 +106,30 @@ void Renderer::Render() const
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
 	
-
 		// draw scene
 		for (auto mesh : m_Scene->GetObjects())
 		{
-			mesh->GetShader()->Bind();
-			mesh->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-			mesh->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
-			mesh->GetShader()->SetUniformMat4f("u_model", mesh->ComputeMatrix());
-			mesh->GetShader()->Unbind();
-			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *mesh->GetShader());
+			Material *material = mesh->GetMaterial();
+			Shader *shader = material->GetShader();
+			glm::vec3 cameraPosition = m_Camera->GetPosition();
+
+			shader->Bind();
+
+			glm::vec3 lightPosition = m_Light->m_Position;
+			shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+
+			shader->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+			shader->SetUniformMat4f("u_view", m_Camera->GetView());
+			shader->SetUniformMat4f("u_model", mesh->ComputeMatrix());
+			shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+			shader->Unbind();
+
+			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *shader);
 		}
 
 		// draw UI
 		m_UI->Render();
-
 
 		// Swap front and back buffers
 		glfwSwapBuffers(m_Window->GetWindow());
@@ -130,4 +138,43 @@ void Renderer::Render() const
 		glfwPollEvents();
 
 	}
+}
+
+void Renderer::SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> meshes)
+{
+
+	skybox->GetShader()->Bind();
+	skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+	skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
+	skybox->GetShader()->SetUniform1i("u_texture", 0);
+	skybox->GetShader()->Unbind();
+
+	for (auto mesh : meshes)
+	{
+		Material *material = mesh->GetMaterial();
+		Shader *shader = material->GetShader();
+
+		shader->Bind();
+
+		// pass material infos
+		glm::vec3 materialAmbient = material->GetAmbientColor();
+		glm::vec3 materialDiffuse = material->GetDiffuseColor();
+		glm::vec3 materialSpecular = material->GetSpecularColor();
+		float specularExponent = material->GetSpecularExponent();
+
+		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.x, materialAmbient.y, materialAmbient.z);
+		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.x, materialDiffuse.y, materialDiffuse.z);
+		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.x, materialSpecular.y, materialSpecular.z);
+		shader->SetUniform1f("u_material.specularExponent", specularExponent);
+
+		glm::vec3 lightPosition = m_Light->m_Position;
+		glm::vec3 lightColor = m_Light->m_Color;
+
+		shader->SetUniform1f("u_light.intensity", m_Light->GetIntensity());
+		shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+		shader->SetUniform3f("u_light.color", lightColor.x, lightColor.y, lightColor.z);
+		
+		shader->Unbind();
+	}
+
 }

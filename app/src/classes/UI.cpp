@@ -78,6 +78,7 @@ void UI::SceneInfo()
     ImGui::Begin("Scene Info");
     SceneGraph();
     MeshInfo();
+    MeshTransform("Light Position", m_Light->m_Position, 0.0f);
     ImGui::End();
 }
 

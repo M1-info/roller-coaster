@@ -9,6 +9,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "VertexArray.h"
+#include "Material.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
@@ -17,7 +18,7 @@ class Mesh
 {
 public:
     Mesh();
-    Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices);
+    Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normales);
     ~Mesh();
 
     void SetUp();
@@ -25,23 +26,24 @@ public:
 
     void SetName(std::string name);
     void SetVertices(std::vector<float> vertices);
+    void SetNormales(std::vector<float> normales);
     void SetIndices(std::vector<unsigned int> indices);
-    void SetMatrix(glm::mat4 matrix);
+    void CreateMaterial(std::string shaderFile);
 
     VertexArray *GetVAO() const;
     VertexBuffer *GetVBO() const;
     IndexBuffer *GetIBO() const;
-    Shader *GetShader() const;
     glm::mat4 GetMatrix() const;
+    Material *GetMaterial() const;
 
     std::string GetName() const;
     std::vector<float> GetVertices() const;
+    std::vector<float> GetNormales() const;
     std::vector<unsigned int> GetIndices() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetScale() const;
     glm::vec3 GetRotation() const;
 
-    void AddShader(std::string shader_name);
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
     void Scale(glm::vec3 scale);
@@ -50,15 +52,18 @@ public:
 private:
     std::string m_Name;
     std::vector<float> m_Vertices;
+    std::vector<float> m_Normales;
     std::vector<unsigned int> m_Indices;
 
     size_t m_Vertices_size;
+    size_t m_Normales_size;
     size_t m_Indices_size;
 
     VertexArray *m_VAO;
-    VertexBuffer *m_VBO;
+    VertexBuffer *m_VBO_pos;
+    VertexBuffer *m_VBO_norm;
     IndexBuffer *m_IBO;
-    Shader *m_Shader;
+    Material *m_Material;
 
     glm::mat4 m_Matrix;
 
