@@ -1,13 +1,13 @@
 #include "headers/Material.h"
 
 Material::Material()
-    : m_SpecularExponent(0.0f), m_AmbientColor(glm::vec3(0.0f)), 
-    m_DiffuseColor(glm::vec3(0.0f)), m_SpecularColor(glm::vec3(0.0f)), 
-    m_EmissiveColor(glm::vec3(0.0f)), m_Shader(nullptr)
+    : m_SpecularExponent(0.0f), m_AmbientColor(Color()), 
+    m_DiffuseColor(Color()), m_SpecularColor(Color()), 
+    m_EmissiveColor(Color()), m_Shader(nullptr)
 {
 }
 
-Material::Material(float specularExponent, glm::vec3 ambientColor, glm::vec3 diffuseColor, glm::vec3 specularColor, glm::vec3 emissiveColor)
+Material::Material(float specularExponent, Color ambientColor, Color diffuseColor, Color specularColor, Color emissiveColor)
     : m_SpecularExponent(specularExponent), m_AmbientColor(ambientColor), 
         m_DiffuseColor(diffuseColor), m_SpecularColor(specularColor), 
         m_EmissiveColor(emissiveColor), m_Shader(nullptr)

@@ -30,47 +30,52 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
     if (line.substr(0, 2) == "v ")
     {
       // Vertex
-      OBJVertex vertex;
-      sscanf(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
+      Vertex vertex;
+      sscanf_s(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
       m_Vertices.push_back(vertex);
     }
     else if (line.substr(0, 3) == "vt ")
     {
       // Texture coordinate
-      OBJTextureCoordinate tex_coord;
-      sscanf(line.c_str(), "vt %f %f", &tex_coord.u, &tex_coord.v);
+      TextureCoordinate tex_coord;
+      sscanf_s(line.c_str(), "vt %f %f", &tex_coord.u, &tex_coord.v);
       m_TexCoords.push_back(tex_coord);
     }
     else if (line.substr(0, 3) == "vn ")
     {
       // Normal
-      OBJNormal normal;
-      sscanf(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
+      Normal normal;
+      sscanf_s(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
       m_Normals.push_back(normal);
     }
     else if (line.substr(0, 2) == "f ")
     {
       // Face
-      OBJFace face;
-      int matches = sscanf(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &face.vt1, &face.vn1, &face.v2, &face.vt2, &face.vn2, &face.v3, &face.vt3, &face.vn3);
+      IndexesFace face;
+      unsigned vt1, vt2, vt3, vn1, vn2, vn3;
+      int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &vt1, &vn1, &face.v2, &vt2, &vn2, &face.v3, &vt3, &vn3);
+      std::cout << "matches: " << matches << std::endl;
       if (matches != 9)
       {
         // Normals are optional
-        matches = sscanf(line.c_str(), "f %d/%d %d/%d %d/%d", &face.v1, &face.vt1, &face.v2, &face.vt2, &face.v3, &face.vt3);
-        if (matches != 6)
-        {
-          // Texture coordinates and normals are optional
-          matches = sscanf(line.c_str(), "f %d %d %d", &face.v1, &face.v2, &face.v3);
-        }
+        matches = sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &face.v1, &vt1, &face.v2, &vt2, &face.v3, &vt3);
         if (matches == 3)
         {
+          // Texture coordinates and normals are optional
+          matches = sscanf_s(line.c_str(), "f %d %d %d", &face.v1, &face.v2, &face.v3);
+        }
+        else
+        {
           // Only vertices are specified
-          sscanf(line.c_str(), "f %d//%d %d//%d %d//%d", &face.v1, &face.vn1, &face.v2, &face.vn2, &face.v3, &face.vn3);
-          face.vt1 = 0;
-          face.vt2 = 0;
-          face.vt3 = 0;
+          sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &face.v1, &vn1, &face.v2, &vn2, &face.v3, &vn3);
+          vt1 = 0;
+          vt2 = 0;
+          vt3 = 0;
         }
       }
+      face.v1--;
+      face.v2--;
+      face.v3--;
       m_Faces.push_back(face);
 
       m_Face_id_to_material_map[face_index] = current_material;
@@ -117,42 +122,42 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
           else if (line.substr(0, 3) == "Ka ")
           {
             // Ambient color
-            sscanf(line.c_str(), "Ka %f %f %f", &material.ambient_color.r, &material.ambient_color.g, &material.ambient_color.b);
+            sscanf_s(line.c_str(), "Ka %f %f %f", &material.ambient_color.r, &material.ambient_color.g, &material.ambient_color.b);
           }
           else if (line.substr(0, 3) == "Kd ")
           {
             // Diffuse color
-            sscanf(line.c_str(), "Kd %f %f %f", &material.diffuse_color.r, &material.diffuse_color.g, &material.diffuse_color.b);
+            sscanf_s(line.c_str(), "Kd %f %f %f", &material.diffuse_color.r, &material.diffuse_color.g, &material.diffuse_color.b);
           }
           else if (line.substr(0, 3) == "Ks ")
           {
             // Specular color
-            sscanf(line.c_str(), "Ks %f %f %f", &material.specular_color.r, &material.specular_color.g, &material.specular_color.b);
+            sscanf_s(line.c_str(), "Ks %f %f %f", &material.specular_color.r, &material.specular_color.g, &material.specular_color.b);
           }
           else if (line.substr(0, 3) == "Ke ")
           {
             // Emissive color
-            sscanf(line.c_str(), "Ke %f %f %f", &material.emissive_color.r, &material.emissive_color.g, &material.emissive_color.b);
+            sscanf_s(line.c_str(), "Ke %f %f %f", &material.emissive_color.r, &material.emissive_color.g, &material.emissive_color.b);
           }
           else if (line.substr(0, 2) == "Ns")
           {
             // Shininess
-            sscanf(line.c_str(), "Ns %f", &material.shininess);
+            sscanf_s(line.c_str(), "Ns %f", &material.shininess);
           }
           else if (line.substr(0, 2) == "Ni")
           {
             // Optical density
-            sscanf(line.c_str(), "Ni %f", &material.optical_density);
+            sscanf_s(line.c_str(), "Ni %f", &material.optical_density);
           }
           else if (line.substr(0, 2) == "d ")
           {
             // Transparency
-            sscanf(line.c_str(), "d %f", &material.transparency);
+            sscanf_s(line.c_str(), "d %f", &material.transparency);
           }
           else if (line.substr(0, 5) == "illum")
           {
             // Transparency
-            sscanf(line.c_str(), "illum %d", &material.illumination_model);
+            sscanf_s(line.c_str(), "illum %d", &material.illumination_model);
           }
           else if (line.substr(0, 6) == "map_Kd")
           {
@@ -172,22 +177,22 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   obj_file.close();
 }
 
-std::vector<OBJVertex> OBJLoader::GetVertices()
+std::vector<Vertex> OBJLoader::GetVertices()
 {
   return m_Vertices;
 }
 
-std::vector<OBJTextureCoordinate> OBJLoader::GetTextureCoordinates()
+std::vector<TextureCoordinate> OBJLoader::GetTextureCoordinates()
 {
   return m_TexCoords;
 }
 
-std::vector<OBJNormal> OBJLoader::GetNormals()
+std::vector<Normal> OBJLoader::GetNormals()
 {
   return m_Normals;
 }
 
-std::vector<OBJFace> OBJLoader::GetFaces()
+std::vector<IndexesFace> OBJLoader::GetFaces()
 {
   return m_Faces;
 }
@@ -228,7 +233,8 @@ std::string OBJLoader::ToString()
   str << "Faces:\n";
   for (const auto &f : m_Faces)
   {
-    str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << f.vt1 << ", " << f.vt2 << ", " << f.vt3 << ", " << f.vn1 << ", " << f.vn2 << ", " << f.vn3 << "\n";
+    // str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << f.vt1 << ", " << f.vt2 << ", " << f.vt3 << ", " << f.vn1 << ", " << f.vn2 << ", " << f.vn3 << "\n";
+    str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << "\n";
   }
   str << "Materials:\n";
   for (const auto &m : m_Materials)
@@ -273,7 +279,7 @@ OBJMaterial OBJLoader::GetMaterialsFromFaceId(int face_id)
   }
 }
 
-OBJMaterial OBJLoader::GetMaterialsFromFace(OBJFace &face)
+OBJMaterial OBJLoader::GetMaterialsFromFace(IndexesFace &face)
 {
   // Look up the material name for the face
   auto it = m_Face_to_material_map.find(face);

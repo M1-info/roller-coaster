@@ -10,9 +10,8 @@ class VertexBufferLayout;
 struct VertexAttributes
 {
 	GLfloat position[3];
-	GLfloat normal[3];
-	GLfloat tangents[3];
 	GLfloat texCoords[2];
+	GLfloat normal[3];
 };
 
 class VertexArray

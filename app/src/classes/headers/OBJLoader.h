@@ -15,49 +15,69 @@ struct Color {
   float b; // Blue component (0.0 - 1.0)
   float a; // Alpha (transparency) component (0.0 - 1.0)
 
-  // Constructor
   Color(float r = 0.0, float g = 0.0, float b = 0.0, float a = 1.0) : r(r), g(g), b(b), a(a) {}
 };
 
-struct OBJVertex {
+struct Vertex {
   float x;
   float y;
   float z;
+
+  Vertex(float x = 0.0, float y = 0.0, float z = 0.0) : x(x), y(y), z(z) {}
 };
 
-struct OBJTextureCoordinate {
+struct TextureCoordinate {
   float u;
   float v;
 };
 
-struct OBJNormal {
+struct Normal {
   float x;
   float y;
   float z;
+
+  Normal(float x = 0.0, float y = 0.0, float z = 0.0) : x(x), y(y), z(z) {}
 };
 
-struct OBJFace {
-  int v1;
-  int v2;
-  int v3;
-  int vt1;
-  int vt2;
-  int vt3;
-  int vn1;
-  int vn2;
-  int vn3;
+struct IndexesFace {
+  unsigned int v1;
+  unsigned int v2;
+  unsigned int v3;
 
-  bool operator<(const OBJFace& other) const {
+  IndexesFace(){}
+  IndexesFace(unsigned int v1, unsigned int v2, unsigned int v3) : v1(v1), v2(v2), v3(v3) {}
+
+  bool operator<(const IndexesFace& other) const {
     if (v1 != other.v1) return v1 < other.v1;
     if (v2 != other.v2) return v2 < other.v2;
-    if (v3 != other.v3) return v3 < other.v3;
-    if (vt1 != other.vt1) return vt1 < other.vt1;
-    if (vt2 != other.vt2) return vt2 < other.vt2;
-    if (vt3 != other.vt3) return vt3 < other.vt3;
-    if (vn1 != other.vn1) return vn1 < other.vn1;
-    if (vn2 != other.vn2) return vn2 < other.vn2;
-    return vn3 < other.vn3;
+    return v3 < other.v3;
   }
+};
+
+struct Face {
+  unsigned int v1;
+  unsigned int v2;
+  unsigned int v3;
+  unsigned int vt1;
+  unsigned int vt2;
+  unsigned int vt3;
+  unsigned int vn1;
+  unsigned int vn2;
+  unsigned int vn3;
+
+  Face(unsigned int v1, unsigned int v2, unsigned int v3) : v1(v1), v2(v2), v3(v3), vt1(0), vt2(0), vt3(0), vn1(0), vn2(0), vn3(0) {}
+
+  // bool operator<(const Face& other) const {
+  //   if (v1 != other.v1) return v1 < other.v1;
+  //   if (v2 != other.v2) return v2 < other.v2;
+  //   if (v3 != other.v3) return v3 < other.v3;
+  //   if (vt1 != other.vt1) return vt1 < other.vt1;
+  //   if (vt2 != other.vt2) return vt2 < other.vt2;
+  //   if (vt3 != other.vt3) return vt3 < other.vt3;
+  //   if (vn1 != other.vn1) return vn1 < other.vn1;
+  //   if (vn2 != other.vn2) return vn2 < other.vn2;
+  //   return vn3 < other.vn3;
+  // }
 };
 
 struct OBJMaterial {
@@ -73,30 +93,29 @@ struct OBJMaterial {
   std::string diffuse_texture_map;
 };
 
-
 class OBJLoader {
  public:
   OBJLoader(const std::string& obj_filename);
   ~OBJLoader();
 
   std::string ToString();
-  std::vector<OBJVertex> GetVertices();
-  std::vector<OBJTextureCoordinate> GetTextureCoordinates();
-  std::vector<OBJNormal> GetNormals();
-  std::vector<OBJFace> GetFaces();
+  std::vector<Vertex> GetVertices();
+  std::vector<TextureCoordinate> GetTextureCoordinates();
+  std::vector<Normal> GetNormals();
+  std::vector<IndexesFace> GetFaces();
   std::vector<OBJMaterial> GetMaterials();
   OBJMaterial GetMaterialsFromFaceId(int faceId);
-  OBJMaterial GetMaterialsFromFace(OBJFace& face);
+  OBJMaterial GetMaterialsFromFace(IndexesFace& face);
 
  private:
-  std::vector<OBJVertex> m_Vertices;
-  std::vector<OBJTextureCoordinate> m_TexCoords;
-  std::vector<OBJNormal> m_Normals;
-  std::vector<OBJFace> m_Faces;
+  std::vector<Vertex> m_Vertices;
+  std::vector<TextureCoordinate> m_TexCoords;
+  std::vector<Normal> m_Normals;
+  std::vector<IndexesFace> m_Faces;
   std::vector<OBJMaterial> m_Materials;
   
   std::map<int, std::string> m_Face_id_to_material_map;
-  std::map<OBJFace, std::string> m_Face_to_material_map;
+  std::map<IndexesFace, std::string> m_Face_to_material_map;
   std::map<std::string, OBJMaterial> m_Material_name_to_material_map;
   
 };

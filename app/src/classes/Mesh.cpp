@@ -9,33 +9,37 @@ Mesh::Mesh()
     m_Name = std::to_string(rand());
 }
 
-Mesh::Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned int> indices, std::vector<float> normales)
+Mesh::Mesh(std::string name, std::vector<Vertex> vertices, std::vector<IndexesFace> indices, std::vector<Normal> normales)
     : m_Matrix(glm::mat4(1.0f)), m_Position(glm::vec3(0.0f)), m_Scale(glm::vec3(1.0f)), m_Rotation(glm::vec3(0.0f))
 {
-
-    m_Name = name;
+     m_Name = name;
 
     m_Vertices = vertices;
     m_Normales = normales;
     m_Indices = indices;
-    m_Vertices_size = m_Vertices.size() * sizeof(float);
-    m_Normales_size = m_Normales.size() * sizeof(float);
-    m_Indices_size = m_Indices.size() * sizeof(unsigned int);
+    m_Vertices_size = m_Vertices.size() * sizeof(Vertex);
+    m_Normales_size = m_Normales.size() * sizeof(Normal);
+    m_Indices_size = m_Indices.size() * sizeof(IndexesFace);
 
-    // create vertex array and vertex buffer
+    // create vertex array
     m_VAO = new VertexArray();
-    m_VBO_pos = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
 
-    // create vertex buffer layout to pass components to shader
+    // create vertex buffer for positions
+    m_VBO_pos = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
     VertexBufferLayout layout_pos;
     layout_pos.Push<float>(3); // position
 
-    // add vertex buffer layout to vertex array
     m_VAO->AddBuffer(*m_VBO_pos, layout_pos);
 
+    // create vertex buffer for textures
+    // m_VBO_tex = new VertexBuffer(m_TexCoords.data(), m_TexCoords_size);
+    // VertexBufferLayout layout_tex;
+    // layout_tex.Push<float>(2); // textures
 
+    // m_VAO->AddBuffer(*m_VBO_tex, layout_tex);
+
+    // create vertex buffer for normales
     m_VBO_norm = new VertexBuffer(m_Normales.data(), m_Normales_size);
-
     VertexBufferLayout layout_norm;
     layout_norm.Push<float>(3); // normales
     
@@ -45,6 +49,27 @@ Mesh::Mesh(std::string name, std::vector<float> vertices, std::vector<unsigned i
     m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
 
     Clear();
+}
+
+Mesh *Mesh::FromOBJ(const std::string filename)
+{
+    OBJLoader loader(filename);
+
+    std::vector<Vertex> vertices = loader.GetVertices();
+    std::vector<Normal> normales = loader.GetNormals();
+    // std::vector<TextureCoordinate> texCoords = loader.GetTextureCoordinates();
+    std::vector<IndexesFace> indices = loader.GetFaces();
+    OBJMaterial material = loader.GetMaterials()[0];
+
+    Mesh * mesh = new Mesh(filename, vertices, indices, normales);
+
+    mesh->CreateMaterial("phong");
+    mesh->GetMaterial()->SetAmbientColor(material.ambient_color);
+    mesh->GetMaterial()->SetDiffuseColor(material.diffuse_color);
+    mesh->GetMaterial()->SetSpecularColor(material.specular_color);
+    mesh->GetMaterial()->SetSpecularExponent(material.shininess);
+
+    return mesh;
 }
 
 Mesh::~Mesh()
@@ -78,17 +103,17 @@ void Mesh::SetName(std::string name)
     m_Name = name;
 }
 
-void Mesh::SetVertices(std::vector<float> vertices)
+void Mesh::SetVertices(std::vector<Vertex> vertices)
 {
     m_Vertices = vertices;
 }
 
-void Mesh::SetNormales(std::vector<float> normales)
+void Mesh::SetNormales(std::vector<Normal> normales)
 {
     m_Normales = normales;
 }
 
-void Mesh::SetIndices(std::vector<unsigned int> indices)
+void Mesh::SetIndices(std::vector<IndexesFace> indices)
 {
     m_Indices = indices;
 }
@@ -119,17 +144,17 @@ IndexBuffer *Mesh::GetIBO() const
     return m_IBO;
 }
 
-std::vector<float> Mesh::GetVertices() const
+std::vector<Vertex> Mesh::GetVertices() const
 {
     return m_Vertices;
 }
 
-std::vector<float> Mesh::GetNormales() const
+std::vector<Normal> Mesh::GetNormales() const
 {
     return m_Normales;
 }
 
-std::vector<unsigned int> Mesh::GetIndices() const
+std::vector<IndexesFace> Mesh::GetIndices() const
 {
     return m_Indices;
 }
@@ -178,14 +203,14 @@ void Mesh::Scale(glm::vec3 scale)
 
 glm::mat4 Mesh::ComputeMatrix()
 {  
-    // glm::mat4 model(1.0f);
+    glm::mat4 model(1.0f);
 
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_Position);
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), m_Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)) *
-                         glm::rotate(glm::mat4(1.0f), m_Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)) *
-                         glm::rotate(glm::mat4(1.0f), m_Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 translation = glm::translate(model, m_Position);
+    glm::mat4 rotation = glm::rotate(model, m_Rotation.x, glm::vec3(1.0f, 0.0f, 0.0f)) *
+                         glm::rotate(model, m_Rotation.y, glm::vec3(0.0f, 1.0f, 0.0f)) *
+                         glm::rotate(model, m_Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
-    glm::mat4 scale = glm::scale(glm::mat4(1.0f), m_Scale);
+    glm::mat4 scale = glm::scale(model, m_Scale);
 
     m_Matrix = translation * rotation * scale;
     return m_Matrix;

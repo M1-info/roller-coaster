@@ -125,6 +125,8 @@ void Renderer::Render()
 
 			shader->Unbind();
 
+			// mesh->Draw();
+
 			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *shader);
 		}
 
@@ -157,14 +159,14 @@ void Renderer::SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> me
 		shader->Bind();
 
 		// pass material infos
-		glm::vec3 materialAmbient = material->GetAmbientColor();
-		glm::vec3 materialDiffuse = material->GetDiffuseColor();
-		glm::vec3 materialSpecular = material->GetSpecularColor();
+		Color materialAmbient = material->GetAmbientColor();
+		Color materialDiffuse = material->GetDiffuseColor();
+		Color materialSpecular = material->GetSpecularColor();
 		float specularExponent = material->GetSpecularExponent();
 
-		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.x, materialAmbient.y, materialAmbient.z);
-		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.x, materialDiffuse.y, materialDiffuse.z);
-		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.x, materialSpecular.y, materialSpecular.z);
+		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
+		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
+		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
 		shader->SetUniform1f("u_material.specularExponent", specularExponent);
 
 		glm::vec3 lightPosition = m_Light->m_Position;
