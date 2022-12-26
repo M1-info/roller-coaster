@@ -106,7 +106,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
         {
           if (line.substr(0, 7) == "newmtl ")
           {
-            std::cout << "Loading " << line << "..." << std::endl;
             if (i != 0)
             {
               m_Materials.push_back(material);

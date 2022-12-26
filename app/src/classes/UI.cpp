@@ -75,11 +75,10 @@ void UI::FrameRate(ImGuiViewport *viewport) const
 
 void UI::SceneInfo()
 {
-    ImGui::Begin("Scene Info");
     SceneGraph();
     MeshInfo();
     MeshTransform("Light Position", m_Light->m_Position, 0.0f);
-    ImGui::End();
+    CameraInfo();
 }
 
 void UI::SceneGraph()
@@ -171,5 +170,111 @@ void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue
     ImGui::Columns(1);
 
     ImGui::PopID();
+}
 
+void UI::CameraInfo()
+{
+    std::shared_ptr<Camera> camera = m_Window->GetCamera();
+    glm::vec3 *position = camera->GetPositionPtr();
+    float *yaw = camera->GetYawPtr();
+    float *pitch = camera->GetPitchPtr();
+    float *cameraSpeed = camera->GetMoveSpeedPtr();
+    float *sensitivity = camera->GetMoveSensitivityPtr();
+
+    float resetValue = 0.0f;
+
+    ImGui::PushID("Camera");
+
+    ImGui::Begin("Camera info");
+
+    ImGui::Columns(2);
+    ImGui::Text("Camera Mouvements");
+    ImGui::NextColumn();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 2));
+    ImGui::PushItemWidth(70);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    if(ImGui::Button("Speed"))
+        *yaw = resetValue;
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    ImGui::DragFloat("##Speed", cameraSpeed, 0.1f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(70);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+    if(ImGui::Button("Sensitivity"))
+        *pitch = resetValue;
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    ImGui::DragFloat("##Sensitivity", sensitivity, 0.1f, 0.1f, 1.0f);
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::NextColumn();
+
+    ImGui::Text("Camera position");
+    ImGui::NextColumn();
+
+    ImGui::PushItemWidth(70);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+    if(ImGui::Button("X"))
+        position->x = resetValue;
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    if(ImGui::DragFloat("##X", &position->x, 0.1f))
+        camera->Update();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(70);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+    if(ImGui::Button("Y"))
+        position->y = resetValue;
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    if(ImGui::DragFloat("##Y", &position->y, 0.1f))
+        camera->Update();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+    ImGui::PushItemWidth(70);
+
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.8f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
+    if(ImGui::Button("Z"))
+        position->z = resetValue;
+    ImGui::PopStyleColor(3);
+
+    ImGui::SameLine();
+    if(ImGui::DragFloat("##Z", &position->z, 0.1f))
+        camera->Update();
+    ImGui::PopItemWidth();
+    ImGui::SameLine();
+
+
+    ImGui::PopStyleVar();
+    ImGui::Columns(1);
+
+    ImGui::End();
+
+    ImGui::PopID();
 }

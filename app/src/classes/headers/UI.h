@@ -32,6 +32,7 @@ public:
     void SceneGraph();
     void MeshInfo();
     void MeshTransform(std::string component, glm::vec3 &value, float resetValue = 0.0f);
+    void CameraInfo();
 
 
     inline void SetWindow(Window *window) { m_Window = window; }

@@ -31,6 +31,7 @@ public:
     inline float GetFarPlane() const { return m_FarPlane; };
 
     inline glm::vec3 GetPosition() const { return m_Position; };
+    inline glm::vec3 *GetPositionPtr() { return &m_Position; };
     inline glm::vec3 GetTarget() const { return m_Target; };
 
     inline glm::mat4 GetProjection() const { return m_Projection; };
@@ -39,12 +40,16 @@ public:
 
     inline float GetYaw() const { return m_Yaw; };
     inline float GetPitch() const { return m_Pitch; };
+    inline float *GetYawPtr() { return &m_Yaw; };
+    inline float *GetPitchPtr() { return &m_Pitch; };
 
     inline float GetLastX() const { return m_lastX; };
     inline float GetLastY() const { return m_lastY; };
 
     inline float GetMoveSensitivity() const { return m_MoveSensitivity; };
     inline float GetMoveSpeed() const { return m_MoveSpeed; };
+    inline float *GetMoveSensitivityPtr() { return &m_MoveSensitivity; };
+    inline float *GetMoveSpeedPtr() { return &m_MoveSpeed; };
     inline CameraMovement GetCurrentMouvementDirection() const { return m_CurrentMouvementDirection; };
 
     inline glm::vec3 GetFront() const { return m_Front; };
