@@ -5,7 +5,7 @@ Cart::Cart(const std::string filename)
 
     m_Type = MeshType::CART;
 
-    m_Position = glm::vec3(0.0f);
+    m_Position = glm::vec3(-2.0f);
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);

@@ -35,7 +35,7 @@ public:
     void Clear();
 
     void SetName(std::string name);
-    void SetVertices(std::vector<glm::vec3> vertices);
+    //void SetVertices(std::vector<glm::vec3> vertices);
     void SetNormales(std::vector<glm::vec3> normales);
     void SetIndices(std::vector<IndexesFace> indices);
     void CreateMaterial(std::string shaderFile);
@@ -57,7 +57,9 @@ public:
     std::vector<std::shared_ptr<Mesh>> GetChildren() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetScale() const;
+    glm::vec3 *GetScalePtr();
     glm::vec3 GetRotation() const;
+    glm::vec3 *GetRotationPtr();
     MeshType GetType() const;
 
     void Translate(glm::vec3 translation);

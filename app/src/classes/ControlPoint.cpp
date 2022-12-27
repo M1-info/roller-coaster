@@ -10,7 +10,7 @@ ControlPoint::ControlPoint(glm::vec3 point, int index)
     m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);
 
-    m_Name = "ControlPoint" + std::to_string(index);
+    m_Name = "ControlPoint_" + std::to_string(index);
 
     CreateMaterial("basic");
 

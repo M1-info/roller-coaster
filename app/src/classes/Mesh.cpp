@@ -31,10 +31,10 @@ void Mesh::SetName(std::string name)
     m_Name = name;
 }
 
-void Mesh::SetVertices(std::vector<glm::vec3> vertices)
-{
-    m_Vertices = vertices;
-}
+// void Mesh::SetVertices(std::vector<glm::vec3> vertices)
+// {
+//     m_Vertices = vertices;
+// }
 
 void Mesh::SetNormales(std::vector<glm::vec3> normales)
 {
@@ -132,9 +132,17 @@ glm::vec3 Mesh::GetScale() const
     return m_Scale;
 }
 
+glm::vec3 *Mesh::GetScalePtr(){
+    return &m_Scale;
+}
+
 glm::vec3 Mesh::GetRotation() const
 {
     return m_Rotation;
+}
+
+glm::vec3 *Mesh::GetRotationPtr(){
+    return &m_Rotation;
 }
 
 MeshType Mesh::GetType() const

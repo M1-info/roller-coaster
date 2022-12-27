@@ -47,16 +47,32 @@ void UI::Render()
 
     // Begin Dockspace
     ImGui::Begin("DockSpace", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
-
+    
     ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
-    ConsoleLog();
+    /* scene infos window */
+    
+    ImGui::SetNextWindowSize(ImVec2(500, 450), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    SceneGraph();
+    
 
-    // scene infos window
-    SceneInfo();
+    ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y -600), ImGuiCond_Once);
+    MeshInfo();
+    
+    ImGui::SetNextWindowSize(ImVec2(500, 150), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 400), ImGuiCond_Once);
+    CameraInfo();
+
+    
+    ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 250), ImGuiCond_Once);
+    ConsoleLog();
+    
 
     ImGui::End();
 
@@ -70,14 +86,6 @@ void UI::FrameRate(ImGuiViewport *viewport) const
     ImGui::Begin("Frame Rate", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
     ImGui::Text("Frame Rate: %.1f FPS", ImGui::GetIO().Framerate);
     ImGui::End();
-}
-
-void UI::SceneInfo()
-{
-    SceneGraph();
-    MeshInfo();
-    MeshTransform("Light Position", &m_Light->m_Position, 0.0f);
-    CameraInfo();
 }
 
 void UI::SceneGraph()
@@ -114,38 +122,60 @@ void UI::MeshInfo()
         ImGui::Text(m_SelectedMesh->GetName().c_str());
         ImGui::Separator();
         ImGui::Text("Transform");
-        ImGui::Separator();
+        // ImGui::Separator();
+        ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Add some space between the two lines
+
+        // if(m_SelectedMesh->GetType() == MeshType::CONTROL_POINT){
+        //     glm::vec3 *vertex = m_SelectedMesh->GetVertexPtr(0);
+        //     MeshTransform("Position", vertex);
+        // }
+        // else
+        //     MeshTransform("Position", &m_SelectedMesh->m_Position, 0.0f);
+        // ImGui::Separator();
+        // MeshTransform("Rotation", &m_SelectedMesh->m_Rotation);
+        // ImGui::Separator();
+        // MeshTransform("Scale", &m_SelectedMesh->m_Scale, 1.0f);
+
+
         if(m_SelectedMesh->GetType() == MeshType::CONTROL_POINT){
             glm::vec3 *vertex = m_SelectedMesh->GetVertexPtr(0);
-            MeshTransform("Position", vertex);
+            MeshTransform("Position", vertex, glm::vec3(0.0f));
+            ImGui::Separator();
+            vertex = m_SelectedMesh->GetRotationPtr();
+            MeshTransform("Rotation", vertex, glm::vec3(0.0f));
+            ImGui::Separator();
+            vertex = m_SelectedMesh->GetScalePtr();
+            MeshTransform("Scale", vertex, glm::vec3(1.0f));
+        } else {
+            MeshTransform("Position", &m_SelectedMesh->m_Position, glm::vec3(0.0f));
+            ImGui::Separator();
+            MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, glm::vec3(0.0f));
+            ImGui::Separator();
+            MeshTransform("Scale", &m_SelectedMesh->m_Scale, glm::vec3(1.0f));
         }
-        else
-            MeshTransform("Position", &m_SelectedMesh->m_Position, 0.0f);
-        ImGui::Separator();
-        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation);
-        ImGui::Separator();
-        MeshTransform("Scale", &m_SelectedMesh->m_Scale, 1.0f);
+
     }
     ImGui::End();
 }
 
-void UI::MeshTransform(std::string component, glm::vec3 *value, float resetValue)
+void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue)
 {
 
     ImGui::PushID(component.c_str());
 
     ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, 100);
     ImGui::Text(component.c_str());
     ImGui::NextColumn();
-
-    ImGui::PushItemWidth(70);
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     if(ImGui::Button("X"))
-        value->x = resetValue;
+        value->x = resetValue.x;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -162,7 +192,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, float resetValue
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
     if(ImGui::Button("Y"))
-        value->y = resetValue;
+        value->y = resetValue.y;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -179,7 +209,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, float resetValue
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
     if(ImGui::Button("Z"))
-        value->z = resetValue;
+        value->z = resetValue.z;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -211,8 +241,10 @@ void UI::CameraInfo()
     ImGui::Begin("Camera info");
 
     ImGui::Columns(2);
+    ImGui::SetColumnWidth(0, 150);
     ImGui::Text("Camera Mouvements");
     ImGui::NextColumn();
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 2));
     ImGui::PushItemWidth(70);
@@ -244,12 +276,14 @@ void UI::CameraInfo()
     ImGui::SameLine();
 
     ImGui::NextColumn();
+    ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Add some space between the two lines
 
     ImGui::Text("Camera position");
     ImGui::NextColumn();
 
     ImGui::PushItemWidth(70);
 
+    ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Add some space between the two lines
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));

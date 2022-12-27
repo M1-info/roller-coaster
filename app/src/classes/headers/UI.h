@@ -9,6 +9,8 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_internal.h>
+
 
 #include "FrameBuffer.h"
 #include "Window.h"
@@ -29,10 +31,9 @@ public:
     void Render();
 
     void FrameRate(ImGuiViewport *viewport) const;
-    void SceneInfo();
     void SceneGraph();
     void MeshInfo();
-    void MeshTransform(std::string component, glm::vec3 *value, float resetValue = 0.0f);
+    void MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue = glm::vec3(0.0f));
     void CameraInfo();
     void ConsoleLog();
 

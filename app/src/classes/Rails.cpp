@@ -2,7 +2,6 @@
 
 Rails::Rails(std::vector<glm::vec3> controlPoints)
 {
-
     m_Type = MeshType::RAILS;
 
     m_Position = glm::vec3(0.0f);
@@ -51,7 +50,6 @@ void Rails::Draw()
 
 void Rails::Update()
 {
-
     m_Vertices.clear();
 
     for(int i = 4; i <= m_Children.size(); i+=3){
