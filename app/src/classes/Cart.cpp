@@ -3,6 +3,8 @@
 Cart::Cart(const std::string filename)
 {
 
+    m_Type = MeshType::CART;
+
     m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
@@ -10,8 +12,8 @@ Cart::Cart(const std::string filename)
 
     OBJLoader loader(filename);
 
-    std::vector<Vertex> vertices = loader.GetVertices();
-    std::vector<Normal> normales = loader.GetNormals();
+    std::vector<glm::vec3> vertices = loader.GetVertices();
+    std::vector<glm::vec3> normales = loader.GetNormals();
     std::vector<IndexesFace> indices = loader.GetFaces();
     OBJMaterial material = loader.GetMaterials()[0];
 
@@ -27,8 +29,8 @@ Cart::Cart(const std::string filename)
     m_Vertices = vertices;
     m_Normales = normales;
     m_Indices = indices;
-    m_Vertices_size = m_Vertices.size() * sizeof(Vertex);
-    m_Normales_size = m_Normales.size() * sizeof(Normal);
+    m_Vertices_size = m_Vertices.size() * sizeof(glm::vec3);
+    m_Normales_size = m_Normales.size() * sizeof(glm::vec3);
     m_Indices_size = m_Indices.size() * sizeof(IndexesFace);
 
     // create vertex array

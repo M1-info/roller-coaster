@@ -12,6 +12,7 @@ public:
     Cart(const std::string filename);
 
     void Draw() override;
+    void Update() override {};
 };
 
 #endif // CART_H

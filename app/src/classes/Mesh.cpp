@@ -31,12 +31,12 @@ void Mesh::SetName(std::string name)
     m_Name = name;
 }
 
-void Mesh::SetVertices(std::vector<Vertex> vertices)
+void Mesh::SetVertices(std::vector<glm::vec3> vertices)
 {
     m_Vertices = vertices;
 }
 
-void Mesh::SetNormales(std::vector<Normal> normales)
+void Mesh::SetNormales(std::vector<glm::vec3> normales)
 {
     m_Normales = normales;
 }
@@ -82,12 +82,17 @@ IndexBuffer *Mesh::GetIBO() const
     return m_IBO;
 }
 
-std::vector<Vertex> Mesh::GetVertices() const
+std::vector<glm::vec3> Mesh::GetVertices() const
 {
     return m_Vertices;
 }
 
-std::vector<Normal> Mesh::GetNormales() const
+glm::vec3 *Mesh::GetVertexPtr(int index)
+{
+    return &m_Vertices[index];
+}
+
+std::vector<glm::vec3> Mesh::GetNormales() const
 {
     return m_Normales;
 }
@@ -130,6 +135,11 @@ glm::vec3 Mesh::GetScale() const
 glm::vec3 Mesh::GetRotation() const
 {
     return m_Rotation;
+}
+
+MeshType Mesh::GetType() const
+{
+    return m_Type;
 }
 
 void Mesh::Translate(glm::vec3 translation)

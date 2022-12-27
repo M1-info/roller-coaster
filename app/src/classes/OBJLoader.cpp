@@ -27,22 +27,22 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   {
     if (line.substr(0, 2) == "v ")
     {
-      // Vertex
-      Vertex vertex;
+      // glm::vec3
+      glm::vec3 vertex;
       sscanf_s(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
       m_Vertices.push_back(vertex);
     }
     else if (line.substr(0, 3) == "vt ")
     {
       // Texture coordinate
-      TextureCoordinate tex_coord;
-      sscanf_s(line.c_str(), "vt %f %f", &tex_coord.u, &tex_coord.v);
+      glm::vec2 tex_coord;
+      sscanf_s(line.c_str(), "vt %f %f", &tex_coord.x, &tex_coord.y);
       m_TexCoords.push_back(tex_coord);
     }
     else if (line.substr(0, 3) == "vn ")
     {
-      // Normal
-      Normal normal;
+      // glm::vec3
+      glm::vec3 normal;
       sscanf_s(line.c_str(), "vn %f %f %f", &normal.x, &normal.y, &normal.z);
       m_Normals.push_back(normal);
     }
@@ -174,17 +174,17 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   obj_file.close();
 }
 
-std::vector<Vertex> OBJLoader::GetVertices()
+std::vector<glm::vec3> OBJLoader::GetVertices()
 {
   return m_Vertices;
 }
 
-std::vector<TextureCoordinate> OBJLoader::GetTextureCoordinates()
+std::vector<glm::vec2> OBJLoader::GetTextureCoordinates()
 {
   return m_TexCoords;
 }
 
-std::vector<Normal> OBJLoader::GetNormals()
+std::vector<glm::vec3> OBJLoader::GetNormals()
 {
   return m_Normals;
 }
@@ -220,7 +220,7 @@ std::string OBJLoader::ToString()
   str << "Texture coordinates:\n";
   for (const auto &tc : m_TexCoords)
   {
-    str << "  " << tc.u << ", " << tc.v << "\n";
+    str << "  " << tc.x << ", " << tc.y << "\n";
   }
   str << "Normals:\n";
   for (const auto &n : m_Normals)

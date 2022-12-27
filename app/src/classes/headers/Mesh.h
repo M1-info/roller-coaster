@@ -17,19 +17,26 @@
 #include "Shader.h"
 #include "OBJLoader.h"
 
+enum MeshType {
+    MESH,
+    RAILS,
+    CART,
+    CONTROL_POINT
+};
+
 class Mesh
 {
 public:
     Mesh() = default;
-    Mesh(std::string name, std::vector<Vertex> vertices, std::vector<IndexesFace> indices, std::vector<Normal> normales);
+    Mesh(std::string name, std::vector<glm::vec3> vertices, std::vector<IndexesFace> indices, std::vector<glm::vec3> normales);
     virtual ~Mesh();
 
     void SetUp();
     void Clear();
 
     void SetName(std::string name);
-    void SetVertices(std::vector<Vertex> vertices);
-    void SetNormales(std::vector<Normal> normales);
+    void SetVertices(std::vector<glm::vec3> vertices);
+    void SetNormales(std::vector<glm::vec3> normales);
     void SetIndices(std::vector<IndexesFace> indices);
     void CreateMaterial(std::string shaderFile);
     void SetParent(std::shared_ptr<Mesh> parent);
@@ -42,14 +49,16 @@ public:
     Material *GetMaterial() const;
 
     std::string GetName() const;
-    std::vector<Vertex> GetVertices() const;
-    std::vector<Normal> GetNormales() const;
+    std::vector<glm::vec3> GetVertices() const;
+    glm::vec3 *GetVertexPtr(int index);
+    std::vector<glm::vec3> GetNormales() const;
     std::vector<IndexesFace> GetIndices() const;
     std::shared_ptr<Mesh> GetParent() const;
     std::vector<std::shared_ptr<Mesh>> GetChildren() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetScale() const;
     glm::vec3 GetRotation() const;
+    MeshType GetType() const;
 
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
@@ -57,11 +66,12 @@ public:
     glm::mat4 ComputeMatrix();
 
     virtual void Draw() = 0;
+    virtual void Update() = 0;
 
 protected:
     std::string m_Name;
-    std::vector<Vertex> m_Vertices;
-    std::vector<Normal> m_Normales;
+    std::vector<glm::vec3> m_Vertices;
+    std::vector<glm::vec3> m_Normales;
     std::vector<IndexesFace> m_Indices;
 
     size_t m_Vertices_size;
@@ -78,6 +88,8 @@ protected:
 
     std::shared_ptr<Mesh> m_Parent;
     std::vector<std::shared_ptr<Mesh>> m_Children;
+
+    MeshType m_Type = MeshType::MESH; 
 
 public: 
    glm::vec3 m_Position;

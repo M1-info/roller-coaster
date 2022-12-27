@@ -76,7 +76,7 @@ void UI::SceneInfo()
 {
     SceneGraph();
     MeshInfo();
-    MeshTransform("Light Position", m_Light->m_Position, 0.0f);
+    MeshTransform("Light Position", &m_Light->m_Position, 0.0f);
     CameraInfo();
 }
 
@@ -85,7 +85,19 @@ void UI::SceneGraph()
     ImGui::Begin("Scene Graph");
     for (auto mesh: m_Scene->GetObjects())
     {
-        if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh))
+        if(mesh->GetChildren().size() > 0)
+        {
+            if (ImGui::TreeNode(mesh->GetName().c_str()))
+            {
+                for (auto child: mesh->GetChildren())
+                {
+                    if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
+                        SetSelectedMesh(child);
+                }
+                ImGui::TreePop();
+            }
+        }
+        else if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh))
             SetSelectedMesh(mesh);
         ImGui::Separator();
     }
@@ -103,16 +115,21 @@ void UI::MeshInfo()
         ImGui::Separator();
         ImGui::Text("Transform");
         ImGui::Separator();
-        MeshTransform("Position", m_SelectedMesh->m_Position);
+        if(m_SelectedMesh->GetType() == MeshType::CONTROL_POINT){
+            glm::vec3 *vertex = m_SelectedMesh->GetVertexPtr(0);
+            MeshTransform("Position", vertex);
+        }
+        else
+            MeshTransform("Position", &m_SelectedMesh->m_Position, 0.0f);
         ImGui::Separator();
-        MeshTransform("Rotation", m_SelectedMesh->m_Rotation);
+        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation);
         ImGui::Separator();
-        MeshTransform("Scale", m_SelectedMesh->m_Scale, 1.0f);
+        MeshTransform("Scale", &m_SelectedMesh->m_Scale, 1.0f);
     }
     ImGui::End();
 }
 
-void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue)
+void UI::MeshTransform(std::string component, glm::vec3 *value, float resetValue)
 {
 
     ImGui::PushID(component.c_str());
@@ -128,11 +145,14 @@ void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     if(ImGui::Button("X"))
-        value.x = resetValue;
+        value->x = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    ImGui::DragFloat("##X", &value.x, 0.1f);
+
+    if(ImGui::DragFloat("##X", &value->x, 0.1f))
+        m_SelectedMesh->Update();
+
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -142,11 +162,14 @@ void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
     if(ImGui::Button("Y"))
-        value.y = resetValue;
+        value->y = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    ImGui::DragFloat("##Y", &value.y, 0.1f);
+
+    if(ImGui::DragFloat("##Y", &value->y, 0.1f))
+        m_SelectedMesh->Update();
+
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -156,11 +179,14 @@ void UI::MeshTransform(std::string component, glm::vec3 &value, float resetValue
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
     if(ImGui::Button("Z"))
-        value.z = resetValue;
+        value->z = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    ImGui::DragFloat("##Z", &value.z, 0.1f);
+
+    if(ImGui::DragFloat("##Z", &value->z, 0.1f))
+        m_SelectedMesh->Update();
+        
     ImGui::PopItemWidth();
     ImGui::SameLine();
 

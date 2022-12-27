@@ -1,16 +1,20 @@
 #include "headers/ControlPoint.h"
 
-ControlPoint::ControlPoint(glm::vec3 point)
+ControlPoint::ControlPoint(glm::vec3 point, int index)
 {
+
+    m_Type = MeshType::CONTROL_POINT;
 
     m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);
 
+    m_Name = "ControlPoint" + std::to_string(index);
+
     CreateMaterial("basic");
 
-    m_Vertices.push_back(Vertex(point.x, point.y, point.z));
+    m_Vertices.push_back(point);
 
     m_VAO = new VertexArray();
 

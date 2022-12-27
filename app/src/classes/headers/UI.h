@@ -14,6 +14,7 @@
 #include "Window.h"
 #include "Scene.h"
 #include "Mesh.h"
+#include "ControlPoint.h"
 #include "Light.h"
 
 class UI
@@ -31,7 +32,7 @@ public:
     void SceneInfo();
     void SceneGraph();
     void MeshInfo();
-    void MeshTransform(std::string component, glm::vec3 &value, float resetValue = 0.0f);
+    void MeshTransform(std::string component, glm::vec3 *value, float resetValue = 0.0f);
     void CameraInfo();
     void ConsoleLog();
 

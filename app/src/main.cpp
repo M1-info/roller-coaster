@@ -7,11 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "classes/headers/Renderer.h"
+#include "classes/headers/Rails.h"
 #include "classes/headers/Cart.h"
 #include "classes/headers/Scene.h"
-#include "classes/headers/Rails.h"
-#include "classes/headers/Material.h"
-#include "classes/headers/OBJLoader.h"
 
 using namespace std;
 
