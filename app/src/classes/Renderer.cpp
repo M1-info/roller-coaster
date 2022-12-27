@@ -47,7 +47,7 @@ void Renderer::Init()
 	float far = 100.0f;
 	m_Camera = std::make_shared<Camera>(fov, aspect, near, far);
 
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 8.0f);
 	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 	m_Camera->Init(position, target, up);
@@ -113,6 +113,16 @@ void Renderer::Render()
 			shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 			shader->Unbind();
+
+			if(mesh->GetChildren().size() > 0){
+				for(auto child : mesh->GetChildren()){
+					child->GetMaterial()->GetShader()->Bind();
+					child->GetMaterial()->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+					child->GetMaterial()->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
+					child->GetMaterial()->GetShader()->SetUniformMat4f("u_model", child->ComputeMatrix());
+					child->GetMaterial()->GetShader()->Unbind();
+				}
+			}
 
 			mesh->Draw();
 

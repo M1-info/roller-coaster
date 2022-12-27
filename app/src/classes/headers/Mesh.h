@@ -2,6 +2,8 @@
 #define MESH_H
 
 #include <string>
+#include <vector>
+#include <memory>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -30,6 +32,8 @@ public:
     void SetNormales(std::vector<Normal> normales);
     void SetIndices(std::vector<IndexesFace> indices);
     void CreateMaterial(std::string shaderFile);
+    void SetParent(std::shared_ptr<Mesh> parent);
+    void SetChildren(std::vector<std::shared_ptr<Mesh>>);
 
     VertexArray *GetVAO() const;
     VertexBuffer *GetVBO() const;
@@ -41,6 +45,8 @@ public:
     std::vector<Vertex> GetVertices() const;
     std::vector<Normal> GetNormales() const;
     std::vector<IndexesFace> GetIndices() const;
+    std::shared_ptr<Mesh> GetParent() const;
+    std::vector<std::shared_ptr<Mesh>> GetChildren() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetScale() const;
     glm::vec3 GetRotation() const;
@@ -69,6 +75,9 @@ protected:
     Material *m_Material;
 
     glm::mat4 m_Matrix;
+
+    std::shared_ptr<Mesh> m_Parent;
+    std::vector<std::shared_ptr<Mesh>> m_Children;
 
 public: 
    glm::vec3 m_Position;

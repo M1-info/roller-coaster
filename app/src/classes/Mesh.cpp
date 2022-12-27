@@ -46,6 +46,16 @@ void Mesh::SetIndices(std::vector<IndexesFace> indices)
     m_Indices = indices;
 }
 
+void Mesh::SetParent(std::shared_ptr<Mesh> parent)
+{
+    m_Parent = parent;
+}
+
+void Mesh::SetChildren(std::vector<std::shared_ptr<Mesh>> children)
+{
+    m_Children = children;
+}
+
 void Mesh::CreateMaterial(std::string shaderFile)
 {
     m_Material = new Material();
@@ -85,6 +95,16 @@ std::vector<Normal> Mesh::GetNormales() const
 std::vector<IndexesFace> Mesh::GetIndices() const
 {
     return m_Indices;
+}
+
+std::shared_ptr<Mesh> Mesh::GetParent() const
+{
+    return m_Parent;
+}
+
+std::vector<std::shared_ptr<Mesh>> Mesh::GetChildren() const
+{
+    return m_Children;
 }
 
 glm::mat4 Mesh::GetMatrix() const
@@ -142,6 +162,10 @@ glm::mat4 Mesh::ComputeMatrix()
     glm::mat4 scale = glm::scale(model, m_Scale);
 
     m_Matrix = translation * rotation * scale;
+
+    if(m_Parent != nullptr)
+        m_Matrix *= m_Parent->ComputeMatrix();
+
     return m_Matrix;
 }
 
