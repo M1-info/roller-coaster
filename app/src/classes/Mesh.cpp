@@ -1,40 +1,5 @@
 #include "headers/Mesh.h"
 
-// Mesh::Mesh(std::string name, std::vector<Vertex> vertices, std::vector<IndexesFace> indices, std::vector<Normal> normales)
-//     : m_Matrix(glm::mat4(1.0f)), m_Position(glm::vec3(0.0f)), m_Scale(glm::vec3(1.0f)), m_Rotation(glm::vec3(0.0f))
-// {
-//      m_Name = name;
-
-//     m_Vertices = vertices;
-//     m_Normales = normales;
-//     m_Indices = indices;
-//     m_Vertices_size = m_Vertices.size() * sizeof(Vertex);
-//     m_Normales_size = m_Normales.size() * sizeof(Normal);
-//     m_Indices_size = m_Indices.size() * sizeof(IndexesFace);
-
-//     // create vertex array
-//     m_VAO = new VertexArray();
-
-//     // create vertex buffer for positions
-//     m_VBO_pos = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
-//     VertexBufferLayout layout_pos;
-//     layout_pos.Push<float>(3); // position
-
-//     m_VAO->AddBuffer(*m_VBO_pos, layout_pos);
-
-//     // create vertex buffer for normales
-//     m_VBO_norm = new VertexBuffer(m_Normales.data(), m_Normales_size);
-//     VertexBufferLayout layout_norm;
-//     layout_norm.Push<float>(3); // normales
-    
-//     m_VAO->AddBuffer(*m_VBO_norm, layout_norm, 1);
-
-//     // create index buffer
-//     m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
-
-//     Clear();
-// }
-
 Mesh::~Mesh()
 {
     m_Vertices.clear();

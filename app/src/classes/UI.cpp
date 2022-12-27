@@ -53,8 +53,7 @@ void UI::Render()
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
-    // frame rate window
-    // FrameRate(viewport);
+    ConsoleLog();
 
     // scene infos window
     SceneInfo();
@@ -275,4 +274,14 @@ void UI::CameraInfo()
     ImGui::End();
 
     ImGui::PopID();
+}
+
+void UI::ConsoleLog()
+{
+    ImGui::Begin("Console");
+    for(auto s: m_Logs)
+        ImGui::Text(s.c_str());
+    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+        ImGui::SetScrollHereY(1.0f);
+    ImGui::End();
 }
