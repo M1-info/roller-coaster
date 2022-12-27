@@ -129,6 +129,13 @@ void Renderer::Render()
 
 		}
 
+		m_Rails->GetShader()->Bind();
+		m_Rails->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+		m_Rails->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
+		m_Rails->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+		m_Rails->GetShader()->Unbind();
+		m_Rails->Draw();
+
 		// draw UI
 		m_UI->Render();
 

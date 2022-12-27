@@ -54,7 +54,7 @@ void UI::Render()
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
     // frame rate window
-    FrameRate(viewport);
+    // FrameRate(viewport);
 
     // scene infos window
     SceneInfo();

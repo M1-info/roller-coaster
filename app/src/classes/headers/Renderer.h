@@ -19,6 +19,7 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Rails.h"
 #include "FrameBuffer.h"
 #include "Skybox.h"
 #include "OBJLoader.h"
@@ -49,11 +50,13 @@ public:
 	inline std::shared_ptr<Camera> GetCamera() const { return m_Camera; }
 	inline Window* GetWindow() const { return m_Window; }
 	inline UI* GetUI() const { return m_UI; }
+	inline void SetRails(Rails *rails) { m_Rails = rails; }
 
 
 private:
 	Window* m_Window;
 	Scene* m_Scene;
+	Rails* m_Rails;
 	std::shared_ptr<Camera> m_Camera;
 	Light * m_Light;
 	UI* m_UI;

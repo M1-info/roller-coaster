@@ -31,13 +31,6 @@ Mesh::Mesh(std::string name, std::vector<Vertex> vertices, std::vector<IndexesFa
 
     m_VAO->AddBuffer(*m_VBO_pos, layout_pos);
 
-    // create vertex buffer for textures
-    // m_VBO_tex = new VertexBuffer(m_TexCoords.data(), m_TexCoords_size);
-    // VertexBufferLayout layout_tex;
-    // layout_tex.Push<float>(2); // textures
-
-    // m_VAO->AddBuffer(*m_VBO_tex, layout_tex);
-
     // create vertex buffer for normales
     m_VBO_norm = new VertexBuffer(m_Normales.data(), m_Normales_size);
     VertexBufferLayout layout_norm;
