@@ -52,6 +52,8 @@ void Rails::Draw()
 void Rails::Update()
 {
 
+    m_Vertices.clear();
+
     for(int i = 4; i <= m_Children.size(); i+=3){
 
         ControlPoint * point1 = dynamic_cast<ControlPoint*>(m_Children[i - 4].get());
@@ -78,5 +80,13 @@ void Rails::Update()
         m_VBO_pos->Bind();
         m_VBO_pos->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
         m_VBO_pos->Unbind();
+
+        if(m_Children.size() > 0){
+            for(auto point : m_Children){
+                point->GetVBO()->Bind();
+                point->GetVBO()->SetData(point->GetVertices().data(), point->GetVertices().size() * sizeof(glm::vec3));
+                point->GetVBO()->Unbind();
+            }
+        }
     }
 }
