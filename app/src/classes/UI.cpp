@@ -176,8 +176,6 @@ void UI::CameraInfo()
 {
     std::shared_ptr<Camera> camera = m_Window->GetCamera();
     glm::vec3 *position = camera->GetPositionPtr();
-    float *yaw = camera->GetYawPtr();
-    float *pitch = camera->GetPitchPtr();
     float *cameraSpeed = camera->GetMoveSpeedPtr();
     float *sensitivity = camera->GetMoveSensitivityPtr();
 
@@ -198,7 +196,7 @@ void UI::CameraInfo()
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     if(ImGui::Button("Speed"))
-        *yaw = resetValue;
+        *cameraSpeed = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
@@ -212,7 +210,7 @@ void UI::CameraInfo()
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
     if(ImGui::Button("Sensitivity"))
-        *pitch = resetValue;
+        *sensitivity = resetValue;
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();

@@ -18,7 +18,7 @@ public:
     ~Scene();
 
     void Init();
-    void Add(Mesh *mesh);
+    void Add(std::shared_ptr<Mesh> mesh);
     void Remove(std::shared_ptr<Mesh> mesh);
     void Clear();
 

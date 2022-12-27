@@ -18,11 +18,9 @@
 class Mesh
 {
 public:
-    Mesh();
+    Mesh() = default;
     Mesh(std::string name, std::vector<Vertex> vertices, std::vector<IndexesFace> indices, std::vector<Normal> normales);
-
-    static Mesh * FromOBJ(const std::string path);
-    ~Mesh();
+    virtual ~Mesh();
 
     void SetUp();
     void Clear();
@@ -52,23 +50,21 @@ public:
     void Scale(glm::vec3 scale);
     glm::mat4 ComputeMatrix();
 
-private:
+    virtual void Draw() = 0;
+
+protected:
     std::string m_Name;
     std::vector<Vertex> m_Vertices;
     std::vector<Normal> m_Normales;
-    std::vector <TextureCoordinate> m_TexCoords;
     std::vector<IndexesFace> m_Indices;
-    std::vector<unsigned int> m_Indices_old;
 
     size_t m_Vertices_size;
     size_t m_Normales_size;
-    size_t m_TexCoords_size;
     size_t m_Indices_size;
 
     VertexArray *m_VAO;
     VertexBuffer *m_VBO_pos;
     VertexBuffer *m_VBO_norm;
-    VertexBuffer *m_VBO_tex;
     IndexBuffer *m_IBO;
     Material *m_Material;
 

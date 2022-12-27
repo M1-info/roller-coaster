@@ -1,20 +1,12 @@
 #include "headers/Rails.h"
 
-Rails::Rails() : m_VAO_lines(nullptr),m_VAO_points(nullptr), m_VBO_lines(nullptr), m_VBO_points(nullptr)
-{
-}
-
 Rails::Rails(std::vector<glm::vec3> controlPoints) : m_VAO_lines(nullptr),m_VAO_points(nullptr), m_VBO_lines(nullptr), m_VBO_points(nullptr)
 {
-    CreateFromControlPoints(controlPoints);
-}
 
-Rails::~Rails()
-{
-}
-
-void Rails::CreateFromControlPoints(std::vector<glm::vec3> controlPoints)
-{
+    m_Position = glm::vec3(0.0f);
+    m_Scale = glm::vec3(1.0f);
+    m_Rotation = glm::vec3(0.0f);
+    m_Matrix = glm::mat4(1.0f);
 
     m_ControlPoints = controlPoints;
 
@@ -28,7 +20,9 @@ void Rails::CreateFromControlPoints(std::vector<glm::vec3> controlPoints)
         }
     }
 
-    m_Shader = new Shader("basic");
+    CreateMaterial("basic");
+
+    SetName("Rails");
 
     m_VAO_lines = new VertexArray();
     m_VBO_lines = new VertexBuffer(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
@@ -50,19 +44,20 @@ void Rails::CreateFromControlPoints(std::vector<glm::vec3> controlPoints)
 
 void Rails::Draw()
 {
+
     m_VAO_lines->Bind();
-    m_Shader->Bind();
+    m_Material->GetShader()->Bind();
     glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
     m_VAO_lines->Unbind();
-    m_Shader->Unbind();
+    m_Material->GetShader()->Unbind();
 
     // draw control points
     glEnable(GL_PROGRAM_POINT_SIZE);
     m_VAO_points->Bind();
-    m_Shader->Bind();
+    m_Material->GetShader()->Bind();
     glDrawArrays(GL_POINTS, 0, m_ControlPoints.size());
     m_VAO_points->Unbind();
-    m_Shader->Unbind();
+    m_Material->GetShader()->Unbind();
     glDisable(GL_PROGRAM_POINT_SIZE);
     
 }

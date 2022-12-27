@@ -7,7 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "classes/headers/Renderer.h"
-#include "classes/headers/Mesh.h"
+#include "classes/headers/Cart.h"
 #include "classes/headers/Scene.h"
 #include "classes/headers/Rails.h"
 #include "classes/headers/Material.h"
@@ -20,11 +20,7 @@ int main(void)
     Renderer* renderer = new Renderer();
     renderer->Init();
 
-    // Mesh *mesh = Mesh::FromOBJ("rail.obj");
-    // Mesh *mesh2 = Mesh::FromOBJ("chariot.obj");
-    Mesh *mesh3 = Mesh::FromOBJ("cube.obj");
-
-    // mesh2->Translate(glm::vec3(3.0f, 0.0f, 0.0f));
+    std::shared_ptr<Cart> cart = std::make_shared<Cart>("chariot.obj");
 
     std::vector<glm::vec3> controlPoints;
     controlPoints.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -38,21 +34,17 @@ int main(void)
     controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
     controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
 
-
-    Rails *rails = new Rails();
-    rails->CreateFromControlPoints(controlPoints);
+    std::shared_ptr<Rails> rails = std::make_shared<Rails>(controlPoints);
 
     Scene* scene = new Scene();
     scene->Init();
-    // scene->Add(mesh);
-    // scene->Add(mesh2);
-    // scene->Add(mesh3);
+    scene->Add(cart);
+    scene->Add(rails);
 
     renderer->SetScene(scene);
     renderer->GetUI()->SetScene(scene);
     renderer->GetUI()->SetWindow(renderer->GetWindow());
     renderer->GetUI()->Init();
-    renderer->SetRails(rails);
 
 
     renderer->Render();

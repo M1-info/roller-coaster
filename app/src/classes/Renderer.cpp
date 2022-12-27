@@ -34,18 +34,6 @@ void Renderer::Clear() const
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-void Renderer::Draw(const VertexArray &vao, const IndexBuffer &ibo, const Shader &shader) const
-{
-
-	shader.Bind();
-	vao.Bind();
-	ibo.Bind();
-	GLCall(glDrawElements(GL_TRIANGLES, ibo.GetCount(), GL_UNSIGNED_INT, nullptr));
-	vao.Unbind();
-	ibo.Unbind();
-	shader.Unbind();
-}
-
 void Renderer::Init()
 {
 	// init window
@@ -110,6 +98,7 @@ void Renderer::Render()
 		for (auto mesh : m_Scene->GetObjects())
 		{
 			Material *material = mesh->GetMaterial();
+
 			Shader *shader = material->GetShader();
 			glm::vec3 cameraPosition = m_Camera->GetPosition();
 
@@ -125,16 +114,16 @@ void Renderer::Render()
 
 			shader->Unbind();
 
-			Draw(*mesh->GetVAO(), *mesh->GetIBO(), *shader);
+			mesh->Draw();
 
 		}
 
-		m_Rails->GetShader()->Bind();
-		m_Rails->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-		m_Rails->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
-		m_Rails->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
-		m_Rails->GetShader()->Unbind();
-		m_Rails->Draw();
+		// m_Rails->GetShader()->Bind();
+		// m_Rails->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+		// m_Rails->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
+		// m_Rails->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+		// m_Rails->GetShader()->Unbind();
+		// m_Rails->Draw();
 
 		// draw UI
 		m_UI->Render();
@@ -160,6 +149,7 @@ void Renderer::SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> me
 	for (auto mesh : meshes)
 	{
 		Material *material = mesh->GetMaterial();
+
 		Shader *shader = material->GetShader();
 
 		shader->Bind();

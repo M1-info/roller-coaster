@@ -13,29 +13,18 @@
 #include "Shader.h"
 #include "OBJLoader.h"
 
-class Rails
+class Rails : public Mesh
 {
 public: 
-    Rails();
     Rails(std::vector<glm::vec3> controlPoints);
-    ~Rails();
-
-    void CreateFromControlPoints(std::vector<glm::vec3> controlPoints);
-
-    inline std::vector<Vertex> GetVertices() { return m_Vertices; }
-    inline Shader* GetShader() { return m_Shader; }
-
-    void Draw();
+    void Draw() override;
 
 private: 
-    std::string m_Name = "Rails";
     VertexArray *m_VAO_lines;
     VertexArray *m_VAO_points;
     VertexBuffer *m_VBO_lines;
     VertexBuffer *m_VBO_points;
-    Shader *m_Shader;
     
-    std::vector<Vertex> m_Vertices;
     std::vector<glm::vec3> m_ControlPoints;
 };
 

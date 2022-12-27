@@ -14,10 +14,10 @@ void Scene::Init()
     m_Skybox->Init();
 }
 
-void Scene::Add(Mesh *mesh)
+void Scene::Add(std::shared_ptr<Mesh> mesh)
 {
-    m_Objects.push_back(std::make_shared<Mesh>(*mesh));
-    m_Objects_map[mesh->GetName()] = std::make_shared<Mesh>(*mesh);
+    m_Objects.push_back(mesh);
+    m_Objects_map[mesh->GetName()] = mesh;
 }
 
 void Scene::Remove(std::shared_ptr<Mesh> mesh)
