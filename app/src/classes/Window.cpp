@@ -113,6 +113,9 @@ void Window::OnMouseMove(GLFWwindow *window, double xpos, double ypos)
 
 void Window::OnMouseClick(GLFWwindow *window, int button, int action, int mods)
 {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos); //getting cursor position
+
     Window *win = (Window *)glfwGetWindowUserPointer(window);
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
@@ -123,6 +126,18 @@ void Window::OnMouseClick(GLFWwindow *window, int button, int action, int mods)
     {
         win->m_IsMousePressed = false;
     }
+
+    // glBindFramebuffer(GL_READ_FRAMEBUFFER, win->GetFBO());
+    // glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+    // PixelInfo Pixel;
+    // glReadPixels(xpos, ypos, 1, 1, GL_RGB, GL_FLOAT, &Pixel);
+
+    // glReadBuffer(GL_NONE);
+    // glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+    // //print the pixel info
+    // std::cout << "Pixel Info: " << Pixel.ObjectID << " " << Pixel.DrawID << " " << Pixel.PrimID << std::endl;
 }
 
 void Window::OnKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -160,6 +175,18 @@ void Window::OnKeyPress(GLFWwindow *window, int key, int scancode, int action, i
     if (key == GLFW_KEY_D && action == GLFW_PRESS)
     {
         win->GetCamera()->SetCurrentMovementDirection(CameraMovement::RIGHT);
+        return;
+    }
+
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    {
+        win->GetCamera()->SetCurrentMovementDirection(CameraMovement::UP);
+        return;
+    }
+
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+    {
+        win->GetCamera()->SetCurrentMovementDirection(CameraMovement::DOWN);
         return;
     }
 }

@@ -14,6 +14,19 @@
 #include <algorithm>
 
 #include "Camera.h"
+#include "FrameBuffer.h"
+
+struct PixelInfo {
+    float ObjectID;
+    float DrawID;
+    float PrimID;
+
+    PixelInfo()     {
+        ObjectID = 0.0f;
+        DrawID = 0.0f;
+        PrimID = 0.0f;
+    }
+};
 
 class Window
 {
@@ -31,9 +44,11 @@ public:
     inline float GetWidth() const { return m_Width; }
     inline float GetHeight() const { return m_Height; }
     inline float GetIsMousePressed() const { return m_IsMousePressed; }
+    inline GLint GetFBO() const { return m_FBO->GetFrameBuffer(); }
 
     // setters
     inline void SetCamera(std::shared_ptr<Camera> camera) { m_Camera = camera; }
+    inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }
 
     // events callbacks
     static void OnResize(GLFWwindow *window, int width, int height);
@@ -45,6 +60,7 @@ private:
     GLFWwindow *m_Window;
     float m_Width, m_Height;
     std::shared_ptr<Camera> m_Camera;
+    FrameBuffer *m_FBO;
 
     bool m_IsMousePressed;
 };

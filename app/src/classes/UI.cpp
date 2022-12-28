@@ -59,15 +59,15 @@ void UI::Render()
         ImGui::DockBuilderAddNode(dockspace_id);
 
         auto dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
-        auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
-        auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+        auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.15f, nullptr, &dockspace_id);
+        auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.8f, nullptr, &dockspace_id);
         auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
 
         ImGui::DockBuilderDockWindow("Scene", dock_id_right);
         ImGui::DockBuilderDockWindow("Scene Graph", dock_id_left);
         ImGui::DockBuilderDockWindow("Camera info", dock_id_left);
         ImGui::DockBuilderDockWindow("Selected mesh info", dock_id_left);
-        ImGui::DockBuilderDockWindow("Console", dock_id_left);
+        ImGui::DockBuilderDockWindow("Console", dock_id_down);
 
         ImGui::DockBuilderFinish(dockspace_id);
         first = false;

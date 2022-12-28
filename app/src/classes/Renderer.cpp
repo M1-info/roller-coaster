@@ -66,6 +66,7 @@ void Renderer::Init()
 	m_FBO = new FrameBuffer(m_Window->GetWidth(), m_Window->GetHeight());
 	m_FBO->Init();
 	m_UI->SetFBO(m_FBO);
+	m_Window->SetFBO(m_FBO);
 }
 
 void Renderer::Render()

@@ -107,6 +107,18 @@ void Camera::Move(CameraMovement direction, float deltaTime)
     if(direction == CameraMovement::RIGHT){
         m_Position += m_Right * velocity;
         Update();
+        return;
+    }
+
+    if(direction == CameraMovement::UP){
+        m_Position += m_Up * velocity;
+        Update();
+        return;
+    }
+
+    if(direction == CameraMovement::DOWN){
+        m_Position += glm::vec3(0.0f, -1.0f, 0.0f) * velocity;
+        Update();
     }
 }
 
