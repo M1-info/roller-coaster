@@ -35,7 +35,6 @@ public:
     void Clear();
 
     void SetName(std::string name);
-    //void SetVertices(std::vector<glm::vec3> vertices);
     void SetNormales(std::vector<glm::vec3> normales);
     void SetIndices(std::vector<IndexesFace> indices);
     void CreateMaterial(std::string shaderFile);
@@ -59,6 +58,9 @@ public:
     glm::vec3 GetScale() const;
     glm::vec3 GetRotation() const;
     MeshType GetType() const;
+
+    void AddChildren(std::shared_ptr<Mesh> child);
+    void RemoveChildren(std::shared_ptr<Mesh> child);
 
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
@@ -95,6 +97,7 @@ public:
    glm::vec3 m_Position;
    glm::vec3 m_Scale;
    glm::vec3 m_Rotation;
+   bool m_IsSelected = false;
 };
 
 #endif // MESH_H

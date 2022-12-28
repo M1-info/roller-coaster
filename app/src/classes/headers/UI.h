@@ -41,7 +41,12 @@ public:
 
     inline void SetWindow(Window *window) { m_Window = window; }
     inline void SetScene(Scene *scene) { m_Scene = scene; }
-    inline void SetSelectedMesh(std::shared_ptr<Mesh> mesh) { m_SelectedMesh = mesh; }
+    inline void SetSelectedMesh(std::shared_ptr<Mesh> mesh) { 
+        if (m_SelectedMesh != nullptr)
+            m_SelectedMesh->m_IsSelected = false;
+        m_SelectedMesh = mesh;
+        m_SelectedMesh->m_IsSelected = true;
+    }
     inline void SetLight(Light * light) { m_Light = light; }
     inline void AddLog(const std::string log) { m_Logs.push_back(log); }
     inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }

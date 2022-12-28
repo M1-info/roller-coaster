@@ -31,11 +31,6 @@ void Mesh::SetName(std::string name)
     m_Name = name;
 }
 
-// void Mesh::SetVertices(std::vector<glm::vec3> vertices)
-// {
-//     m_Vertices = vertices;
-// }
-
 void Mesh::SetNormales(std::vector<glm::vec3> normales)
 {
     m_Normales = normales;
@@ -141,6 +136,28 @@ MeshType Mesh::GetType() const
 {
     return m_Type;
 }
+
+
+
+
+void Mesh::AddChildren(std::shared_ptr<Mesh> child)
+{
+    m_Children.push_back(child);
+}
+
+void Mesh::RemoveChildren(std::shared_ptr<Mesh> child)
+{
+    for(int i = 0; i < m_Children.size(); i++)
+    {
+        if(m_Children[i] == child)
+        {
+            m_Children.erase(m_Children.begin() + i);
+            break;
+        }
+    }
+}
+
+
 
 void Mesh::Translate(glm::vec3 translation)
 {

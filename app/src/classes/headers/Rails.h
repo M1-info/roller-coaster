@@ -18,6 +18,7 @@ class Rails : public Mesh
 {
 public: 
     Rails(std::vector<glm::vec3> controlPoints);
+    //void AddControlPoint(glm::vec3 controlPoint);
     void Draw() override;
     void Update() override;
 };

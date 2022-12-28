@@ -33,6 +33,13 @@ Rails::Rails(std::vector<glm::vec3> controlPoints)
     m_VAO->Unbind();
 }
 
+// void Rails::AddControlPoint(glm::vec3 point)
+// {
+//     std::shared_ptr<ControlPoint> controlPoint = std::make_shared<ControlPoint>(point, m_Children.size());
+//     controlPoint->SetParent((std::shared_ptr<Mesh>)this);
+//     m_Children.push_back(controlPoint);
+// }
+
 void Rails::Draw()
 {
     Update();

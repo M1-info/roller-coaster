@@ -105,16 +105,30 @@ void UI::SceneGraph()
         {
             if (ImGui::TreeNode(mesh->GetName().c_str()))
             {
+                ImGui::Dummy(ImVec2(0.0f, 3.0f)); // Add some space between the two lines
+
+                if(mesh->GetType() == MeshType::RAILS){
+                    // display button to add new control point
+                    if (ImGui::Button("Add control point"))
+                    {
+                        std::cout << "Add control point" << std::endl;
+                    }
+                    ImGui::Dummy(ImVec2(0.0f, 3.0f)); // Add some space between the two lines
+                }
+
                 for (auto child: mesh->GetChildren())
                 {
-                    if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
+                    if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child)){
                         SetSelectedMesh(child);
+                    }
+
                 }
                 ImGui::TreePop();
             }
         }
         else if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh))
             SetSelectedMesh(mesh);
+        
         ImGui::Separator();
     }
     ImGui::End();
@@ -229,7 +243,7 @@ void UI::CameraInfo()
     ImGui::Begin("Camera info");
 
     ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, 150);
+    ImGui::SetColumnWidth(0, 80);
     ImGui::Text("Move speed");
     ImGui::NextColumn();
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());

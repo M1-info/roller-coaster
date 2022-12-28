@@ -107,17 +107,27 @@ void Renderer::Render()
 			Material *material = mesh->GetMaterial();
 
 			Shader *shader = material->GetShader();
-			glm::vec3 cameraPosition = m_Camera->GetPosition();
-
+			
 			shader->Bind();
 
-			glm::vec3 lightPosition = m_Light->m_Position;
-			shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+
+			if(mesh->GetType() != MeshType::RAILS){
+				glm::vec3 cameraPosition = m_Camera->GetPosition();
+				glm::vec3 lightPosition = m_Light->m_Position;
+				shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+				shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+			}
 
 			shader->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 			shader->SetUniformMat4f("u_view", m_Camera->GetView());
 			shader->SetUniformMat4f("u_model", mesh->ComputeMatrix());
-			shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+			if(mesh->m_IsSelected){
+				shader->SetUniform1i("u_isSelected", 1);
+			} else {
+				shader->SetUniform1i("u_isSelected", 0);
+			}
+
 
 			shader->Unbind();
 
@@ -127,6 +137,12 @@ void Renderer::Render()
 					child->GetMaterial()->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
 					child->GetMaterial()->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
 					child->GetMaterial()->GetShader()->SetUniformMat4f("u_model", child->ComputeMatrix());
+					if(child->m_IsSelected){
+						child->GetMaterial()->GetShader()->SetUniform1i("u_isSelected", 1);
+					} else {
+						child->GetMaterial()->GetShader()->SetUniform1i("u_isSelected", 0);
+					}
+
 					child->GetMaterial()->GetShader()->Unbind();
 				}
 			}
@@ -160,6 +176,9 @@ void Renderer::SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> me
 
 	for (auto mesh : meshes)
 	{
+		if(mesh->GetType() == MeshType::RAILS)
+			continue;
+
 		Material *material = mesh->GetMaterial();
 
 		Shader *shader = material->GetShader();

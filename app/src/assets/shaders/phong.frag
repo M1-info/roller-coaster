@@ -8,6 +8,7 @@ in vec3 v_normals;
 uniform mat4 u_model;
 uniform mat4 u_view;
 uniform vec3 u_cameraPos;
+uniform int u_isSelected;
 
 uniform struct Light
 {
@@ -49,6 +50,9 @@ void main()
 
     vec3 finalLight = (ambient + diffuseLight + specularLight) * u_light.intensity;
 
-    out_color = vec4(1.0, 0.0, 1.0, 1.0) * vec4(finalLight, 1.0);
+    if(u_isSelected == 1)
+        out_color = vec4(1.0, 1.0, 0.0, 1.0); // yellow
+    else
+        out_color = vec4(1.0, 0.0, 1.0, 1.0) * vec4(finalLight, 1.0);
 
 };
