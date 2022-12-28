@@ -30,7 +30,7 @@ Renderer::~Renderer()
 
 void Renderer::Clear() const
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
@@ -61,6 +61,11 @@ void Renderer::Init()
 	m_Light = new Light(glm::vec3(5.0f, 10.0f, 0.0f), glm::vec3(0.0), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f);
 
 	m_UI->SetLight(m_Light);
+
+	// init frame buffer
+	m_FBO = new FrameBuffer(m_Window->GetWidth(), m_Window->GetHeight());
+	m_FBO->Init();
+	m_UI->SetFBO(m_FBO);
 }
 
 void Renderer::Render()
@@ -74,7 +79,6 @@ void Renderer::Render()
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
-
 		float currentTime = glfwGetTime();
 		float deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
@@ -83,6 +87,8 @@ void Renderer::Render()
 		m_Camera->Render(deltaTime);
 
 		// clear scene
+		Clear();
+		m_FBO->Bind();
 		Clear();
 
 		// draw skybox
@@ -127,6 +133,8 @@ void Renderer::Render()
 			mesh->Draw();
 
 		}
+
+		m_FBO->Unbind();
 
 		// draw UI
 		m_UI->Render();

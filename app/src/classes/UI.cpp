@@ -37,8 +37,8 @@ void UI::Render()
 
     // full screen window only for docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
-    // ImGui::SetNextWindowPos(viewport->WorkPos);
-    // ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -55,18 +55,19 @@ void UI::Render()
     
     static bool first = true;
     if(first){
-        ImGui::SetWindowSize(ImVec2(400, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
-        ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-
         ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id);
 
         auto dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
-        auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
-        ImGui::DockBuilderDockWindow("Scene Graph", dock_id_top);
-        ImGui::DockBuilderDockWindow("Camera info", dock_id_down);
-        ImGui::DockBuilderDockWindow("Selected mesh info", dock_id_down);
-        ImGui::DockBuilderDockWindow("Console", dock_id_down);
+        auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Down, 0.2f, nullptr, &dockspace_id);
+        auto dock_id_right = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.2f, nullptr, &dockspace_id);
+        auto dock_id_left = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+
+        ImGui::DockBuilderDockWindow("Scene", dock_id_right);
+        ImGui::DockBuilderDockWindow("Scene Graph", dock_id_left);
+        ImGui::DockBuilderDockWindow("Camera info", dock_id_left);
+        ImGui::DockBuilderDockWindow("Selected mesh info", dock_id_left);
+        ImGui::DockBuilderDockWindow("Console", dock_id_left);
 
         ImGui::DockBuilderFinish(dockspace_id);
         first = false;
@@ -76,26 +77,12 @@ void UI::Render()
 
 
     /* scene infos window */
-    
-    ImGui::SetNextWindowSize(ImVec2(500, 450), ImGuiCond_Once);
-    //ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    SceneRender();
     SceneGraph();
-    
-
-    ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
-    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y -600), ImGuiCond_Once);
     MeshInfo();
-    
-    ImGui::SetNextWindowSize(ImVec2(500, 150), ImGuiCond_Once);
-    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 400), ImGuiCond_Once);
     CameraInfo();
-
-    
-    ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
-    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 250), ImGuiCond_Once);
     ConsoleLog();
     
-
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -243,7 +230,7 @@ void UI::CameraInfo()
 
     ImGui::Columns(2);
     ImGui::SetColumnWidth(0, 150);
-    ImGui::Text("Camera Mouvements");
+    ImGui::Text("Move speed");
     ImGui::NextColumn();
     ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
@@ -279,7 +266,7 @@ void UI::CameraInfo()
     ImGui::NextColumn();
     ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Add some space between the two lines
 
-    ImGui::Text("Camera position");
+    ImGui::Text("Position");
     ImGui::NextColumn();
 
     ImGui::PushItemWidth(70);
@@ -344,5 +331,16 @@ void UI::ConsoleLog()
         ImGui::Text(s.c_str());
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
         ImGui::SetScrollHereY(1.0f);
+    ImGui::End();
+}
+
+void UI::SceneRender()
+{
+    ImGui::Begin("Scene", nullptr);
+        ImGui::Image(   (ImTextureID)m_FBO->GetColorBuffer(), 
+                        ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowWidth() / m_AspectRatio), // keep aspect ratio even if resize
+                        ImVec2(0, 1), 
+                        ImVec2(1, 0)
+                    );
     ImGui::End();
 }

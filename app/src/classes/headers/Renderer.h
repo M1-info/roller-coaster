@@ -58,6 +58,7 @@ private:
 	std::shared_ptr<Camera> m_Camera;
 	Light * m_Light;
 	UI* m_UI;
+	FrameBuffer* m_FBO;
 };
 
 

@@ -36,6 +36,7 @@ public:
     void MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue = glm::vec3(0.0f));
     void CameraInfo();
     void ConsoleLog();
+    void SceneRender();
 
 
     inline void SetWindow(Window *window) { m_Window = window; }
@@ -43,6 +44,7 @@ public:
     inline void SetSelectedMesh(std::shared_ptr<Mesh> mesh) { m_SelectedMesh = mesh; }
     inline void SetLight(Light * light) { m_Light = light; }
     inline void AddLog(const std::string log) { m_Logs.push_back(log); }
+    inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }
 
 private:
     Window *m_Window;
@@ -50,6 +52,8 @@ private:
     Light *m_Light;
     std::shared_ptr<Mesh> m_SelectedMesh;
     std::vector<std::string> m_Logs;
+    FrameBuffer *m_FBO;
+    float m_AspectRatio = 16.0f / 9.0f;
 };
 
 #endif // UI_H
