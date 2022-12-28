@@ -8,6 +8,7 @@ Mesh::~Mesh()
     delete m_VAO;
     delete m_VBO_pos;
     delete m_IBO;
+    std::cout << "Mesh " << m_Name << " deleted" << std::endl;
 }
 
 void Mesh::SetUp()
@@ -145,16 +146,10 @@ void Mesh::AddChildren(std::shared_ptr<Mesh> child)
     m_Children.push_back(child);
 }
 
-void Mesh::RemoveChildren(std::shared_ptr<Mesh> child)
+void Mesh::RemoveChildren(const std::shared_ptr<Mesh> &child)
 {
-    for(int i = 0; i < m_Children.size(); i++)
-    {
-        if(m_Children[i] == child)
-        {
-            m_Children.erase(m_Children.begin() + i);
-            break;
-        }
-    }
+    auto remove = std::remove(m_Children.begin(), m_Children.end(), child);
+    m_Children.erase(remove, m_Children.end());
 }
 
 

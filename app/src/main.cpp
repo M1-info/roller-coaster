@@ -22,15 +22,15 @@ int main(void)
 
     std::vector<glm::vec3> controlPoints;
     controlPoints.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(6.0f, 2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(12.0f, -2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(18.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(24.0f, 3.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(18.0f, -4.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(20.0f, -2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(6.0f, 2.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(12.0f, -2.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(18.0f, 0.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(24.0f, 3.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(18.0f, -4.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(20.0f, -2.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
+    // controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
 
     std::shared_ptr<Rails> rails = std::make_shared<Rails>(controlPoints);
 

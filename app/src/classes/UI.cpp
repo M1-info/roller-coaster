@@ -111,18 +111,50 @@ void UI::SceneGraph()
                     // display button to add new control point
                     if (ImGui::Button("Add control point"))
                     {
-                        std::cout << "Add control point" << std::endl;
+                        mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
+                        mesh->Update();
                     }
+                    
                     ImGui::Dummy(ImVec2(0.0f, 3.0f)); // Add some space between the two lines
                 }
 
-                for (auto child: mesh->GetChildren())
+
+                //std::shared_ptr<Mesh> ptDeleted = nullptr; 
+
+                for (const std::shared_ptr<Mesh> child: mesh->GetChildren())
                 {
+                    std::cout << child->GetName() << "is render" << std::endl;
+
+                    ImGui::PushID(child->GetName().c_str());
+                    ImGui::Columns(2);
                     if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child)){
                         SetSelectedMesh(child);
                     }
+                    ImGui::NextColumn();
 
+                    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    if(ImGui::Button("X")){
+                        //ptDeleted = child;
+
+                        //SetSelectedMesh(nullptr);
+                        std::cout << "remove child" << std::endl;
+                        mesh->RemoveChildren(child);
+                        std::cout << "after remove child" << std::endl;
+                        mesh->Update();
+                        std::cout << "after update" << std::endl;
+                    }
+                    ImGui::PopStyleColor(3);
+                    ImGui::Columns(1);
+                    ImGui::PopID();
                 }
+
+                // if(ptDeleted != nullptr){
+                //     mesh->RemoveChildren(ptDeleted);
+                //     mesh->Update();
+                // }
+
                 ImGui::TreePop();
             }
         }

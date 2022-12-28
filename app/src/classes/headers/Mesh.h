@@ -60,7 +60,7 @@ public:
     MeshType GetType() const;
 
     void AddChildren(std::shared_ptr<Mesh> child);
-    void RemoveChildren(std::shared_ptr<Mesh> child);
+    void RemoveChildren(const std::shared_ptr<Mesh> &child);
 
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);

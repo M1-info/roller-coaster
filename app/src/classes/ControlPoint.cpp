@@ -29,6 +29,17 @@ ControlPoint::ControlPoint(glm::vec3 point, int index)
     m_VBO_pos->Unbind();
 }
 
+ControlPoint::~ControlPoint()
+{
+    m_Vertices.clear();
+    m_Indices.clear();
+
+    delete m_VAO;
+    delete m_VBO_pos;
+    delete m_IBO;
+    std::cout << "ControlPoint " << m_Name << " deleted" << std::endl;
+}
+
 
 void ControlPoint::Draw()
 {

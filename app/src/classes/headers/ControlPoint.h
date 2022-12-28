@@ -8,6 +8,7 @@ class ControlPoint : public Mesh
 {
 public:
     ControlPoint(glm::vec3 point, int index);
+    ~ControlPoint();
 
     void Draw() override;
     void Update() override {};
