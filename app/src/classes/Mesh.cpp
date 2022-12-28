@@ -132,17 +132,9 @@ glm::vec3 Mesh::GetScale() const
     return m_Scale;
 }
 
-glm::vec3 *Mesh::GetScalePtr(){
-    return &m_Scale;
-}
-
 glm::vec3 Mesh::GetRotation() const
 {
     return m_Rotation;
-}
-
-glm::vec3 *Mesh::GetRotationPtr(){
-    return &m_Rotation;
 }
 
 MeshType Mesh::GetType() const

@@ -57,9 +57,7 @@ public:
     std::vector<std::shared_ptr<Mesh>> GetChildren() const;
     glm::vec3 GetPosition() const;
     glm::vec3 GetScale() const;
-    glm::vec3 *GetScalePtr();
     glm::vec3 GetRotation() const;
-    glm::vec3 *GetRotationPtr();
     MeshType GetType() const;
 
     void Translate(glm::vec3 translation);

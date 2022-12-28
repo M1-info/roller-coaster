@@ -37,8 +37,8 @@ void UI::Render()
 
     // full screen window only for docking
     ImGuiViewport *viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->WorkPos);
-    ImGui::SetNextWindowSize(viewport->WorkSize);
+    // ImGui::SetNextWindowPos(viewport->WorkPos);
+    // ImGui::SetNextWindowSize(viewport->WorkSize);
     ImGui::SetNextWindowViewport(viewport->ID);
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
@@ -52,29 +52,50 @@ void UI::Render()
 
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    
+    static bool first = true;
+    if(first){
+        ImGui::SetWindowSize(ImVec2(400, ImGui::GetIO().DisplaySize.y), ImGuiCond_Once);
+        ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+
+        ImGui::DockBuilderRemoveNode(dockspace_id);
+        ImGui::DockBuilderAddNode(dockspace_id);
+
+        auto dock_id_top = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Up, 0.2f, nullptr, &dockspace_id);
+        auto dock_id_down = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.2f, nullptr, &dockspace_id);
+        ImGui::DockBuilderDockWindow("Scene Graph", dock_id_top);
+        ImGui::DockBuilderDockWindow("Camera info", dock_id_down);
+        ImGui::DockBuilderDockWindow("Selected mesh info", dock_id_down);
+        ImGui::DockBuilderDockWindow("Console", dock_id_down);
+
+        ImGui::DockBuilderFinish(dockspace_id);
+        first = false;
+    }
+
+    ImGui::End();
+
 
     /* scene infos window */
     
     ImGui::SetNextWindowSize(ImVec2(500, 450), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    //ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     SceneGraph();
     
 
     ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y -600), ImGuiCond_Once);
+    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y -600), ImGuiCond_Once);
     MeshInfo();
     
     ImGui::SetNextWindowSize(ImVec2(500, 150), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 400), ImGuiCond_Once);
+    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 400), ImGuiCond_Once);
     CameraInfo();
 
     
     ImGui::SetNextWindowSize(ImVec2(500, 200), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 250), ImGuiCond_Once);
+    //ImGui::SetNextWindowPos(ImVec2(0, ImGui::GetIO().DisplaySize.y - 250), ImGuiCond_Once);
     ConsoleLog();
     
 
-    ImGui::End();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -122,37 +143,19 @@ void UI::MeshInfo()
         ImGui::Text(m_SelectedMesh->GetName().c_str());
         ImGui::Separator();
         ImGui::Text("Transform");
-        // ImGui::Separator();
+        
         ImGui::Dummy(ImVec2(0.0f, 20.0f)); // Add some space between the two lines
-
-        // if(m_SelectedMesh->GetType() == MeshType::CONTROL_POINT){
-        //     glm::vec3 *vertex = m_SelectedMesh->GetVertexPtr(0);
-        //     MeshTransform("Position", vertex);
-        // }
-        // else
-        //     MeshTransform("Position", &m_SelectedMesh->m_Position, 0.0f);
-        // ImGui::Separator();
-        // MeshTransform("Rotation", &m_SelectedMesh->m_Rotation);
-        // ImGui::Separator();
-        // MeshTransform("Scale", &m_SelectedMesh->m_Scale, 1.0f);
-
 
         if(m_SelectedMesh->GetType() == MeshType::CONTROL_POINT){
             glm::vec3 *vertex = m_SelectedMesh->GetVertexPtr(0);
-            MeshTransform("Position", vertex, glm::vec3(0.0f));
-            ImGui::Separator();
-            vertex = m_SelectedMesh->GetRotationPtr();
-            MeshTransform("Rotation", vertex, glm::vec3(0.0f));
-            ImGui::Separator();
-            vertex = m_SelectedMesh->GetScalePtr();
-            MeshTransform("Scale", vertex, glm::vec3(1.0f));
-        } else {
-            MeshTransform("Position", &m_SelectedMesh->m_Position, glm::vec3(0.0f));
-            ImGui::Separator();
-            MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, glm::vec3(0.0f));
-            ImGui::Separator();
-            MeshTransform("Scale", &m_SelectedMesh->m_Scale, glm::vec3(1.0f));
+            MeshTransform("Position", vertex);
         }
+        else
+            MeshTransform("Position", &m_SelectedMesh->m_Position, glm::vec3(0.0f));
+        ImGui::Separator();
+        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, glm::vec3(0.0f));
+        ImGui::Separator();
+        MeshTransform("Scale", &m_SelectedMesh->m_Scale, glm::vec3(1.0f));
 
     }
     ImGui::End();
@@ -186,7 +189,6 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
-    ImGui::PushItemWidth(70);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
@@ -203,7 +205,6 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
-    ImGui::PushItemWidth(70);
 
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.8f, 1.0f));
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
