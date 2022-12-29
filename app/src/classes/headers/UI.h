@@ -2,6 +2,8 @@
 #ifndef UI_H
 #define UI_H
 
+#include <iostream>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
@@ -10,7 +12,6 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 #include <imgui/imgui_internal.h>
-
 
 #include "FrameBuffer.h"
 #include "Window.h"

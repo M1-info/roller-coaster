@@ -12,7 +12,7 @@ out vec3 v_normals;
 
 void main()
 {
-    gl_Position=u_projection*u_view*u_model*vec4(position, 1.0);
-    v_position=position;
-    v_normals=normals;
+    v_position=(u_model*vec4(position,1.)).xyz;
+    v_normals=(u_model*vec4(normals,0.)).xyz;
+    gl_Position=u_projection*u_view*vec4(v_position,1.);
 };

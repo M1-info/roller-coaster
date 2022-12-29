@@ -16,16 +16,18 @@ public:
     BezierCurve(std::vector<glm::vec3> controlPoints);
     ~BezierCurve();
 
-    void SetControlPoints(std::vector<glm::vec3> controlPoints);
-    void AddControlPoint(glm::vec3 controlPoint);
-    void RemoveControlPoint(int index);
-    void ClearControlPoints();
-
+    /* return the control points of the curve */
     std::vector<glm::vec3> GetControlPoints();
+
+    /* return the control point at the given index */
     glm::vec3 GetControlPoint(int index);
 
+    /* t is a value between 0 and 1
+     0 is the start of the curve
+     1 is the end of the curve
+     return the point on the curve at the given t value
+    */
     glm::vec3 GetPoint(float t);
-    std::vector<glm::vec3> GetPoints(int resolution);
 
 private:
     std::vector<glm::vec3> m_ControlPoints;

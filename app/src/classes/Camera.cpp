@@ -3,7 +3,7 @@
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
     : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane), 
-    m_MoveSpeed(2.5f), m_MoveSensitivity(0.1f)
+    m_MoveSpeed(BASE_SPEED), m_MoveSensitivity(BASE_SENSITIVITY), m_CurrentMouvementDirection(CameraMovement::NOMOVE)
 {
 
     if(m_Fov == 0.0f)
@@ -33,18 +33,15 @@ Camera::~Camera()
 {
 }
 
+/*
+    Initialize the camera with a position, a target and an up vector
+*/
 void Camera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up)
 {
     m_Position = position;
     m_Target = target;
     m_Up = up;
 
-    Update();
-}
-
-void Camera::LookAt(glm::vec3 target)
-{
-    m_Target = target;
     Update();
 }
 
@@ -56,6 +53,10 @@ glm::mat4 Camera::GetOrientation()
     return orientation;
 }
 
+/**
+ * This method update the view matrix
+ * It is called when the camera is moved or rotated
+*/
 void Camera::Update()
 {
     m_Front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));

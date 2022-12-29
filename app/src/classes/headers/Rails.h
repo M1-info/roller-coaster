@@ -16,9 +16,9 @@
 
 class Rails : public Mesh
 {
-public: 
+public:
     Rails(std::vector<glm::vec3> controlPoints);
-    //void AddControlPoint(glm::vec3 controlPoint);
+    static std::shared_ptr<Rails> Create(std::vector<glm::vec3> controlPoints);
     void Draw() override;
     void Update() override;
 };

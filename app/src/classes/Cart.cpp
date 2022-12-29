@@ -12,7 +12,7 @@ Cart::Cart(const std::string filename)
 
     OBJLoader loader(filename);
 
-    std::vector<glm::vec3> vertices = loader.GetVertices();
+    m_Vertices = loader.GetVertices();
     std::vector<glm::vec3> normales = loader.GetNormals();
     std::vector<IndexesFace> indices = loader.GetFaces();
     OBJMaterial material = loader.GetMaterials()[0];
@@ -26,12 +26,22 @@ Cart::Cart(const std::string filename)
     m_Material->SetSpecularColor(material.specular_color);
     m_Material->SetSpecularExponent(material.shininess);
 
-    m_Vertices = vertices;
+    for (auto i : indices)
+    {
+        m_Indices.push_back(i.vertices[0]);
+        m_Indices.push_back(i.vertices[1]);
+        m_Indices.push_back(i.vertices[2]);
+
+        // m_Normales.push_back(normales[i.normals[0]]);
+        // m_Normales.push_back(normales[i.normals[1]]);
+        // m_Normales.push_back(normales[i.normals[2]]);
+    }
+
     m_Normales = normales;
-    m_Indices = indices;
+
     m_Vertices_size = m_Vertices.size() * sizeof(glm::vec3);
     m_Normales_size = m_Normales.size() * sizeof(glm::vec3);
-    m_Indices_size = m_Indices.size() * sizeof(IndexesFace);
+    m_Indices_size = m_Indices.size() * sizeof(unsigned int);
 
     // create vertex array
     m_VAO = new VertexArray();
@@ -47,7 +57,7 @@ Cart::Cart(const std::string filename)
     m_VBO_norm = new VertexBuffer(m_Normales.data(), m_Normales_size);
     VertexBufferLayout layout_norm;
     layout_norm.Push<float>(3); // normales
-    
+
     m_VAO->AddBuffer(*m_VBO_norm, layout_norm, 1);
 
     // create index buffer
@@ -59,10 +69,10 @@ Cart::Cart(const std::string filename)
 void Cart::Draw()
 {
     m_Material->GetShader()->Bind();
-	m_VAO->Bind();
-	m_IBO->Bind();
+    m_VAO->Bind();
+    m_IBO->Bind();
     glDrawElements(GL_TRIANGLES, m_Indices_size, GL_UNSIGNED_INT, 0);
     m_Material->GetShader()->Unbind();
-	m_VAO->Unbind();
-	m_IBO->Unbind();
+    m_VAO->Unbind();
+    m_IBO->Unbind();
 }

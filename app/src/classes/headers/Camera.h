@@ -7,6 +7,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include <algorithm> 
 
+#define BASE_SPEED 5.0f
+#define BASE_SENSITIVITY 0.1f
+
 enum class CameraMovement
 {
     NOMOVE,
@@ -26,6 +29,8 @@ public:
     ~Camera();
 
     void Init(glm::vec3 position, glm::vec3 target, glm::vec3 up);
+
+    /* GETTERS */
 
     inline float GetFov() const { return m_Fov; };
     inline float GetAspectRatio() const { return m_AspectRatio; };
@@ -59,6 +64,9 @@ public:
     inline glm::vec3 GetUp() const { return m_Up; };
     inline glm::vec3 GetWorldUp() const { return m_WorldUp; };
 
+
+    /* SETTERS */
+
     inline void SetFov(float fov) { m_Fov = fov; };
     inline void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; };
     inline void SetNearPlane(float nearPlane) { m_NearPlane = nearPlane; };
@@ -84,16 +92,19 @@ public:
     inline void SetRight(glm::vec3 right) { m_Right = right; };
     inline void SetUp(glm::vec3 up) { m_Up = up; };
 
+    /* Return the camera orientation based on Yaw and Pitch values */
     glm::mat4 GetOrientation();
 
     void OnMouseMove(float x, float y);
 
-    void LookAt(glm::vec3 target);
     void Move(CameraMovement direction, float deltaTime);
     void Update();
+
+    /* Called once per frame */
     void Render(float deltaTime);
 
 private:
+    /* Projection values */
     float m_Fov;
     float m_AspectRatio;
     float m_NearPlane;
@@ -101,22 +112,23 @@ private:
 
     glm::vec3 m_Position;
     glm::vec3 m_Target;
-
-    float m_Yaw;
-    float m_Pitch;
-
     float m_lastX;
     float m_lastY;
 
-    float m_MoveSensitivity;
-    CameraMovement m_CurrentMouvementDirection;
-    float m_MoveSpeed;
+    /* Camera orientation values */
+    float m_Yaw;
+    float m_Pitch;
 
+    /* View matrix values */
     glm::vec3 m_Front;
     glm::vec3 m_Right;
     glm::vec3 m_Up;
-
     glm::vec3 m_WorldUp;
+
+    /* Parameters to change camera mouvement behavior  */
+    float m_MoveSensitivity;
+    float m_MoveSpeed;
+    CameraMovement m_CurrentMouvementDirection;
 
     glm::mat4 m_Projection;
     glm::mat4 m_View;

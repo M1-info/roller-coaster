@@ -23,13 +23,11 @@ public:
     void Clear();
 
     std::vector<std::shared_ptr<Mesh>> GetObjects() const;
-    std::map<std::string, std::shared_ptr<Mesh>> GetObjectsMap() const;
     Skybox *GetSkybox() const;
 
 private:
     Skybox *m_Skybox;
     std::vector<std::shared_ptr<Mesh>> m_Objects;
-    std::map<std::string, std::shared_ptr<Mesh>> m_Objects_map;
 };
 
 #endif // SCENE_H

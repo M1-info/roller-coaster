@@ -40,10 +40,9 @@ public:
 	~Renderer();
 
 	void Clear() const;
-	void Draw(const VertexArray& vao, const IndexBuffer& ibo, const Shader& shader) const;
 	void Init();
 	void Render();
-	void SetUpScene(Skybox * skybox, std::vector<std::shared_ptr<Mesh>> meshes);
+	void SetUpScene();
 
 	inline void SetScene(Scene *scene) { m_Scene = scene; }
 	inline Scene* GetScene() const { return m_Scene; }

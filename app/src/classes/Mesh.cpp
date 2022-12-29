@@ -4,11 +4,24 @@ Mesh::~Mesh()
 {
     m_Vertices.clear();
     m_Indices.clear();
+    m_Normales.clear();
+    m_Children.clear();
+    m_Parent = nullptr;
 
-    delete m_VAO;
-    delete m_VBO_pos;
-    delete m_IBO;
-    std::cout << "Mesh " << m_Name << " deleted" << std::endl;
+    if (m_VAO)
+        delete m_VAO;
+
+    if (m_VBO_pos)
+        delete m_VBO_pos;
+
+    if (m_VBO_norm)
+        delete m_VBO_norm;
+
+    if (m_IBO)
+        delete m_IBO;
+
+    if (m_Material)
+        delete m_Material;
 }
 
 void Mesh::SetUp()
@@ -37,7 +50,7 @@ void Mesh::SetNormales(std::vector<glm::vec3> normales)
     m_Normales = normales;
 }
 
-void Mesh::SetIndices(std::vector<IndexesFace> indices)
+void Mesh::SetIndices(std::vector<unsigned int> indices)
 {
     m_Indices = indices;
 }
@@ -93,7 +106,7 @@ std::vector<glm::vec3> Mesh::GetNormales() const
     return m_Normales;
 }
 
-std::vector<IndexesFace> Mesh::GetIndices() const
+std::vector<unsigned int> Mesh::GetIndices() const
 {
     return m_Indices;
 }
@@ -109,12 +122,12 @@ std::vector<std::shared_ptr<Mesh>> Mesh::GetChildren() const
 }
 
 glm::mat4 Mesh::GetMatrix() const
-{  
+{
     return m_Matrix;
 }
 
-Material* Mesh::GetMaterial() const
-{  
+Material *Mesh::GetMaterial() const
+{
     return m_Material;
 }
 
@@ -138,21 +151,23 @@ MeshType Mesh::GetType() const
     return m_Type;
 }
 
-
-
-
 void Mesh::AddChildren(std::shared_ptr<Mesh> child)
 {
     m_Children.push_back(child);
+    child->SetParent(shared_from_this());
 }
 
-void Mesh::RemoveChildren(const std::shared_ptr<Mesh> &child)
+void Mesh::RemoveChildren(std::shared_ptr<Mesh> child)
 {
-    auto remove = std::remove(m_Children.begin(), m_Children.end(), child);
-    m_Children.erase(remove, m_Children.end());
+    std::vector<std::shared_ptr<Mesh>>::iterator it = std::find(m_Children.begin(), m_Children.end(), child);
+
+    if (it != m_Children.end())
+    {
+        it->get()->SetParent(nullptr);
+        m_Children.erase(it);
+        m_Children.shrink_to_fit();
+    }
 }
-
-
 
 void Mesh::Translate(glm::vec3 translation)
 {
@@ -173,7 +188,7 @@ void Mesh::Scale(glm::vec3 scale)
 }
 
 glm::mat4 Mesh::ComputeMatrix()
-{  
+{
     glm::mat4 model(1.0f);
 
     glm::mat4 translation = glm::translate(model, m_Position);
@@ -185,9 +200,8 @@ glm::mat4 Mesh::ComputeMatrix()
 
     m_Matrix = translation * rotation * scale;
 
-    if(m_Parent != nullptr)
+    if (m_Parent != nullptr)
         m_Matrix *= m_Parent->ComputeMatrix();
 
     return m_Matrix;
 }
-

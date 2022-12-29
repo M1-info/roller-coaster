@@ -4,15 +4,14 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "SceneObject.h"
+#include <string>
 
 class Light
 {
 public:
     Light();
     Light(glm::vec3 position, glm::vec3 rotation, glm::vec3 color, float intensity);
-    Light (glm::vec3 color, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float intensity);
+    Light(glm::vec3 color, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, float intensity);
     ~Light();
 
     std::string GetName() const;
@@ -25,19 +24,15 @@ public:
     void Translate(glm::vec3 translation);
     void Rotate(glm::vec3 rotation);
 
-private: 
+private:
     glm::mat4 m_Matrix;
-
     std::string m_Name;
-
     float m_Intensity;
 
-public: 
+public:
     glm::vec3 m_Position;
     glm::vec3 m_Rotation;
     glm::vec3 m_Color;
-
 };
-
 
 #endif // LIGHT_H

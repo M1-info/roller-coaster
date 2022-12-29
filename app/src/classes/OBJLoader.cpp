@@ -50,30 +50,51 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
     {
       // Face
       IndexesFace face;
-      unsigned vt1, vt2, vt3, vn1, vn2, vn3;
-      int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &face.v1, &vt1, &vn1, &face.v2, &vt2, &vn2, &face.v3, &vt3, &vn3);
-  
+      unsigned int vertices[3];
+      unsigned int tex_coords[3];
+      unsigned int normals[3];
+      // unsigned vt1, vt2, vt3, vn1, vn2, vn3;
+      int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &vertices[0], &tex_coords[0], &normals[0], &vertices[1], &tex_coords[1], &normals[1], &vertices[2], &tex_coords[2], &normals[2]);
+
       if (matches != 9)
       {
         // Normals are optional
-        matches = sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &face.v1, &vt1, &face.v2, &vt2, &face.v3, &vt3);
+        matches = sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &vertices[0], &tex_coords[0], &vertices[1], &tex_coords[1], &vertices[2], &tex_coords[2]);
         if (matches == 3)
         {
           // Texture coordinates and normals are optional
-          matches = sscanf_s(line.c_str(), "f %d %d %d", &face.v1, &face.v2, &face.v3);
+          matches = sscanf_s(line.c_str(), "f %d %d %d", &vertices[0], &vertices[1], &vertices[2]);
         }
         else
         {
           // Only vertices are specified
-          sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &face.v1, &vn1, &face.v2, &vn2, &face.v3, &vn3);
-          vt1 = 0;
-          vt2 = 0;
-          vt3 = 0;
+          sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &vertices[0], &normals[0], &vertices[1], &normals[1], &vertices[2], &normals[2]);
+          tex_coords[0] = 0;
+          tex_coords[1] = 0;
+          tex_coords[2] = 0;
         }
       }
-      face.v1--;
-      face.v2--;
-      face.v3--;
+      vertices[0]--;
+      vertices[1]--;
+      vertices[2]--;
+      if (tex_coords[0] != 0)
+        tex_coords[0]--;
+      if (tex_coords[1] != 0)
+        tex_coords[1]--;
+      if (tex_coords[2] != 0)
+        tex_coords[2]--;
+      normals[0]--;
+      normals[1]--;
+      normals[2]--;
+      face.vertices[0] = vertices[0];
+      face.vertices[1] = vertices[1];
+      face.vertices[2] = vertices[2];
+      face.texCoords[0] = tex_coords[0];
+      face.texCoords[1] = tex_coords[1];
+      face.texCoords[2] = tex_coords[2];
+      face.normals[0] = normals[0];
+      face.normals[1] = normals[1];
+      face.normals[2] = normals[2];
       m_Faces.push_back(face);
 
       m_Face_id_to_material_map[face_index] = current_material;
@@ -230,8 +251,7 @@ std::string OBJLoader::ToString()
   str << "Faces:\n";
   for (const auto &f : m_Faces)
   {
-    // str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << f.vt1 << ", " << f.vt2 << ", " << f.vt3 << ", " << f.vn1 << ", " << f.vn2 << ", " << f.vn3 << "\n";
-    str << "  " << f.v1 << ", " << f.v2 << ", " << f.v3 << ", " << "\n";
+    str << "  " << f.vertices[0] << ", " << f.vertices[1] << ", " << f.vertices[2] << ", " << f.texCoords[0] << ", " << f.texCoords[1] << ", " << f.texCoords[2] << ", " << f.normals[0] << ", " << f.normals[1] << ", " << f.normals[2] << "\n";
   }
   str << "Materials:\n";
   for (const auto &m : m_Materials)
