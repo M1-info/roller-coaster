@@ -40,3 +40,18 @@ Skybox *Scene::GetSkybox() const
 {
     return m_Skybox;
 }
+
+std::shared_ptr<Mesh> Scene::GetObjectByName(const std::string name) const
+{
+    // use find if to find the object with the name
+    std::shared_ptr<Mesh> object = nullptr;
+    for (auto it = m_Objects.begin(); it != m_Objects.end(); it++)
+    {
+        if ((*it)->GetName() == name)
+        {
+            object = *it;
+            break;
+        }
+    }
+    return object;
+}

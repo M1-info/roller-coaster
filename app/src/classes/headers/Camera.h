@@ -64,7 +64,6 @@ public:
     inline glm::vec3 GetUp() const { return m_Up; };
     inline glm::vec3 GetWorldUp() const { return m_WorldUp; };
 
-
     /* SETTERS */
 
     inline void SetFov(float fov) { m_Fov = fov; };
@@ -132,6 +131,9 @@ private:
 
     glm::mat4 m_Projection;
     glm::mat4 m_View;
+
+public: 
+    bool m_IsOnCart;
 };
 
 #endif // CAMERA_H

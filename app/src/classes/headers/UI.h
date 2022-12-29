@@ -37,6 +37,7 @@ public:
     void MeshInfo();
     void MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue = glm::vec3(0.0f));
     void CameraInfo();
+    void SwapCameraPosition();
     void ConsoleLog();
     void SceneRender();
 

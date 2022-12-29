@@ -2,20 +2,20 @@
 #include <iostream>
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
-    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane), 
-    m_MoveSpeed(BASE_SPEED), m_MoveSensitivity(BASE_SENSITIVITY), m_CurrentMouvementDirection(CameraMovement::NOMOVE)
+    : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane),
+      m_MoveSpeed(BASE_SPEED), m_MoveSensitivity(BASE_SENSITIVITY), m_CurrentMouvementDirection(CameraMovement::NOMOVE)
 {
 
-    if(m_Fov == 0.0f)
+    if (m_Fov == 0.0f)
         m_Fov = 45.0f;
 
-    if(m_AspectRatio == 0.0f)
+    if (m_AspectRatio == 0.0f)
         m_AspectRatio = 16.0f / 9.0f;
-    
-    if(m_NearPlane == 0.0f)
+
+    if (m_NearPlane == 0.0f)
         m_NearPlane = 0.1f;
 
-    if(m_FarPlane == 0.0f)
+    if (m_FarPlane == 0.0f)
         m_FarPlane = 100.0f;
 
     m_Yaw = -90.0f;
@@ -56,7 +56,7 @@ glm::mat4 Camera::GetOrientation()
 /**
  * This method update the view matrix
  * It is called when the camera is moved or rotated
-*/
+ */
 void Camera::Update()
 {
     m_Front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
@@ -87,50 +87,53 @@ void Camera::Move(CameraMovement direction, float deltaTime)
 {
     float velocity = m_MoveSpeed * deltaTime;
 
-    if(direction == CameraMovement::FORWARD){
+    if (direction == CameraMovement::FORWARD)
+    {
         m_Position += m_Front * velocity;
         Update();
         return;
     }
 
-    if(direction == CameraMovement::BACKWARD){
+    if (direction == CameraMovement::BACKWARD)
+    {
         m_Position -= m_Front * velocity;
         Update();
         return;
     }
 
-    if(direction == CameraMovement::LEFT){
+    if (direction == CameraMovement::LEFT)
+    {
         m_Position -= m_Right * velocity;
         Update();
         return;
     }
 
-    if(direction == CameraMovement::RIGHT){
+    if (direction == CameraMovement::RIGHT)
+    {
         m_Position += m_Right * velocity;
         Update();
         return;
     }
 
-    if(direction == CameraMovement::UP){
+    if (direction == CameraMovement::UP)
+    {
         m_Position += m_Up * velocity;
         Update();
         return;
     }
 
-    if(direction == CameraMovement::DOWN){
+    if (direction == CameraMovement::DOWN)
+    {
         m_Position += glm::vec3(0.0f, -1.0f, 0.0f) * velocity;
         Update();
     }
 }
 
-
 void Camera::Render(float deltaTime)
 {
-    if(m_CurrentMouvementDirection == CameraMovement::NOMOVE)
+    if (m_CurrentMouvementDirection == CameraMovement::NOMOVE)
         return;
 
-    Move(m_CurrentMouvementDirection, deltaTime);
+    if (!m_IsOnCart)
+        Move(m_CurrentMouvementDirection, deltaTime);
 }
-
-
-

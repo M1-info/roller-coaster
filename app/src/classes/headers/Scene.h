@@ -24,6 +24,7 @@ public:
 
     std::vector<std::shared_ptr<Mesh>> GetObjects() const;
     Skybox *GetSkybox() const;
+    std::shared_ptr<Mesh> GetObjectByName(const std::string name) const;
 
 private:
     Skybox *m_Skybox;

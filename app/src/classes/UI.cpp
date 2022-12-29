@@ -448,9 +448,31 @@ void UI::CameraInfo()
     ImGui::PopStyleVar();
     ImGui::Columns(1);
 
+    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+
+    SwapCameraPosition();
+
     ImGui::End();
 
     ImGui::PopID();
+}
+
+void UI::SwapCameraPosition()
+{
+    std::shared_ptr<Camera> camera = m_Window->GetCamera();
+    std::shared_ptr<Mesh> cart = m_Scene->GetObjectByName("Chariot");
+
+    if (ImGui::Checkbox("Swap camera position", &camera->m_IsOnCart))
+    {
+        if (camera->m_IsOnCart)
+        {
+            camera->SetPosition(cart->m_Position + glm::vec3(0.0f, 2.0f, 0.0f));
+        }
+        else
+        {
+            camera->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+        }
+    }
 }
 
 void UI::ConsoleLog()
