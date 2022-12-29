@@ -106,18 +106,18 @@ void UI::SceneGraph()
     {
         ImGui::PushID(mesh->GetName().c_str());
 
-        if (mesh->GetChildren().size() > 0)
+        if (mesh->GetType() == MeshType::RAILS)
         {
             if (ImGui::TreeNode(mesh->GetName().c_str()))
             {
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-                if (mesh->GetType() == MeshType::RAILS)
-                {
-                    if (ImGui::Button("Add control point"))
-                        mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
-                    ImGui::Dummy(ImVec2(0.0f, 3.0f));
+                if (ImGui::Button("Add control point")){
+                    mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
+                    mesh->Update();
                 }
+                ImGui::Dummy(ImVec2(0.0f, 3.0f));
+                
 
                 for (std::shared_ptr<Mesh> child : mesh->GetChildren())
                 {
@@ -135,7 +135,7 @@ void UI::SceneGraph()
                     if (ImGui::Button("X"))
                     {
                         child->m_IsSelected = false;
-                        child->SetParent(nullptr);
+						child->GetParent().reset();
                         mesh->RemoveChildren(child);
                         mesh->Update();
                         m_SelectedMesh.reset();
@@ -144,6 +144,9 @@ void UI::SceneGraph()
                     ImGui::PopStyleColor(3);
                     ImGui::Columns(1);
                     ImGui::PopID();
+
+                    if(child != m_SelectedMesh)
+                        child->m_IsSelected = false;
                 }
 
                 ImGui::TreePop();

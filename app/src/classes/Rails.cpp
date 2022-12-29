@@ -3,7 +3,7 @@
 std::shared_ptr<Rails> Rails::Create(std::vector<glm::vec3> controlPoints)
 {
 
-    std::shared_ptr<Rails> rails = std::make_shared<Rails>(controlPoints);
+    std::shared_ptr<Rails> rails = std::make_shared<Rails>();
 
     rails->m_Type = MeshType::RAILS;
 
@@ -38,41 +38,28 @@ std::shared_ptr<Rails> Rails::Create(std::vector<glm::vec3> controlPoints)
     return rails;
 }
 
-Rails::Rails(std::vector<glm::vec3> controlPoints)
+Rails::Rails()
 {
-    // m_Type = MeshType::RAILS;
+	m_VAO = nullptr;
+	m_VBO_pos = nullptr;
+	m_VBO_norm = nullptr;
+	m_IBO = nullptr;
+	m_Material = nullptr;
+	m_Parent = nullptr;
+	m_Position = glm::vec3(0.0f);
+	m_Scale = glm::vec3(1.0f);
+	m_Rotation = glm::vec3(0.0f);
+	m_Matrix = glm::mat4(1.0f);
+}
 
-    // m_Position = glm::vec3(0.0f);
-    // m_Scale = glm::vec3(1.0f);
-    // m_Rotation = glm::vec3(0.0f);
-    // m_Matrix = glm::mat4(1.0f);
+void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
+{
+    Mesh::RemoveChildren(child);
 
-    // for (int i = 0; i < controlPoints.size(); i++)
-    // {
-    //     glm::vec3 point = controlPoints[i];
-    //     std::shared_ptr<ControlPoint> controlPoint = std::make_shared<ControlPoint>(point, i);
-
-    //     // std::cout << "ControlPoint " << i << " created" << std::endl;
-    //     // controlPoint->SetParent();
-    //     // std::cout << "ControlPoint " << i << " created" << std::endl;
-    //     m_Children.push_back(controlPoint);
-    // }
-
-    // m_VBO_pos = nullptr;
-
-    // Update();
-
-    // CreateMaterial("basic");
-
-    // SetName("Rails");
-
-    // m_VAO = new VertexArray();
-    // m_VBO_pos = new VertexBuffer(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
-    // VertexBufferLayout layout;
-    // layout.Push<float>(3);
-    // m_VAO->AddBuffer(*m_VBO_pos, layout);
-    // m_VBO_pos->Unbind();
-    // m_VAO->Unbind();
+    for(int i = 0; i < m_Children.size(); i++)
+    {
+        m_Children[i].get()->SetName("ControlPoint_" + std::to_string(i));
+    }
 }
 
 void Rails::Draw()
@@ -96,11 +83,6 @@ void Rails::Update()
 
     for (int i = 4; i <= m_Children.size(); i += 3)
     {
-
-        // ControlPoint *point1 = dynamic_cast<ControlPoint *>(m_Children[i - 4].get());
-        // ControlPoint *point2 = dynamic_cast<ControlPoint *>(m_Children[i - 3].get());
-        // ControlPoint *point3 = dynamic_cast<ControlPoint *>(m_Children[i - 2].get());
-        // ControlPoint *point4 = dynamic_cast<ControlPoint *>(m_Children[i - 1].get());
 
         std::vector<glm::vec3> points({m_Children[i - 4].get()->GetVertices()[0],
                                        m_Children[i - 3].get()->GetVertices()[0],

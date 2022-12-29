@@ -6,21 +6,21 @@ Mesh::~Mesh()
     m_Indices.clear();
     m_Normales.clear();
     m_Children.clear();
-    m_Parent = nullptr;
+    m_Parent.reset();
 
-    if (m_VAO)
+    if (m_VAO != nullptr)
         delete m_VAO;
 
-    if (m_VBO_pos)
+    if (m_VBO_pos != nullptr)
         delete m_VBO_pos;
 
-    if (m_VBO_norm)
+    if (m_VBO_norm != nullptr)
         delete m_VBO_norm;
 
-    if (m_IBO)
+    if (m_IBO != nullptr)
         delete m_IBO;
 
-    if (m_Material)
+    if (m_Material != nullptr)
         delete m_Material;
 }
 

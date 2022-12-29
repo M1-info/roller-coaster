@@ -2,6 +2,9 @@
 
 ControlPoint::ControlPoint(glm::vec3 point, int index)
 {
+	m_VBO_norm = nullptr;
+	m_IBO = nullptr;
+	m_Material = nullptr;
 
     m_Type = MeshType::CONTROL_POINT;
 
