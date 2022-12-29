@@ -3,6 +3,8 @@
 Cart::Cart(const std::string filename)
 {
 
+    m_VBO_norm = nullptr;
+
     m_Type = MeshType::CART;
 
     m_Position = glm::vec3(-2.0f);
@@ -12,7 +14,7 @@ Cart::Cart(const std::string filename)
 
     OBJLoader loader(filename);
 
-    m_Vertices = loader.GetVertices();
+    std::vector<glm::vec3> vertices = loader.GetVertices();
     std::vector<glm::vec3> normales = loader.GetNormals();
     std::vector<IndexesFace> indices = loader.GetFaces();
     OBJMaterial material = loader.GetMaterials()[0];
@@ -28,16 +30,22 @@ Cart::Cart(const std::string filename)
 
     for (auto i : indices)
     {
-        m_Indices.push_back(i.vertices[0]);
-        m_Indices.push_back(i.vertices[1]);
-        m_Indices.push_back(i.vertices[2]);
+        // m_Indices.push_back(i.vertices[0]);
+        // m_Indices.push_back(i.normals[0]);
+        // m_Indices.push_back(i.vertices[1]);
+        // m_Indices.push_back(i.normals[1]);
+        // m_Indices.push_back(i.vertices[2]);
+        // m_Indices.push_back(i.normals[2]);
 
-        // m_Normales.push_back(normales[i.normals[0]]);
-        // m_Normales.push_back(normales[i.normals[1]]);
-        // m_Normales.push_back(normales[i.normals[2]]);
+        m_Vertices.push_back(vertices[i.vertices[0]]);
+        m_Normales.push_back(normales[i.normals[0]]);
+        m_Vertices.push_back(vertices[i.vertices[1]]);
+        m_Normales.push_back(normales[i.normals[1]]);
+        m_Vertices.push_back(vertices[i.vertices[2]]);
+        m_Normales.push_back(normales[i.normals[2]]);
     }
 
-    m_Normales = normales;
+    // m_Normales = normales;
 
     m_Vertices_size = m_Vertices.size() * sizeof(glm::vec3);
     m_Normales_size = m_Normales.size() * sizeof(glm::vec3);
@@ -50,6 +58,7 @@ Cart::Cart(const std::string filename)
     m_VBO_pos = new VertexBuffer(m_Vertices.data(), m_Vertices_size);
     VertexBufferLayout layout_pos;
     layout_pos.Push<float>(3); // position
+    // layout_pos.Push<float>(3); // normals
 
     m_VAO->AddBuffer(*m_VBO_pos, layout_pos);
 
@@ -61,7 +70,7 @@ Cart::Cart(const std::string filename)
     m_VAO->AddBuffer(*m_VBO_norm, layout_norm, 1);
 
     // create index buffer
-    m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
+    // m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
 
     Clear();
 }
@@ -70,9 +79,10 @@ void Cart::Draw()
 {
     m_Material->GetShader()->Bind();
     m_VAO->Bind();
-    m_IBO->Bind();
-    glDrawElements(GL_TRIANGLES, m_Indices_size, GL_UNSIGNED_INT, 0);
+    // m_IBO->Bind();
+    // glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, m_Vertices_size);
     m_Material->GetShader()->Unbind();
+    // m_IBO->Unbind();
     m_VAO->Unbind();
-    m_IBO->Unbind();
 }
