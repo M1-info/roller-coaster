@@ -13,6 +13,10 @@ public:
 
     void Draw() override;
     void Update() override {};
+    // void UpdateVelocity(float gravity);
+
+// private:
+//     glm::vec3 m_Velocity;
 };
 
 #endif // CART_H

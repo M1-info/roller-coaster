@@ -2,6 +2,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#define GRAVITY 9.81f
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

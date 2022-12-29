@@ -1,13 +1,14 @@
-#include "headers/Cart.h"
+#include "headers/Rail.h"
 
-Cart::Cart(const std::string filename)
+Rail::Rail(const std::string filename)
 {
 
     m_VBO_norm = nullptr;
+    m_IBO = nullptr;
 
-    m_Type = MeshType::CART;
+    m_Type = MeshType::RAIL;
 
-    m_Position = glm::vec3(-2.0f);
+    m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);
@@ -23,21 +24,17 @@ Cart::Cart(const std::string filename)
     m_Name[0] = toupper(m_Name[0]);
 
     CreateMaterial("phong");
+    // m_Material->SetMaterialColor(Color(0.56f, 0.27f, 0.11f));
     // m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
     m_Material->SetAmbientColor(material.ambient_color);
     m_Material->SetDiffuseColor(material.diffuse_color);
     m_Material->SetSpecularColor(material.specular_color);
     m_Material->SetSpecularExponent(material.shininess);
 
+    SetUpShader();
+
     for (auto i : indices)
     {
-        // m_Indices.push_back(i.vertices[0]);
-        // m_Indices.push_back(i.normals[0]);
-        // m_Indices.push_back(i.vertices[1]);
-        // m_Indices.push_back(i.normals[1]);
-        // m_Indices.push_back(i.vertices[2]);
-        // m_Indices.push_back(i.normals[2]);
-
         m_Vertices.push_back(vertices[i.vertices[0]]);
         m_Normales.push_back(normales[i.normals[0]]);
         m_Vertices.push_back(vertices[i.vertices[1]]);
@@ -45,8 +42,6 @@ Cart::Cart(const std::string filename)
         m_Vertices.push_back(vertices[i.vertices[2]]);
         m_Normales.push_back(normales[i.normals[2]]);
     }
-
-    // m_Normales = normales;
 
     m_Vertices_size = m_Vertices.size() * sizeof(glm::vec3);
     m_Normales_size = m_Normales.size() * sizeof(glm::vec3);
@@ -67,20 +62,35 @@ Cart::Cart(const std::string filename)
     layout_norm.Push<float>(3); // normales
     m_VAO->AddBuffer(*m_VBO_norm, layout_norm, 1);
 
-    // create index buffer
-    // m_IBO = new IndexBuffer(m_Indices.data(), m_Indices_size);
-
     Clear();
 }
 
-void Cart::Draw()
+void Rail::Draw()
 {
     m_Material->GetShader()->Bind();
     m_VAO->Bind();
-    // m_IBO->Bind();
-    // glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
     m_Material->GetShader()->Unbind();
-    // m_IBO->Unbind();
     m_VAO->Unbind();
+}
+
+void Rail::SetUpShader()
+{
+    Shader *shader = m_Material->GetShader();
+
+    Color materialAmbient = m_Material->GetAmbientColor();
+    Color materialDiffuse = m_Material->GetDiffuseColor();
+    Color materialSpecular = m_Material->GetSpecularColor();
+    // Color materialColor = m_Material->GetMaterialColor();
+    float specularExponent = m_Material->GetSpecularExponent();
+
+    shader->Bind();
+
+    // shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
+    shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
+    shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
+    shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
+    shader->SetUniform1f("u_material.specularExponent", specularExponent);
+
+    shader->Unbind();
 }

@@ -106,18 +106,58 @@ void UI::SceneGraph()
     {
         ImGui::PushID(mesh->GetName().c_str());
 
+        ImGui::Dummy(ImVec2(0.0f, 3.0f));
+
         if (mesh->GetType() == MeshType::RAILS)
         {
             if (ImGui::TreeNode(mesh->GetName().c_str()))
             {
+                if (mesh->GetType() == MeshType::RAILS)
+                {
+                    std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
+                    if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
+                        if (rails->m_DrawRails)
+                            rails->UpdateRails();
+
+                    for (std::shared_ptr<Mesh> child : rails->GetRails())
+                    {
+                        ImGui::PushID(child->GetName().c_str());
+                        ImGui::Columns(2);
+                        if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
+                        {
+                            SetSelectedMesh(child);
+                        }
+                        ImGui::NextColumn();
+
+                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                        if (ImGui::Button("X"))
+                        {
+                            child->m_IsSelected = false;
+                            child->GetParent().reset();
+                            mesh->RemoveChildren(child);
+                            mesh->Update();
+                            m_SelectedMesh.reset();
+                        }
+
+                        ImGui::PopStyleColor(3);
+                        ImGui::Columns(1);
+                        ImGui::PopID();
+
+                        if (child != m_SelectedMesh)
+                            child->m_IsSelected = false;
+                    }
+                }
+
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-                if (ImGui::Button("Add control point")){
+                if (ImGui::Button("Add control point"))
+                {
                     mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
                     mesh->Update();
                 }
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
-                
 
                 for (std::shared_ptr<Mesh> child : mesh->GetChildren())
                 {
@@ -135,7 +175,7 @@ void UI::SceneGraph()
                     if (ImGui::Button("X"))
                     {
                         child->m_IsSelected = false;
-						child->GetParent().reset();
+                        child->GetParent().reset();
                         mesh->RemoveChildren(child);
                         mesh->Update();
                         m_SelectedMesh.reset();
@@ -145,7 +185,7 @@ void UI::SceneGraph()
                     ImGui::Columns(1);
                     ImGui::PopID();
 
-                    if(child != m_SelectedMesh)
+                    if (child != m_SelectedMesh)
                         child->m_IsSelected = false;
                 }
 
@@ -232,7 +272,15 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
+        {
             m_SelectedMesh->GetParent()->Update();
+            if (m_SelectedMesh->GetType() == MeshType::CONTROL_POINT)
+            {
+                std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_SelectedMesh->GetParent());
+                if (rails->m_DrawRails)
+                    rails->m_DrawRails = false;
+            }
+        }
     }
 
     ImGui::PopItemWidth();
@@ -251,7 +299,15 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
+        {
             m_SelectedMesh->GetParent()->Update();
+            if (m_SelectedMesh->GetType() == MeshType::CONTROL_POINT)
+            {
+                std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_SelectedMesh->GetParent());
+                if (rails->m_DrawRails)
+                    rails->m_DrawRails = false;
+            }
+        }
     }
 
     ImGui::PopItemWidth();
@@ -270,7 +326,15 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
+        {
             m_SelectedMesh->GetParent()->Update();
+            if (m_SelectedMesh->GetType() == MeshType::CONTROL_POINT)
+            {
+                std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_SelectedMesh->GetParent());
+                if (rails->m_DrawRails)
+                    rails->m_DrawRails = false;
+            }
+        }
     }
 
     ImGui::PopItemWidth();

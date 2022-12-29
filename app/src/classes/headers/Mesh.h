@@ -23,7 +23,8 @@ enum MeshType
     MESH,
     RAILS,
     CART,
-    CONTROL_POINT
+    CONTROL_POINT,
+    RAIL
 };
 
 class Mesh : public std::enable_shared_from_this<Mesh>

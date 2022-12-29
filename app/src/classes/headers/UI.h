@@ -19,6 +19,7 @@
 #include "Mesh.h"
 #include "ControlPoint.h"
 #include "Light.h"
+#include "Rails.h"
 
 class UI
 {

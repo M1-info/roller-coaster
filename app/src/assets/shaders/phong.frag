@@ -18,6 +18,7 @@ uniform struct Light
 
 uniform struct Material
 {
+    vec3 color;
     vec3 coeffAmbient;
     vec3 coeffDiffuse;
     vec3 coeffSpecular;
@@ -45,10 +46,10 @@ void main()
     float specular=pow(max(dot(viewDir,reflectDir),0.),u_material.specularExponent);
     vec3 specularLight=specular*u_material.coeffSpecular;
     
-    vec3 finalLight=(ambient+diffuseLight+specularLight)*u_light.intensity;
+    vec3 result=(ambient+diffuseLight+specularLight)*u_light.intensity;
     
-    // if(u_isSelected==1)
-    // out_color=vec4(1.,1.,0.,1.);
-    // else
-    out_color=vec4(1.,0.,1.,1.)*vec4(finalLight,1.);
+    if(u_isSelected==1)
+    out_color=vec4(1.,1.,0.,1.);
+    else
+    out_color=vec4(1.,0.,1.,1.)*vec4(result,1.);
 };

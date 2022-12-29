@@ -93,8 +93,10 @@ void Renderer::SetUpScene()
 		Color materialAmbient = material->GetAmbientColor();
 		Color materialDiffuse = material->GetDiffuseColor();
 		Color materialSpecular = material->GetSpecularColor();
+		// Color materialColor = material->GetMaterialColor();
 		float specularExponent = material->GetSpecularExponent();
 
+		// shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
 		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
 		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
 		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
@@ -170,6 +172,7 @@ void Renderer::Render()
 			shader->Unbind();
 
 			if (mesh->GetChildren().size() > 0)
+			{
 				for (auto child : mesh->GetChildren())
 				{
 					child->GetMaterial()->GetShader()->Bind();
@@ -185,6 +188,34 @@ void Renderer::Render()
 					child->GetMaterial()->GetShader()->Unbind();
 				}
 
+				if (mesh->GetType() == MeshType::RAILS)
+				{
+					std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
+					if (rails->m_DrawRails)
+					{
+						for (auto rail : rails->GetRails())
+						{
+							Shader *shaderRail = rail->GetMaterial()->GetShader();
+							glm::vec3 cameraPosition = m_Camera->GetPosition();
+							glm::vec3 lightPosition = m_Light->m_Position;
+
+							shaderRail->Bind();
+
+							shaderRail->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+							shaderRail->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+							shaderRail->SetUniformMat4f("u_projection", m_Camera->GetProjection());
+							shaderRail->SetUniformMat4f("u_view", m_Camera->GetView());
+							shaderRail->SetUniformMat4f("u_model", rail->ComputeMatrix());
+							if (rail->m_IsSelected)
+								shaderRail->SetUniform1i("u_isSelected", 1);
+							else
+								shaderRail->SetUniform1i("u_isSelected", 0);
+
+							shaderRail->Unbind();
+						}
+					}
+				}
+			}
 			mesh->Draw();
 		}
 
