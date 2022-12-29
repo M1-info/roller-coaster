@@ -119,44 +119,48 @@ void UI::SceneGraph()
                         if (rails->m_DrawRails)
                             rails->UpdateRails();
 
-                    // for (std::shared_ptr<Mesh> child : rails->GetRails())
-                    // {
-                    //     ImGui::PushID(child->GetName().c_str());
-                    //     ImGui::Columns(2);
-                    //     if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
-                    //     {
-                    //         SetSelectedMesh(child);
-                    //     }
-                    //     ImGui::NextColumn();
+                    ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
-                    //     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
-                    //     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
-                    //     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-                    //     if (ImGui::Button("X"))
-                    //     {
-                    //         child->m_IsSelected = false;
-                    //         child->GetParent().reset();
-                    //         mesh->RemoveChildren(child);
-                    //         mesh->Update();
-                    //         m_SelectedMesh.reset();
-                    //     }
+                    // Select field
+                    ImGui::Text("Select control points file");
+                    ImGui::ListBoxHeader("", ImVec2(0, 50));
 
-                    //     ImGui::PopStyleColor(3);
-                    //     ImGui::Columns(1);
-                    //     ImGui::PopID();
+                    for (auto &file : rails->m_ControlPointsFiles)
+                    {
+                        bool isSelected = (file == rails->m_ControlPointsFileName);
+                        if (ImGui::Selectable(file.c_str(), isSelected))
+                        {
+                            rails->LoadRails(file.c_str());
+                        }
+                        if (isSelected)
+                            ImGui::SetItemDefaultFocus();
+                    }
 
-                    //     if (child != m_SelectedMesh)
-                    //         child->m_IsSelected = false;
-                    // }
+                    ImGui::ListBoxFooter();
+
+                    ImGui::Columns(2);
+                    if (ImGui::Button("Add control point"))
+                    {
+                        mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
+                        mesh->Update();
+                    }
+                    ImGui::NextColumn();
+                    if (ImGui::Button("Save current points"))
+                    {
+                        bool isExported = rails->ExportRails();
+                        std::string message;
+                        if (isExported)
+                            message = "Rails exported to " + std::string(rails->m_ControlPointsFileName);
+                        else
+                            message = "Error exporting rails to " + std::string(rails->m_ControlPointsFileName);
+
+                        AddLog(message);
+                        rails->LoadControlPointsFiles();
+                        rails->m_ControlPointsFileName = "controlPoints";
+                    }
+                    ImGui::Columns(1);
                 }
 
-                ImGui::Dummy(ImVec2(0.0f, 3.0f));
-
-                if (ImGui::Button("Add control point"))
-                {
-                    mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
-                    mesh->Update();
-                }
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
 
                 for (std::shared_ptr<Mesh> child : mesh->GetChildren())
@@ -174,6 +178,9 @@ void UI::SceneGraph()
                     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
                     if (ImGui::Button("X"))
                     {
+                        if (child->GetParent()->GetType() == MeshType::RAILS)
+                            std::dynamic_pointer_cast<Rails>(child->GetParent())->m_DrawRails = false;
+
                         child->m_IsSelected = false;
                         child->GetParent().reset();
                         mesh->RemoveChildren(child);

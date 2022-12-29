@@ -7,20 +7,7 @@ std::shared_ptr<Rails> Rails::Create(std::vector<glm::vec3> controlPoints)
 
     rails->m_Type = MeshType::RAILS;
 
-    rails->m_Position = glm::vec3(0.0f);
-    rails->m_Scale = glm::vec3(1.0f);
-    rails->m_Rotation = glm::vec3(0.0f);
-    rails->m_Matrix = glm::mat4(1.0f);
-
-    for (int i = 0; i < controlPoints.size(); i++)
-    {
-        glm::vec3 point = controlPoints[i];
-        std::shared_ptr<ControlPoint> controlPoint = std::make_shared<ControlPoint>(point, i);
-        controlPoint->SetParent(rails);
-        rails->m_Children.push_back(controlPoint);
-    }
-
-    rails->m_VBO_pos = nullptr;
+    rails->GenerateControlPoints(controlPoints);
 
     rails->Update();
 
@@ -53,6 +40,8 @@ Rails::Rails()
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);
+
+    LoadControlPointsFiles();
 }
 
 void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
@@ -152,5 +141,109 @@ void Rails::UpdateRails()
         float angle = atan2(direction.y, direction.x);
 
         m_Rails[i].get()->m_Rotation.z = angle;
+    }
+}
+
+void Rails::GenerateControlPoints(std::vector<glm::vec3> controlPoints)
+{
+    m_Children.clear();
+    for (int i = 0; i < controlPoints.size(); i++)
+    {
+        glm::vec3 point = controlPoints[i];
+        std::shared_ptr<ControlPoint> controlPoint = std::make_shared<ControlPoint>(point, i);
+        AddChildren(controlPoint);
+    }
+}
+
+void Rails::LoadRails(const std::string filename)
+{
+    std::string filepath;
+
+#if VISUAL_STUDIO
+    filepath = "src/assets/rails/";
+#elif MINGW
+    filepath = "app\\src\\assets\\rails\\";
+#endif
+
+    std::ifstream file(filepath + filename);
+    std::string line;
+
+    std::vector<glm::vec3> controlPoints;
+
+    while (std::getline(file, line))
+    {
+        glm::vec3 vertex;
+        sscanf_s(line.c_str(), "%f %f %f", &vertex.x, &vertex.y, &vertex.z);
+        glm::vec3 point(vertex.x, vertex.y, vertex.z);
+        controlPoints.push_back(point);
+    }
+
+    GenerateControlPoints(controlPoints);
+    Update();
+    UpdateRails();
+}
+
+bool Rails::ExportRails()
+{
+
+    std::string filepath;
+
+#if VISUAL_STUDIO
+    filepath = "src/assets/rails/";
+#elif MINGW
+    filepath = "app\\src\\assets\\rails\\";
+#endif
+
+    std::string filename = m_ControlPointsFileName + ".txt";
+
+    bool exists = true;
+    int i = 0;
+    struct stat buf;
+    while (exists)
+    {
+        std::string file = filepath + filename;
+        if (stat(file.c_str(), &buf) != -1)
+        {
+            i++;
+            filename = m_ControlPointsFileName + "_" + std::to_string(i) + ".txt";
+        }
+        else
+            exists = false;
+    }
+
+    m_ControlPointsFileName = filepath + filename;
+
+    std::ofstream file(m_ControlPointsFileName);
+
+    if (!file.is_open())
+        return false;
+
+    for (auto point : m_Children)
+    {
+        glm::vec3 vertex = point.get()->GetVertices()[0];
+        file << vertex.x << " " << vertex.y << " " << vertex.z << std::endl;
+    }
+
+    file.close();
+    return true;
+}
+
+void Rails::LoadControlPointsFiles()
+{
+    m_ControlPointsFiles.clear();
+
+    std::string filepath;
+
+#if VISUAL_STUDIO
+    filepath = "src/assets/rails/";
+#elif MINGW
+    filepath = "app\\src\\assets\\rails\\";
+#endif
+
+    // load all files in directory
+    for (const auto &entry : std::filesystem::directory_iterator(filepath))
+    {
+        std::string filename = entry.path().filename().string();
+        m_ControlPointsFiles.push_back(filename);
     }
 }
