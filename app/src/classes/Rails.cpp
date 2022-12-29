@@ -1,13 +1,10 @@
 #include "headers/Rails.h"
 
-std::shared_ptr<Rails> Rails::Create(std::vector<glm::vec3> controlPoints)
+std::shared_ptr<Rails> Rails::Create()
 {
-
     std::shared_ptr<Rails> rails = std::make_shared<Rails>();
 
     rails->m_Type = MeshType::RAILS;
-
-    rails->GenerateControlPoints(controlPoints);
 
     rails->Update();
 
@@ -57,17 +54,19 @@ void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
 void Rails::Draw()
 {
 
-    m_VAO->Bind();
-    m_Material->GetShader()->Bind();
-    glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
-    m_VAO->Unbind();
-    m_Material->GetShader()->Unbind();
-
-    for (auto child : m_Children)
-        child->Draw();
-
     if (!m_DrawRails)
+    {
+        m_VAO->Bind();
+        m_Material->GetShader()->Bind();
+        glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
+        m_VAO->Unbind();
+        m_Material->GetShader()->Unbind();
+
+        for (auto child : m_Children)
+            child->Draw();
+
         return;
+    }
 
     if (m_Rails.size() == 0)
         return;
@@ -138,9 +137,33 @@ void Rails::UpdateRails()
         glm::vec3 rail2 = m_Rails[i + 1].get()->m_Position;
 
         glm::vec3 direction = rail2 - rail1;
+        direction = glm::normalize(direction);
+
         float angle = atan2(direction.y, direction.x);
 
-        m_Rails[i].get()->m_Rotation.z = angle;
+        m_Rails[i].get()->m_Rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // Store the rotation of the preceding rail in a temporary vector
+        // glm::vec3 prevRotation;
+        // if (i == 0)
+        //     prevRotation = glm::vec3(0.0f);
+        // else
+        //     prevRotation = m_Rails[i - 1].get()->m_Rotation;
+
+        // // Calculate the direction between the current and next rail, and rotate it by the same angles as the preceding rail
+        // glm::vec3 direction = rail2 - rail1;
+        // direction = glm::rotateZ(direction, prevRotation.z);
+        // direction = glm::rotateY(direction, prevRotation.y);
+        // direction = glm::rotateX(direction, prevRotation.x);
+
+        // // Calculate the angles for the current rail's rotation using the rotated direction vector
+        // float angleX = acos(direction.x);
+        // float angleY = -asin(direction.y);
+        // float angleZ = atan(direction.z);
+
+        // m_Rails[i].get()->m_Rotation.x = angleX;
+        // m_Rails[i].get()->m_Rotation.y = angleY;
+        // m_Rails[i].get()->m_Rotation.z = angleZ;
     }
 }
 

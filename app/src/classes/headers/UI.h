@@ -44,14 +44,9 @@ public:
 
     inline void SetWindow(Window *window) { m_Window = window; }
     inline void SetScene(Scene *scene) { m_Scene = scene; }
-    inline void SetSelectedMesh(std::shared_ptr<Mesh> mesh) { 
-        if (m_SelectedMesh != nullptr)
-            m_SelectedMesh->m_IsSelected = false;
-        m_SelectedMesh = mesh;
-        m_SelectedMesh->m_IsSelected = true;
-    }
+    void SetSelectedMesh(std::shared_ptr<Mesh> mesh);
     inline void SetLight(Light * light) { m_Light = light; }
-    inline void AddLog(const std::string log) { m_Logs.push_back(log); }
+    void AddLog(const std::string log, ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }
 
 private:
@@ -59,7 +54,7 @@ private:
     Scene *m_Scene;
     Light *m_Light;
     std::shared_ptr<Mesh> m_SelectedMesh;
-    std::vector<std::string> m_Logs;
+    std::vector<std::pair<std::string, ImVec4>> m_Logs;
     FrameBuffer *m_FBO;
     float m_AspectRatio = 16.0f / 9.0f;
 };

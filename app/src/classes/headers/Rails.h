@@ -6,8 +6,10 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <sys/stat.h>
 #include <filesystem>
+#include <cmath>
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -22,7 +24,7 @@ class Rails : public Mesh
 {
 public:
     Rails();
-    static std::shared_ptr<Rails> Create(std::vector<glm::vec3> controlPoints);
+    static std::shared_ptr<Rails> Create();
     void RemoveChildren(std::shared_ptr<Mesh> child) override;
     void Draw() override;
     void Update() override;
@@ -42,6 +44,7 @@ public:
     bool m_DrawRails = false;
     std::string m_ControlPointsFileName = "controlPoints";
     std::vector<std::string> m_ControlPointsFiles;
+    std::string m_ControlPointsFileSelected = "";
 };
 
 #endif // RAILS_H

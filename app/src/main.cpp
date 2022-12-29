@@ -20,19 +20,7 @@ int main(void)
 
     std::shared_ptr<Cart> cart = std::make_shared<Cart>("chariot.obj");
 
-    std::vector<glm::vec3> controlPoints;
-    controlPoints.push_back(glm::vec3(0.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(6.0f, 2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(12.0f, -2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(18.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(24.0f, 3.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(18.0f, -4.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(20.0f, -2.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
-    controlPoints.push_back(glm::vec3(32.0f, 0.0f, 0.0f));
-
-    std::shared_ptr<Rails> rails = Rails::Create(controlPoints);
+    std::shared_ptr<Rails> rails = Rails::Create();
 
     Scene *scene = new Scene();
     scene->Init();

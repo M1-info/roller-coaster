@@ -115,6 +115,7 @@ void UI::SceneGraph()
                 if (mesh->GetType() == MeshType::RAILS)
                 {
                     std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
+                    ImGui::Dummy(ImVec2(5.0f, 5.0f));
                     if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
                         if (rails->m_DrawRails)
                             rails->UpdateRails();
@@ -127,11 +128,13 @@ void UI::SceneGraph()
 
                     for (auto &file : rails->m_ControlPointsFiles)
                     {
-                        bool isSelected = (file == rails->m_ControlPointsFileName);
+                        bool isSelected = (file == rails->m_ControlPointsFileSelected);
                         if (ImGui::Selectable(file.c_str(), isSelected))
                         {
-                            rails->LoadRails(file.c_str());
+                            rails->m_ControlPointsFileSelected = file;
+
                         }
+                    
                         if (isSelected)
                             ImGui::SetItemDefaultFocus();
                     }
@@ -139,26 +142,34 @@ void UI::SceneGraph()
                     ImGui::ListBoxFooter();
 
                     ImGui::Columns(2);
-                    if (ImGui::Button("Add control point"))
-                    {
-                        mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
-                        mesh->Update();
-                    }
-                    ImGui::NextColumn();
                     if (ImGui::Button("Save current points"))
                     {
                         bool isExported = rails->ExportRails();
                         std::string message;
                         if (isExported)
-                            message = "Rails exported to " + std::string(rails->m_ControlPointsFileName);
+                            message = "Rails exported to " + std::string(rails->m_ControlPointsFileName); 
                         else
                             message = "Error exporting rails to " + std::string(rails->m_ControlPointsFileName);
 
-                        AddLog(message);
+                        ImVec4 color = isExported ? ImVec4(0.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+                        AddLog(message, color);
                         rails->LoadControlPointsFiles();
                         rails->m_ControlPointsFileName = "controlPoints";
                     }
+                    ImGui::NextColumn();
+                    if (ImGui::Button("Load control points"))
+                    {
+                        rails->LoadRails(rails->m_ControlPointsFileSelected.c_str());
+                        rails->m_ControlPointsFileSelected = "";
+                    }
+
                     ImGui::Columns(1);
+                    ImGui::Dummy(ImVec2(0.0f, 5.0f));
+                    if (ImGui::Button("Add control point"))
+                    {
+                        mesh->AddChildren(std::make_shared<ControlPoint>(glm::vec3(0.0f), mesh->GetChildren().size()));
+                        mesh->Update();
+                    }
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));
@@ -169,7 +180,13 @@ void UI::SceneGraph()
                     ImGui::Columns(2);
                     if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
                     {
-                        SetSelectedMesh(child);
+                        if(m_SelectedMesh == child){
+                            m_SelectedMesh.reset();
+                            child->m_IsSelected = false;
+                        } else {
+                            m_SelectedMesh = child;
+                            child->m_IsSelected = true;
+                        }
                     }
                     ImGui::NextColumn();
 
@@ -202,8 +219,16 @@ void UI::SceneGraph()
         else
         {
             ImGui::Columns(2);
-            if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh))
-                SetSelectedMesh(mesh);
+            if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh)){
+                if(m_SelectedMesh == mesh){
+                    m_SelectedMesh.reset();
+                    mesh->m_IsSelected = false;
+                } else {
+                    m_SelectedMesh = mesh;
+                    mesh->m_IsSelected = true;
+                }
+            }
+            
 
             ImGui::NextColumn();
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
@@ -471,6 +496,7 @@ void UI::SwapCameraPosition()
         else
         {
             camera->SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+            camera->Update();
         }
     }
 }
@@ -478,8 +504,12 @@ void UI::SwapCameraPosition()
 void UI::ConsoleLog()
 {
     ImGui::Begin("Console");
-    for (auto s : m_Logs)
-        ImGui::Text(s.c_str());
+    for (auto s : m_Logs){
+        ImGui::PushStyleColor(ImGuiCol_Text, s.second);
+        ImGui::Text(s.first.c_str());
+        ImGui::PopStyleColor();
+    }
+    
     if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
         ImGui::SetScrollHereY(1.0f);
     ImGui::End();
@@ -494,3 +524,17 @@ void UI::SceneRender()
                  ImVec2(1, 0));
     ImGui::End();
 }
+
+void UI::SetSelectedMesh(std::shared_ptr<Mesh> mesh) 
+{ 
+    if (m_SelectedMesh != nullptr)
+        m_SelectedMesh->m_IsSelected = false;
+    m_SelectedMesh = mesh;
+    m_SelectedMesh->m_IsSelected = true;
+}
+
+void UI::AddLog(const std::string log, ImVec4 color) 
+{
+    m_Logs.push_back(std::make_pair(log, color)); 
+}
+    

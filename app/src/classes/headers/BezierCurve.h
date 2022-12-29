@@ -3,7 +3,7 @@
 #define BEZIERCURVE_H
 
 #define BEZIER_CURVE_MATRIX glm::mat4(-1, 3, -3, 1, 3, -6, 3, 0, -3, 3, 0, 0, 1, 0, 0, 0)
-
+#define BSPLINE_CURVE_MATRIX glm::mat4(-1, 3, -3, 1, 3, -6, 3, 0, -3, 0, 3, 0, 1, 4, 1, 0)
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -32,6 +32,5 @@ public:
 private:
     std::vector<glm::vec3> m_ControlPoints;
 };
-
 
 #endif // BEZIERCURVE_H

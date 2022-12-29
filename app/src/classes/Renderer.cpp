@@ -131,6 +131,12 @@ void Renderer::Render()
 
 		// update camera
 		m_Camera->Render(deltaTime);
+		if (m_Camera->m_IsOnCart)
+		{
+			std::shared_ptr<Mesh> cart = m_Scene->GetObjectByName("Chariot");
+			m_Camera->SetPosition(cart->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
+			m_Camera->Update();
+		}
 
 		glm::mat4 viewMatrix = m_Camera->GetView();
 		glm::mat4 projectionView = m_Camera->GetProjection() * viewMatrix;
@@ -183,22 +189,6 @@ void Renderer::Render()
 			/* OBJECT CHILDREN */
 			if (mesh->GetChildren().size() > 0)
 			{
-				for (auto child : mesh->GetChildren())
-				{
-					Shader *childShader = child->GetMaterial()->GetShader();
-					childShader->Bind();
-
-					childShader->SetUniformMat4f("u_projectionView", projectionView);
-					childShader->SetUniformMat4f("u_model", child->ComputeMatrix());
-
-					if (child->m_IsSelected)
-						childShader->SetUniform1i("u_isSelected", 1);
-					else
-						childShader->SetUniform1i("u_isSelected", 0);
-
-					childShader->Unbind();
-				}
-
 				// Rails need to draw also m_Rails (each rail is a mesh)
 				if (mesh->GetType() == MeshType::RAILS)
 				{
@@ -219,6 +209,24 @@ void Renderer::Render()
 							shaderRail->SetUniformMat4f("u_model", rail->ComputeMatrix());
 
 							shaderRail->Unbind();
+						}
+					}
+					else
+					{
+						for (auto child : mesh->GetChildren())
+						{
+							Shader *childShader = child->GetMaterial()->GetShader();
+							childShader->Bind();
+
+							childShader->SetUniformMat4f("u_projectionView", projectionView);
+							childShader->SetUniformMat4f("u_model", child->ComputeMatrix());
+
+							if (child->m_IsSelected)
+								childShader->SetUniform1i("u_isSelected", 1);
+							else
+								childShader->SetUniform1i("u_isSelected", 0);
+
+							childShader->Unbind();
 						}
 					}
 				}
