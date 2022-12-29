@@ -2,9 +2,9 @@
 
 ControlPoint::ControlPoint(glm::vec3 point, int index)
 {
-	m_VBO_norm = nullptr;
-	m_IBO = nullptr;
-	m_Material = nullptr;
+    m_VBO_norm = nullptr;
+    m_IBO = nullptr;
+    m_Material = nullptr;
 
     m_Type = MeshType::CONTROL_POINT;
 
@@ -15,7 +15,7 @@ ControlPoint::ControlPoint(glm::vec3 point, int index)
 
     m_Name = "ControlPoint_" + std::to_string(index);
 
-    CreateMaterial("basic");
+    CreateMaterial("controlPoints");
 
     m_Vertices.push_back(point);
 

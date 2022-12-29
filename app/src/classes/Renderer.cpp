@@ -71,20 +71,23 @@ void Renderer::Init()
 
 void Renderer::SetUpScene()
 {
+
+	glm::mat4 projectionView = m_Camera->GetProjection() * glm::mat4(glm::mat3(m_Camera->GetView()));
+
 	Skybox *skybox = m_Scene->GetSkybox();
-	skybox->GetShader()->Bind();
-	skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-	skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
-	skybox->GetShader()->SetUniform1i("u_texture", 0);
-	skybox->GetShader()->Unbind();
+	Shader *skyboxShader = skybox->GetShader();
+	skyboxShader->Bind();
+	skyboxShader->SetUniformMat4f("u_projectionView", projectionView);
+	skyboxShader->SetUniform1i("u_texture", 0);
+	skyboxShader->Unbind();
 
 	for (auto mesh : m_Scene->GetObjects())
 	{
+		// rails don't need uniforms about light and material
 		if (mesh->GetType() == MeshType::RAILS)
 			continue;
 
 		Material *material = mesh->GetMaterial();
-
 		Shader *shader = material->GetShader();
 
 		shader->Bind();
@@ -93,10 +96,10 @@ void Renderer::SetUpScene()
 		Color materialAmbient = material->GetAmbientColor();
 		Color materialDiffuse = material->GetDiffuseColor();
 		Color materialSpecular = material->GetSpecularColor();
-		// Color materialColor = material->GetMaterialColor();
+		Color materialColor = material->GetMaterialColor();
 		float specularExponent = material->GetSpecularExponent();
 
-		// shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
+		shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
 		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
 		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
 		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
@@ -129,39 +132,45 @@ void Renderer::Render()
 		// update camera
 		m_Camera->Render(deltaTime);
 
+		glm::mat4 viewMatrix = m_Camera->GetView();
+		glm::mat4 projectionView = m_Camera->GetProjection() * viewMatrix;
+		glm::mat4 projectionViewSkyBox = m_Camera->GetProjection() * glm::mat4(glm::mat3(viewMatrix));
+
 		// clear scene
 		Clear();
 		m_FBO->Bind();
 		Clear();
 
-		// draw skybox
-		skybox->GetShader()->Bind();
-		skybox->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-		skybox->GetShader()->SetUniformMat4f("u_view", glm::mat4(glm::mat3(m_Camera->GetView())));
-		skybox->GetShader()->Unbind();
+		/* SKYBOX */
+		Shader *skyboxShader = skybox->GetShader();
+		skyboxShader->Bind();
+		skyboxShader->SetUniformMat4f("u_projectionView", projectionViewSkyBox);
+		skyboxShader->Unbind();
 		glDisable(GL_DEPTH_TEST);
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
 
-		// draw scene
+		/* SCENE OBJECTS */
 		for (auto mesh : m_Scene->GetObjects())
 		{
 			Material *material = mesh->GetMaterial();
-
 			Shader *shader = material->GetShader();
+
+			glm::vec3 cameraPosition = m_Camera->GetPosition();
+			glm::vec3 lightPosition = m_Light->m_Position;
 
 			shader->Bind();
 
+			// rails is a container for other meshes
+			// so we don't need to pass camera and light position
 			if (mesh->GetType() != MeshType::RAILS)
 			{
-				glm::vec3 cameraPosition = m_Camera->GetPosition();
-				glm::vec3 lightPosition = m_Light->m_Position;
 				shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 				shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
+				shader->SetUniformMat4f("u_view", viewMatrix);
 			}
 
-			shader->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-			shader->SetUniformMat4f("u_view", m_Camera->GetView());
+			shader->SetUniformMat4f("u_projectionView", projectionView);
 			shader->SetUniformMat4f("u_model", mesh->ComputeMatrix());
 
 			if (mesh->m_IsSelected)
@@ -171,23 +180,26 @@ void Renderer::Render()
 
 			shader->Unbind();
 
+			/* OBJECT CHILDREN */
 			if (mesh->GetChildren().size() > 0)
 			{
 				for (auto child : mesh->GetChildren())
 				{
-					child->GetMaterial()->GetShader()->Bind();
+					Shader *childShader = child->GetMaterial()->GetShader();
+					childShader->Bind();
 
-					child->GetMaterial()->GetShader()->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-					child->GetMaterial()->GetShader()->SetUniformMat4f("u_view", m_Camera->GetView());
-					child->GetMaterial()->GetShader()->SetUniformMat4f("u_model", child->ComputeMatrix());
+					childShader->SetUniformMat4f("u_projectionView", projectionView);
+					childShader->SetUniformMat4f("u_model", child->ComputeMatrix());
+
 					if (child->m_IsSelected)
-						child->GetMaterial()->GetShader()->SetUniform1i("u_isSelected", 1);
+						childShader->SetUniform1i("u_isSelected", 1);
 					else
-						child->GetMaterial()->GetShader()->SetUniform1i("u_isSelected", 0);
+						childShader->SetUniform1i("u_isSelected", 0);
 
-					child->GetMaterial()->GetShader()->Unbind();
+					childShader->Unbind();
 				}
 
+				// Rails need to draw also m_Rails (each rail is a mesh)
 				if (mesh->GetType() == MeshType::RAILS)
 				{
 					std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
@@ -196,20 +208,15 @@ void Renderer::Render()
 						for (auto rail : rails->GetRails())
 						{
 							Shader *shaderRail = rail->GetMaterial()->GetShader();
-							glm::vec3 cameraPosition = m_Camera->GetPosition();
-							glm::vec3 lightPosition = m_Light->m_Position;
 
 							shaderRail->Bind();
 
 							shaderRail->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
 							shaderRail->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
-							shaderRail->SetUniformMat4f("u_projection", m_Camera->GetProjection());
-							shaderRail->SetUniformMat4f("u_view", m_Camera->GetView());
+
+							shaderRail->SetUniformMat4f("u_projectionView", projectionView);
+							shaderRail->SetUniformMat4f("u_view", viewMatrix);
 							shaderRail->SetUniformMat4f("u_model", rail->ComputeMatrix());
-							if (rail->m_IsSelected)
-								shaderRail->SetUniform1i("u_isSelected", 1);
-							else
-								shaderRail->SetUniform1i("u_isSelected", 0);
 
 							shaderRail->Unbind();
 						}
@@ -221,7 +228,7 @@ void Renderer::Render()
 
 		m_FBO->Unbind();
 
-		// draw UI
+		// Draw UI
 		m_UI->Render();
 
 		// Swap front and back buffers

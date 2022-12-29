@@ -119,35 +119,35 @@ void UI::SceneGraph()
                         if (rails->m_DrawRails)
                             rails->UpdateRails();
 
-                    for (std::shared_ptr<Mesh> child : rails->GetRails())
-                    {
-                        ImGui::PushID(child->GetName().c_str());
-                        ImGui::Columns(2);
-                        if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
-                        {
-                            SetSelectedMesh(child);
-                        }
-                        ImGui::NextColumn();
+                    // for (std::shared_ptr<Mesh> child : rails->GetRails())
+                    // {
+                    //     ImGui::PushID(child->GetName().c_str());
+                    //     ImGui::Columns(2);
+                    //     if (ImGui::Selectable(child->GetName().c_str(), m_SelectedMesh == child))
+                    //     {
+                    //         SetSelectedMesh(child);
+                    //     }
+                    //     ImGui::NextColumn();
 
-                        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
-                        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-                        if (ImGui::Button("X"))
-                        {
-                            child->m_IsSelected = false;
-                            child->GetParent().reset();
-                            mesh->RemoveChildren(child);
-                            mesh->Update();
-                            m_SelectedMesh.reset();
-                        }
+                    //     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
+                    //     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
+                    //     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    //     if (ImGui::Button("X"))
+                    //     {
+                    //         child->m_IsSelected = false;
+                    //         child->GetParent().reset();
+                    //         mesh->RemoveChildren(child);
+                    //         mesh->Update();
+                    //         m_SelectedMesh.reset();
+                    //     }
 
-                        ImGui::PopStyleColor(3);
-                        ImGui::Columns(1);
-                        ImGui::PopID();
+                    //     ImGui::PopStyleColor(3);
+                    //     ImGui::Columns(1);
+                    //     ImGui::PopID();
 
-                        if (child != m_SelectedMesh)
-                            child->m_IsSelected = false;
-                    }
+                    //     if (child != m_SelectedMesh)
+                    //         child->m_IsSelected = false;
+                    // }
                 }
 
                 ImGui::Dummy(ImVec2(0.0f, 3.0f));

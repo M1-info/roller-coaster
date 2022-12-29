@@ -24,8 +24,7 @@ Rail::Rail(const std::string filename)
     m_Name[0] = toupper(m_Name[0]);
 
     CreateMaterial("phong");
-    // m_Material->SetMaterialColor(Color(0.56f, 0.27f, 0.11f));
-    // m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
+    m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
     m_Material->SetAmbientColor(material.ambient_color);
     m_Material->SetDiffuseColor(material.diffuse_color);
     m_Material->SetSpecularColor(material.specular_color);
@@ -81,16 +80,17 @@ void Rail::SetUpShader()
     Color materialAmbient = m_Material->GetAmbientColor();
     Color materialDiffuse = m_Material->GetDiffuseColor();
     Color materialSpecular = m_Material->GetSpecularColor();
-    // Color materialColor = m_Material->GetMaterialColor();
+    Color materialColor = m_Material->GetMaterialColor();
     float specularExponent = m_Material->GetSpecularExponent();
 
     shader->Bind();
 
-    // shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
+    shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
     shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
     shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
     shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
     shader->SetUniform1f("u_material.specularExponent", specularExponent);
+    shader->SetUniform1i("u_isSelected", 0);
 
     shader->Unbind();
 }

@@ -2,7 +2,6 @@
 
 out vec4 out_color;
 
-uniform vec4 u_color;
 uniform int u_isSelected;
 
 

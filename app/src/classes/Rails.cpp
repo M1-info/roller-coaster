@@ -24,7 +24,7 @@ std::shared_ptr<Rails> Rails::Create(std::vector<glm::vec3> controlPoints)
 
     rails->Update();
 
-    rails->CreateMaterial("basic");
+    rails->CreateMaterial("controlPoints");
 
     rails->SetName("Rails");
 
