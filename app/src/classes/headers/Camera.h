@@ -2,13 +2,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include <algorithm> 
+#include <algorithm>
 
-#define BASE_SPEED 5.0f
-#define BASE_SENSITIVITY 0.1f
+#define BASE_SPEED 20.0f
+#define BASE_SENSITIVITY 0.2f
 
 enum class CameraMovement
 {
@@ -132,7 +131,7 @@ private:
     glm::mat4 m_Projection;
     glm::mat4 m_View;
 
-public: 
+public:
     bool m_IsOnCart;
 };
 

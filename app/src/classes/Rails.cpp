@@ -88,7 +88,8 @@ void Rails::Update()
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
         BezierCurve curve(points);
-        for (float t = 0; t <= 1.0; t += 0.01)
+        float step = 0.01f;
+        for (float t = 0; t <= 1; t += step)
         {
             glm::vec3 curvePoints = curve.GetPoint(t);
             glm::vec3 vertex(curvePoints.x, curvePoints.y, curvePoints.z);
@@ -118,52 +119,48 @@ void Rails::UpdateRails()
 {
     m_Rails.clear();
 
-    for (int i = 0; i < m_Vertices.size(); i += 5)
-    {
-        std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
-        rail->m_Position = m_Vertices[i];
-        m_Rails.push_back(rail);
-    }
+    glm::vec3 prevPosition = m_Vertices[0];
+    std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
+    rail->m_Position = prevPosition;
+    m_Rails.push_back(rail);
 
-    for (int i = 0; i < m_Rails.size(); i++)
+    for (int i = 1; i < m_Vertices.size(); i++)
     {
-        if (i == m_Rails.size() - 1)
+        glm::vec3 currentPosition = m_Vertices[i];
+        glm::vec3 direction = currentPosition - prevPosition;
+        float length = glm::length(direction);
+
+        if (glm::length(length) > 0.5f)
         {
-            m_Rails[i].get()->m_Rotation.z = m_Rails[i - 1].get()->m_Rotation.z;
-            continue;
+            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
+            rail->m_Position = currentPosition;
+            m_Rails.push_back(rail);
+            prevPosition = currentPosition;
+
+            float angleX = glm::atan(direction.z, direction.x);
+            float angleY = glm::atan(direction.z, direction.y);
+            float angleZ = glm::atan(direction.y, direction.x);
+            if (direction.y < 0.0f)
+            {
+                angleZ = -angleZ;
+            }
+
+            glm::vec3 prevRotation = m_Rails[m_Rails.size() - 1].get()->m_Rotation;
+            rail->m_Rotation.x = prevRotation.x + angleX;
+            rail->m_Rotation.y = prevRotation.y + angleY;
+            rail->m_Rotation.z = prevRotation.z + angleZ;
+
+            // if (direction.z < 0.0f)
+            // {
+            //     angleX = -angleX;
+            //     angleY = -angleY;
+            // }
+            // if (direction.y < 0.0f)
+            // {
+            //     angleZ = -angleZ;
+            // }
+            // rail->m_Rotation = glm::vec3(angleX, angleY, angleZ);
         }
-
-        glm::vec3 rail1 = m_Rails[i].get()->m_Position;
-        glm::vec3 rail2 = m_Rails[i + 1].get()->m_Position;
-
-        glm::vec3 direction = rail2 - rail1;
-        direction = glm::normalize(direction);
-
-        // float angle = atan2(direction.y, direction.x);
-
-        // m_Rails[i].get()->m_Rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
-
-        // Store the rotation of the preceding rail in a temporary vector
-        // glm::vec3 prevRotation;
-        // if (i == 0)
-        //     prevRotation = glm::vec3(0.0f);
-        // else
-        //     prevRotation = m_Rails[i - 1].get()->m_Rotation;
-
-        // // Calculate the direction between the current and next rail, and rotate it by the same angles as the preceding rail
-        // glm::vec3 direction = rail2 - rail1;
-        // direction = glm::rotateZ(direction, prevRotation.z);
-        // direction = glm::rotateY(direction, prevRotation.y);
-        // direction = glm::rotateX(direction, prevRotation.x);
-
-        // // Calculate the angles for the current rail's rotation using the rotated direction vector
-        // float angleX = acos(direction.x);
-        // float angleY = -asin(direction.y);
-        // float angleZ = atan(direction.z);
-
-        // m_Rails[i].get()->m_Rotation.x = angleX;
-        // m_Rails[i].get()->m_Rotation.y = angleY;
-        // m_Rails[i].get()->m_Rotation.z = angleZ;
     }
 }
 
@@ -203,7 +200,7 @@ void Rails::LoadRails(const std::string filename)
 
     GenerateControlPoints(controlPoints);
     Update();
-    UpdateRails();
+    // UpdateRails();
 }
 
 bool Rails::ExportRails()
