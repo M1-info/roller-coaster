@@ -88,8 +88,7 @@ void Rails::Update()
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
         BezierCurve curve(points);
-        float step = 0.01f;
-        for (float t = 0; t <= 1; t += step)
+        for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 curvePoints = curve.GetPoint(t);
             glm::vec3 vertex(curvePoints.x, curvePoints.y, curvePoints.z);
@@ -122,8 +121,6 @@ void Rails::UpdateRails()
 {
     m_Rails.clear();
 
-    float sizeOfRail = 0.5f;
-
     glm::vec3 prevPosition = m_Vertices[0];
     std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
     rail->m_Position = prevPosition;
@@ -135,7 +132,7 @@ void Rails::UpdateRails()
         glm::vec3 direction = currentPosition - prevPosition;
         float length = glm::length(direction);
 
-        if (glm::length(length) > sizeOfRail)
+        if (glm::length(length) > RAIL_WIDTH)
         {
             std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
             rail->m_Position = currentPosition;

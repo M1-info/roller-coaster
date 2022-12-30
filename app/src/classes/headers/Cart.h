@@ -2,7 +2,6 @@
 #ifndef CART_H
 #define CART_H
 
-
 #include "Mesh.h"
 
 class Cart : public Mesh
@@ -12,17 +11,17 @@ public:
     Cart(const std::string filename);
 
     void Draw() override;
-    void Update() override {};
+    void Update() override{};
     void Animate(float deltaTime);
 
-    inline void SetVelocity(glm::vec3 velocity) {m_Velocity = velocity;}
-    inline glm::vec3 GetVelocity() {return m_Velocity;}
+    inline void SetVelocity(glm::vec3 velocity) { m_Velocity = velocity; }
+    inline glm::vec3 GetVelocity() { return m_Velocity; }
 
     void SetRailsVertices(std::vector<glm::vec3> railsVertices);
-    inline std::vector<glm::vec3> GetRailsVertices() {return m_RailsVertices;}
+    inline std::vector<glm::vec3> GetRailsVertices() { return m_RailsVertices; }
 
     void SetRailsTangents(std::vector<glm::vec3> railsTangents);
-    inline std::vector<glm::vec3> GetRailsTangents() {return m_RailsTangents;}
+    inline std::vector<glm::vec3> GetRailsTangents() { return m_RailsTangents; }
 
 private:
     glm::vec3 m_Velocity;

@@ -9,9 +9,10 @@ Cart::Cart(const std::string filename)
 
     m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
-    m_Rotation = glm::vec3(0.0f, 90.0f, 0.0f);
+    m_Rotation = glm::vec3(0.0f);
     m_Matrix = glm::mat4(1.0f);
-    m_Velocity = glm::vec3(0.0f);
+    // m_Velocity = glm::vec3(1.0f);
+    // m_Velocity = 10.0f; // 1 rail per second
     m_CurrentRailVertex = {};
 
     OBJLoader loader(filename);
@@ -88,22 +89,39 @@ void Cart::Animate(float deltaTime)
 {
     if (m_CurrentRailVertex != m_RailsVertices.end())
     {
+        glm::vec3 prevPosition;
+        if (m_CurrentRailVertex != m_RailsVertices.begin())
+            prevPosition = *(m_CurrentRailVertex - 1);
+        else
+            prevPosition = *(m_RailsVertices.end() - 1);
+
         m_Position = *m_CurrentRailVertex;
         m_Position += glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 direction = m_Position - prevPosition;
         m_CurrentRailVertex++;
+
+        // use direction to rotate the cart
+        float angleX = glm::atan(direction.z, direction.x);
+        float angleY = glm::atan(direction.z, direction.y);
+        float angleZ = glm::atan(direction.y, direction.x);
+        angleX = glm::degrees(angleX);
+        angleY = glm::degrees(angleY);
+        angleZ = glm::degrees(angleZ);
+        m_Rotation = glm::vec3(0.0f, angleY, 0.0f);
+        m_Rotation.y += 90.0f;
     }
     else
         m_CurrentRailVertex = m_RailsVertices.begin();
 
-    if (m_CurrentRailTangent != m_RailsTangents.end())
-    {
-        // use tangent to rotate the cart
-        float angleX = glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent));
-        float angleY = glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent));
-        float angleZ = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent));
-        m_Rotation = glm::vec3(angleX, angleY, 0.0f);
-        m_CurrentRailTangent++;
-    }
-    else
-        m_CurrentRailTangent = m_RailsTangents.begin();
+    // if (m_CurrentRailTangent != m_RailsTangents.end())
+    // {
+    //     // use tangent to rotate the cart
+    //     float angleX = glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent));
+    //     float angleY = glm::asin(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent));
+    //     float angleZ = glm::atan(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent));
+    //     m_Rotation = glm::vec3(angleX, angleY, angleZ);
+    //     m_CurrentRailTangent++;
+    // }
+    // else
+    //     m_CurrentRailTangent = m_RailsTangents.begin();
 }

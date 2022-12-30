@@ -36,17 +36,16 @@ public:
     void FrameRate(ImGuiViewport *viewport) const;
     void SceneGraph();
     void MeshInfo();
-    void MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue = glm::vec3(0.0f));
+    void MeshTransform(std::string component, glm::vec3 *value, float step = 0.1f, glm::vec3 resetValue = glm::vec3(0.0f));
     void CameraInfo();
     void SwapCameraPosition();
     void ConsoleLog();
     void SceneRender();
 
-
     inline void SetWindow(Window *window) { m_Window = window; }
     inline void SetScene(Scene *scene) { m_Scene = scene; }
     void SetSelectedMesh(std::shared_ptr<Mesh> mesh);
-    inline void SetLight(Light * light) { m_Light = light; }
+    inline void SetLight(Light *light) { m_Light = light; }
     void AddLog(const std::string log, ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }
 

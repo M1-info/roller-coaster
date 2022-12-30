@@ -3,6 +3,7 @@
 #define RENDERER_H
 
 #define GRAVITY 9.81f
+#define DELTA_TIME_CART_RENDER 0.01f
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -26,12 +27,17 @@
 #include "Skybox.h"
 #include "OBJLoader.h"
 
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError(); x; ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#define ASSERT(x) \
+	if (!(x))     \
+		__debugbreak();
+#define GLCall(x)   \
+	GLClearError(); \
+	x;              \
+	ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
 void GLClearError();
 
-bool GLLogCall(const char* function, const char* file, int line);
+bool GLLogCall(const char *function, const char *file, int line);
 
 class VertexArray;
 class Renderer
@@ -47,20 +53,18 @@ public:
 	void SetUpScene();
 
 	inline void SetScene(Scene *scene) { m_Scene = scene; }
-	inline Scene* GetScene() const { return m_Scene; }
+	inline Scene *GetScene() const { return m_Scene; }
 	inline std::shared_ptr<Camera> GetCamera() const { return m_Camera; }
-	inline Window* GetWindow() const { return m_Window; }
-	inline UI* GetUI() const { return m_UI; }
-
+	inline Window *GetWindow() const { return m_Window; }
+	inline UI *GetUI() const { return m_UI; }
 
 private:
-	Window* m_Window;
-	Scene* m_Scene;
+	Window *m_Window;
+	Scene *m_Scene;
 	std::shared_ptr<Camera> m_Camera;
-	Light * m_Light;
-	UI* m_UI;
-	FrameBuffer* m_FBO;
+	Light *m_Light;
+	UI *m_UI;
+	FrameBuffer *m_FBO;
 };
-
 
 #endif // RENDERER_H

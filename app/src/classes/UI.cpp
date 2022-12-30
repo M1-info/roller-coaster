@@ -89,16 +89,17 @@ void UI::Render()
     ImGui::End();
 
     ImGui::Begin("Animation");
-    if(ImGui::Checkbox("Animation", &m_IsAnimating))
+    if (ImGui::Checkbox("Animation", &m_IsAnimating))
     {
-        if(m_IsAnimating){
+        if (m_IsAnimating)
+        {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
             std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
             cart->SetRailsVertices(rails->GetVertices());
             cart->SetRailsTangents(rails->GetVerticesTangents());
         }
-    }   
- 
+    }
+
     ImGui::End();
 
     ImGui::Render();
@@ -334,16 +335,16 @@ void UI::MeshInfo()
             MeshTransform("Position", vertex);
         }
         else
-            MeshTransform("Position", &m_SelectedMesh->m_Position, glm::vec3(0.0f));
+            MeshTransform("Position", &m_SelectedMesh->m_Position);
         ImGui::Separator();
-        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, glm::vec3(0.0f));
+        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, 1.0f);
         ImGui::Separator();
-        MeshTransform("Scale", &m_SelectedMesh->m_Scale, glm::vec3(1.0f));
+        MeshTransform("Scale", &m_SelectedMesh->m_Scale, 0.1f, glm::vec3(1.0f));
     }
     ImGui::End();
 }
 
-void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetValue)
+void UI::MeshTransform(std::string component, glm::vec3 *value, float step, glm::vec3 resetValue)
 {
 
     ImGui::PushID(component.c_str());
@@ -365,7 +366,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
 
     ImGui::SameLine();
 
-    if (ImGui::DragFloat("##X", &value->x, 0.1f))
+    if (ImGui::DragFloat("##X", &value->x, step))
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
@@ -392,7 +393,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
 
     ImGui::SameLine();
 
-    if (ImGui::DragFloat("##Y", &value->y, 0.1f))
+    if (ImGui::DragFloat("##Y", &value->y, step))
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
@@ -419,7 +420,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, glm::vec3 resetV
 
     ImGui::SameLine();
 
-    if (ImGui::DragFloat("##Z", &value->z, 0.1f))
+    if (ImGui::DragFloat("##Z", &value->z, step))
     {
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)

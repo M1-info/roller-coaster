@@ -122,6 +122,7 @@ void Renderer::Render()
 	Skybox *skybox = m_Scene->GetSkybox();
 	SetUpScene();
 	float lastTime = 0.0f;
+	float lastTimeCartRender = 0.0f;
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
@@ -156,9 +157,15 @@ void Renderer::Render()
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
 
-		if(m_UI->GetIsAnimating()){
-			std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
-			cart->Animate(deltaTime);
+		if (m_UI->GetIsAnimating())
+		{
+			// animate cart if enough time has passed
+			if (currentTime - lastTimeCartRender > DELTA_TIME_CART_RENDER)
+			{
+				std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
+				cart->Animate(deltaTime);
+				lastTimeCartRender = currentTime;
+			}
 		}
 
 		/* SCENE OBJECTS */
@@ -235,7 +242,7 @@ void Renderer::Render()
 							childShader->Unbind();
 						}
 					}
-				}		
+				}
 			}
 			mesh->Draw();
 		}
