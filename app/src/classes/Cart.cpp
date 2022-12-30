@@ -98,10 +98,10 @@ void Cart::Animate(float deltaTime)
     if (m_CurrentRailTangent != m_RailsTangents.end())
     {
         // use tangent to rotate the cart
-        float angleX = glm::degrees(glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent)));
-        float angleY = glm::degrees(glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent)));
-        float angleZ = glm::degrees(glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent)));
-        m_Rotation = glm::vec3(angleX, angleY, angleZ);
+        float angleX = glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent));
+        float angleY = glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent));
+        float angleZ = glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent));
+        m_Rotation = glm::vec3(angleX, angleY, 0.0f);
         m_CurrentRailTangent++;
     }
     else
