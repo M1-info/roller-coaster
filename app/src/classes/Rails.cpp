@@ -139,9 +139,9 @@ void Rails::UpdateRails()
         glm::vec3 direction = rail2 - rail1;
         direction = glm::normalize(direction);
 
-        float angle = atan2(direction.y, direction.x);
+        // float angle = atan2(direction.y, direction.x);
 
-        m_Rails[i].get()->m_Rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
+        // m_Rails[i].get()->m_Rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Store the rotation of the preceding rail in a temporary vector
         // glm::vec3 prevRotation;
@@ -269,4 +269,22 @@ void Rails::LoadControlPointsFiles()
         std::string filename = entry.path().filename().string();
         m_ControlPointsFiles.push_back(filename);
     }
+}
+
+bool Rails::DeleteFileRails(const std::string filename)
+{
+    std::string filepath;
+
+#if VISUAL_STUDIO
+    filepath = "src/assets/rails/";
+#elif MINGW
+    filepath = "app\\src\\assets\\rails\\";
+#endif
+
+    std::string file = filepath + filename;
+
+    if (remove(file.c_str()) != 0)
+        return false;
+    else
+        return true;
 }

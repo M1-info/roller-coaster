@@ -34,8 +34,13 @@ public:
     bool ExportRails();
     void LoadRails(const std::string filename);
     void LoadControlPointsFiles();
+    bool DeleteFileRails(const std::string filename);
 
-    inline std::vector<std::shared_ptr<Rail>> GetRails() { return m_Rails; }
+    inline std::vector<std::shared_ptr<Rail>>
+    GetRails()
+    {
+        return m_Rails;
+    }
 
 private:
     std::vector<std::shared_ptr<Rail>> m_Rails;
