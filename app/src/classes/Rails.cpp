@@ -94,6 +94,9 @@ void Rails::Update()
             glm::vec3 curvePoints = curve.GetPoint(t);
             glm::vec3 vertex(curvePoints.x, curvePoints.y, curvePoints.z);
             m_Vertices.push_back(vertex);
+
+            glm::vec3 tangent = curve.GetTangent(t);
+            m_VerticesTangents.push_back(glm::normalize(tangent));
         }
     }
 
@@ -119,6 +122,8 @@ void Rails::UpdateRails()
 {
     m_Rails.clear();
 
+    float sizeOfRail = 0.5f;
+
     glm::vec3 prevPosition = m_Vertices[0];
     std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
     rail->m_Position = prevPosition;
@@ -130,7 +135,7 @@ void Rails::UpdateRails()
         glm::vec3 direction = currentPosition - prevPosition;
         float length = glm::length(direction);
 
-        if (glm::length(length) > 0.5f)
+        if (glm::length(length) > sizeOfRail)
         {
             std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
             rail->m_Position = currentPosition;
@@ -140,26 +145,13 @@ void Rails::UpdateRails()
             float angleX = glm::atan(direction.z, direction.x);
             float angleY = glm::atan(direction.z, direction.y);
             float angleZ = glm::atan(direction.y, direction.x);
-            if (direction.y < 0.0f)
-            {
-                angleZ = -angleZ;
-            }
+            // if (direction.y < 0.0f)
+            //     angleZ = -angleZ;
 
             glm::vec3 prevRotation = m_Rails[m_Rails.size() - 1].get()->m_Rotation;
             rail->m_Rotation.x = prevRotation.x + angleX;
             rail->m_Rotation.y = prevRotation.y + angleY;
-            rail->m_Rotation.z = prevRotation.z + angleZ;
-
-            // if (direction.z < 0.0f)
-            // {
-            //     angleX = -angleX;
-            //     angleY = -angleY;
-            // }
-            // if (direction.y < 0.0f)
-            // {
-            //     angleZ = -angleZ;
-            // }
-            // rail->m_Rotation = glm::vec3(angleX, angleY, angleZ);
+            rail->m_Rotation.z = prevRotation.z * angleZ;
         }
     }
 }

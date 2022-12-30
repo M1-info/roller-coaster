@@ -20,6 +20,7 @@
 #include "ControlPoint.h"
 #include "Light.h"
 #include "Rails.h"
+#include "Cart.h"
 
 class UI
 {
@@ -49,6 +50,8 @@ public:
     void AddLog(const std::string log, ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     inline void SetFBO(FrameBuffer *fbo) { m_FBO = fbo; }
 
+    inline bool GetIsAnimating() const { return m_IsAnimating; }
+
 private:
     Window *m_Window;
     Scene *m_Scene;
@@ -57,6 +60,7 @@ private:
     std::vector<std::pair<std::string, ImVec4>> m_Logs;
     FrameBuffer *m_FBO;
     float m_AspectRatio = 16.0f / 9.0f;
+    bool m_IsAnimating = false;
 };
 
 #endif // UI_H

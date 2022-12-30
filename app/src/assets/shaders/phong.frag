@@ -49,7 +49,7 @@ void main()
     vec3 result=(ambient+diffuseLight+specularLight)*u_light.intensity;
     
     if(u_isSelected==1)
-    out_color=vec4(1.,1.,0.,1.);
+    out_color=vec4(1.,1.,0.,1.) * vec4(result,1.);
     else
     out_color=vec4(u_material.color,1.)*vec4(result,1.);
 };

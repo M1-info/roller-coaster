@@ -88,6 +88,19 @@ void UI::Render()
     MeshTransform("Light", &m_Light->m_Position);
     ImGui::End();
 
+    ImGui::Begin("Animation");
+    if(ImGui::Checkbox("Animation", &m_IsAnimating))
+    {
+        if(m_IsAnimating){
+            std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
+            std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
+            cart->SetRailsVertices(rails->GetVertices());
+            cart->SetRailsTangents(rails->GetVerticesTangents());
+        }
+    }   
+ 
+    ImGui::End();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

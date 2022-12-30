@@ -13,10 +13,23 @@ public:
 
     void Draw() override;
     void Update() override {};
-    // void UpdateVelocity(float gravity);
+    void Animate(float deltaTime);
 
-// private:
-//     glm::vec3 m_Velocity;
+    inline void SetVelocity(glm::vec3 velocity) {m_Velocity = velocity;}
+    inline glm::vec3 GetVelocity() {return m_Velocity;}
+
+    void SetRailsVertices(std::vector<glm::vec3> railsVertices);
+    inline std::vector<glm::vec3> GetRailsVertices() {return m_RailsVertices;}
+
+    void SetRailsTangents(std::vector<glm::vec3> railsTangents);
+    inline std::vector<glm::vec3> GetRailsTangents() {return m_RailsTangents;}
+
+private:
+    glm::vec3 m_Velocity;
+    std::vector<glm::vec3> m_RailsVertices;
+    std::vector<glm::vec3> m_RailsTangents;
+    std::vector<glm::vec3>::iterator m_CurrentRailVertex;
+    std::vector<glm::vec3>::iterator m_CurrentRailTangent;
 };
 
 #endif // CART_H

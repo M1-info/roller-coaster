@@ -29,6 +29,13 @@ public:
     */
     glm::vec3 GetPoint(float t);
 
+    /* t is a value between 0 and 1
+     0 is the start of the curve
+     1 is the end of the curve
+     return the tangent at the given t value
+    */
+    glm::vec3 GetTangent(float t);
+
 private:
     std::vector<glm::vec3> m_ControlPoints;
 };

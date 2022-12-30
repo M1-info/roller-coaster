@@ -36,14 +36,12 @@ public:
     void LoadControlPointsFiles();
     bool DeleteFileRails(const std::string filename);
 
-    inline std::vector<std::shared_ptr<Rail>>
-    GetRails()
-    {
-        return m_Rails;
-    }
+    inline std::vector<std::shared_ptr<Rail>> GetRails(){return m_Rails;}
+    inline std::vector<glm::vec3> GetVerticesTangents(){return m_VerticesTangents;}
 
 private:
     std::vector<std::shared_ptr<Rail>> m_Rails;
+    std::vector<glm::vec3> m_VerticesTangents;
 
 public:
     bool m_DrawRails = false;

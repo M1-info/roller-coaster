@@ -7,10 +7,12 @@ Cart::Cart(const std::string filename)
 
     m_Type = MeshType::CART;
 
-    m_Position = glm::vec3(-2.0f);
+    m_Position = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
-    m_Rotation = glm::vec3(0.0f);
+    m_Rotation = glm::vec3(0.0f, 90.0f, 0.0f);
     m_Matrix = glm::mat4(1.0f);
+    m_Velocity = glm::vec3(0.0f);
+    m_CurrentRailVertex = {};
 
     OBJLoader loader(filename);
 
@@ -61,6 +63,18 @@ Cart::Cart(const std::string filename)
     Clear();
 }
 
+void Cart::SetRailsVertices(std::vector<glm::vec3> railsVertices)
+{
+    m_RailsVertices = railsVertices;
+    m_CurrentRailVertex = m_RailsVertices.begin();
+}
+
+void Cart::SetRailsTangents(std::vector<glm::vec3> railsTangents)
+{
+    m_RailsTangents = railsTangents;
+    m_CurrentRailTangent = m_RailsTangents.begin();
+}
+
 void Cart::Draw()
 {
     m_Material->GetShader()->Bind();
@@ -68,4 +82,28 @@ void Cart::Draw()
     glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
     m_VAO->Unbind();
     m_Material->GetShader()->Unbind();
+}
+
+void Cart::Animate(float deltaTime)
+{
+    if (m_CurrentRailVertex != m_RailsVertices.end())
+    {
+        m_Position = *m_CurrentRailVertex;
+        m_Position += glm::vec3(0.0f, 1.0f, 0.0f);
+        m_CurrentRailVertex++;
+    }
+    else
+        m_CurrentRailVertex = m_RailsVertices.begin();
+
+    if (m_CurrentRailTangent != m_RailsTangents.end())
+    {
+        // use tangent to rotate the cart
+        float angleX = glm::degrees(glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent)));
+        float angleY = glm::degrees(glm::acos(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent)));
+        float angleZ = glm::degrees(glm::acos(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent)));
+        m_Rotation = glm::vec3(angleX, angleY, angleZ);
+        m_CurrentRailTangent++;
+    }
+    else
+        m_CurrentRailTangent = m_RailsTangents.begin();
 }

@@ -47,3 +47,18 @@ glm::vec3 BezierCurve::GetPoint(float t)
 
     return T * M * P;
 }
+
+/**
+ * @brief Get the tangent at the given t
+ *
+ * @param t in [0, 1]
+ * @return glm::vec3
+ */
+glm::vec3 BezierCurve::GetTangent(float t)
+{
+    float dx = 3 * t * t * (m_ControlPoints[1].x - m_ControlPoints[0].x) + 6 * t * (m_ControlPoints[2].x - m_ControlPoints[1].x) + 3 * (m_ControlPoints[3].x - m_ControlPoints[2].x);
+    float dy = 3 * t * t * (m_ControlPoints[1].y - m_ControlPoints[0].y) + 6 * t * (m_ControlPoints[2].y - m_ControlPoints[1].y) + 3 * (m_ControlPoints[3].y - m_ControlPoints[2].y);
+    float dz = 3 * t * t * (m_ControlPoints[1].z - m_ControlPoints[0].z) + 6 * t * (m_ControlPoints[2].z - m_ControlPoints[1].z) + 3 * (m_ControlPoints[3].z - m_ControlPoints[2].z);
+
+    return glm::vec3(dx, dy, dz);
+}
