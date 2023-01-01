@@ -204,7 +204,28 @@ void Renderer::Render()
 				// Rails need to draw also m_Rails (each rail is a mesh)
 				if (mesh->GetType() == MeshType::RAILS)
 				{
+
 					std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
+					rails->m_Material_tang->GetShader()->Bind();
+					rails->m_Material_tang->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
+					rails->m_Material_tang->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+					rails->m_Material_tang->GetShader()->Unbind();
+
+					rails->m_Material_finalTang->GetShader()->Bind();
+					rails->m_Material_finalTang->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
+					rails->m_Material_finalTang->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+					rails->m_Material_finalTang->GetShader()->Unbind();
+
+					rails->m_Material_norm->GetShader()->Bind();
+					rails->m_Material_norm->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
+					rails->m_Material_norm->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+					rails->m_Material_norm->GetShader()->Unbind();
+
+					rails->m_Material_binormal->GetShader()->Bind();
+					rails->m_Material_binormal->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
+					rails->m_Material_binormal->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
+					rails->m_Material_binormal->GetShader()->Unbind();
+
 					if (rails->m_DrawRails)
 					{
 

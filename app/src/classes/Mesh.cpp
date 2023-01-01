@@ -40,115 +40,10 @@ void Mesh::Clear()
     m_IBO->Unbind();
 }
 
-void Mesh::SetName(std::string name)
-{
-    m_Name = name;
-}
-
-void Mesh::SetNormales(std::vector<glm::vec3> normales)
-{
-    m_Normales = normales;
-}
-
-void Mesh::SetIndices(std::vector<unsigned int> indices)
-{
-    m_Indices = indices;
-}
-
-void Mesh::SetParent(std::shared_ptr<Mesh> parent)
-{
-    m_Parent = parent;
-}
-
-void Mesh::SetChildren(std::vector<std::shared_ptr<Mesh>> children)
-{
-    m_Children = children;
-}
-
 void Mesh::CreateMaterial(std::string shaderFile)
 {
     m_Material = new Material();
     m_Material->AddShader(shaderFile);
-}
-
-std::string Mesh::GetName() const
-{
-    return m_Name;
-}
-
-VertexArray *Mesh::GetVAO() const
-{
-    return m_VAO;
-}
-
-VertexBuffer *Mesh::GetVBO() const
-{
-    return m_VBO_pos;
-}
-
-IndexBuffer *Mesh::GetIBO() const
-{
-    return m_IBO;
-}
-
-std::vector<glm::vec3> Mesh::GetVertices() const
-{
-    return m_Vertices;
-}
-
-glm::vec3 *Mesh::GetVertexPtr(int index)
-{
-    return &m_Vertices[index];
-}
-
-std::vector<glm::vec3> Mesh::GetNormales() const
-{
-    return m_Normales;
-}
-
-std::vector<unsigned int> Mesh::GetIndices() const
-{
-    return m_Indices;
-}
-
-std::shared_ptr<Mesh> Mesh::GetParent() const
-{
-    return m_Parent;
-}
-
-std::vector<std::shared_ptr<Mesh>> Mesh::GetChildren() const
-{
-    return m_Children;
-}
-
-glm::mat4 Mesh::GetMatrix() const
-{
-    return m_Matrix;
-}
-
-Material *Mesh::GetMaterial() const
-{
-    return m_Material;
-}
-
-glm::vec3 Mesh::GetPosition() const
-{
-    return m_Position;
-}
-
-glm::vec3 Mesh::GetScale() const
-{
-    return m_Scale;
-}
-
-glm::vec3 Mesh::GetRotation() const
-{
-    return m_Rotation;
-}
-
-MeshType Mesh::GetType() const
-{
-    return m_Type;
 }
 
 void Mesh::AddChildren(std::shared_ptr<Mesh> child)
@@ -171,31 +66,34 @@ void Mesh::RemoveChildren(std::shared_ptr<Mesh> child)
 
 void Mesh::Translate(glm::vec3 translation)
 {
-    m_Position = translation;
-    m_Matrix = glm::translate(m_Matrix, m_Position);
+    m_Position += translation;
+    m_IsDirty = true;
 }
 
 void Mesh::Rotate(GLfloat angle, glm::vec3 axis)
 {
-    m_Rotation = axis * angle;
-    m_Matrix = glm::rotate(m_Matrix, angle, axis);
+    m_Rotation += axis * angle;
+    m_IsDirty = true;
 }
 
 void Mesh::Scale(glm::vec3 scale)
 {
-    m_Scale = scale;
-    m_Matrix = glm::scale(m_Matrix, m_Scale);
+    m_Scale += scale;
+    m_IsDirty = true;
 }
 
 glm::mat4 Mesh::ComputeMatrix()
 {
+    if (!m_IsDirty)
+        return m_Matrix;
+
     glm::mat4 model(1.0f);
 
     glm::mat4 translation = glm::translate(model, m_Position);
 
-    glm::mat4 rotation = glm::rotate(model, glm::radians(m_Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
-                         glm::rotate(model, glm::radians(m_Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
-                         glm::rotate(model, glm::radians(m_Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::degrees(m_Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
+                         glm::rotate(glm::mat4(1.0f), glm::degrees(m_Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                         glm::rotate(glm::mat4(1.0f), glm::degrees(m_Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
     glm::mat4 scale = glm::scale(model, m_Scale);
 
@@ -203,6 +101,8 @@ glm::mat4 Mesh::ComputeMatrix()
 
     if (m_Parent != nullptr)
         m_Matrix *= m_Parent->ComputeMatrix();
+
+    m_IsDirty = false;
 
     return m_Matrix;
 }

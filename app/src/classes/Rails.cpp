@@ -12,15 +12,66 @@ std::shared_ptr<Rails> Rails::Create()
 
     rails->SetName("Rails");
 
-    rails->m_VAO = new VertexArray();
-    rails->m_VBO_pos = new VertexBuffer(rails->m_Vertices.data(), rails->m_Vertices.size() * sizeof(glm::vec3));
-
     VertexBufferLayout layout;
     layout.Push<float>(3);
 
+    rails->m_VAO = new VertexArray();
+    rails->m_VBO_pos = new VertexBuffer(rails->m_Vertices.data(), rails->m_Vertices.size() * sizeof(glm::vec3));
     rails->m_VAO->AddBuffer(*rails->m_VBO_pos, layout);
     rails->m_VBO_pos->Unbind();
     rails->m_VAO->Unbind();
+
+    // tangent
+    rails->m_VAO_tang = new VertexArray();
+    rails->m_VBO_tang = new VertexBuffer(rails->m_VerticesTangents.data(), rails->m_VerticesTangents.size() * sizeof(glm::vec3));
+    rails->m_VAO_tang->AddBuffer(*rails->m_VBO_tang, layout);
+    rails->m_VBO_tang->Unbind();
+    rails->m_VAO_tang->Unbind();
+
+    rails->m_Material_tang = new Material();
+    rails->m_Material_tang->AddShader("tangents");
+    rails->m_Material_tang->GetShader()->Bind();
+    rails->m_Material_tang->GetShader()->SetUniform3f("u_color", 1.0f, 1.0f, 0.0f);
+    rails->m_Material_tang->GetShader()->Unbind();
+
+    // final tangent
+    rails->m_VAO_finalTang = new VertexArray();
+    rails->m_VBO_finalTang = new VertexBuffer(rails->m_VerticesFinalTangents.data(), rails->m_VerticesFinalTangents.size() * sizeof(glm::vec3));
+    rails->m_VAO_finalTang->AddBuffer(*rails->m_VBO_finalTang, layout);
+    rails->m_VBO_finalTang->Unbind();
+    rails->m_VAO_finalTang->Unbind();
+
+    rails->m_Material_finalTang = new Material();
+    rails->m_Material_finalTang->AddShader("tangents");
+    rails->m_Material_finalTang->GetShader()->Bind();
+    rails->m_Material_finalTang->GetShader()->SetUniform3f("u_color", .0f, 1.0f, 1.0f);
+    rails->m_Material_finalTang->GetShader()->Unbind();
+
+    // normal
+    rails->m_VAO_norm = new VertexArray();
+    rails->m_VBO_norm = new VertexBuffer(rails->m_VerticesNormals.data(), rails->m_VerticesNormals.size() * sizeof(glm::vec3));
+    rails->m_VAO_norm->AddBuffer(*rails->m_VBO_norm, layout);
+    rails->m_VBO_norm->Unbind();
+    rails->m_VAO_norm->Unbind();
+
+    rails->m_Material_norm = new Material();
+    rails->m_Material_norm->AddShader("tangents");
+    rails->m_Material_norm->GetShader()->Bind();
+    rails->m_Material_norm->GetShader()->SetUniform3f("u_color", .0f, .0f, 1.0f);
+    rails->m_Material_norm->GetShader()->Unbind();
+
+    // binormal
+    rails->m_VAO_binormal = new VertexArray();
+    rails->m_VBO_binormal = new VertexBuffer(rails->m_VerticesBinormals.data(), rails->m_VerticesBinormals.size() * sizeof(glm::vec3));
+    rails->m_VAO_binormal->AddBuffer(*rails->m_VBO_binormal, layout);
+    rails->m_VBO_binormal->Unbind();
+    rails->m_VAO_binormal->Unbind();
+
+    rails->m_Material_binormal = new Material();
+    rails->m_Material_binormal->AddShader("tangents");
+    rails->m_Material_binormal->GetShader()->Bind();
+    rails->m_Material_binormal->GetShader()->SetUniform3f("u_color", .0f, 1.0f, .0f);
+    rails->m_Material_binormal->GetShader()->Unbind();
 
     return rails;
 }
@@ -54,13 +105,37 @@ void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
 void Rails::Draw()
 {
 
-    if (!m_DrawRails)
+    if (!m_DrawRails && m_Vertices.size() > 0)
     {
         m_VAO->Bind();
         m_Material->GetShader()->Bind();
         glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
         m_VAO->Unbind();
         m_Material->GetShader()->Unbind();
+
+        // m_VAO_tang->Bind();
+        // m_Material_tang->GetShader()->Bind();
+        // glDrawArrays(GL_LINES, 0, m_VerticesTangents.size());
+        // m_VAO_tang->Unbind();
+        // m_Material_tang->GetShader()->Unbind();
+
+        m_VAO_finalTang->Bind();
+        m_Material_finalTang->GetShader()->Bind();
+        glDrawArrays(GL_LINES, 0, m_VerticesFinalTangents.size());
+        m_VAO_finalTang->Unbind();
+        m_Material_finalTang->GetShader()->Unbind();
+
+        m_VAO_norm->Bind();
+        m_Material_norm->GetShader()->Bind();
+        glDrawArrays(GL_LINES, 0, m_VerticesNormals.size());
+        m_VAO_norm->Unbind();
+        m_Material_norm->GetShader()->Unbind();
+
+        m_VAO_binormal->Bind();
+        m_Material_binormal->GetShader()->Bind();
+        glDrawArrays(GL_LINES, 0, m_VerticesBinormals.size());
+        m_VAO_binormal->Unbind();
+        m_Material_binormal->GetShader()->Unbind();
 
         for (auto child : m_Children)
             child->Draw();
@@ -78,6 +153,10 @@ void Rails::Draw()
 void Rails::Update()
 {
     m_Vertices.clear();
+    m_VerticesTangents.clear();
+    m_VerticesFinalTangents.clear();
+    m_VerticesNormals.clear();
+    m_VerticesBinormals.clear();
 
     for (int i = 4; i <= m_Children.size(); i += 3)
     {
@@ -90,12 +169,28 @@ void Rails::Update()
         BezierCurve curve(points);
         for (float t = 0; t <= 1; t += 0.01)
         {
-            glm::vec3 curvePoints = curve.GetPoint(t);
-            glm::vec3 vertex(curvePoints.x, curvePoints.y, curvePoints.z);
+            glm::vec3 curvePoint = curve.GetPoint(t);
+            glm::vec3 vertex(curvePoint.x, curvePoint.y, curvePoint.z);
             m_Vertices.push_back(vertex);
 
             glm::vec3 tangent = curve.GetTangent(t);
-            m_VerticesTangents.push_back(glm::normalize(tangent));
+            tangent = glm::normalize(tangent);
+            m_VerticesTangents.push_back(vertex);
+            m_VerticesTangents.push_back(vertex + tangent);
+
+            glm::vec3 normalisedTangent = curve.GetNormalisedTangent(t, curvePoint, tangent);
+            normalisedTangent *= 10.0f;
+
+            m_VerticesFinalTangents.push_back(vertex);
+            m_VerticesFinalTangents.push_back(vertex + normalisedTangent);
+
+            glm::vec3 normal = glm::cross(normalisedTangent, tangent);
+            m_VerticesNormals.push_back(vertex);
+            m_VerticesNormals.push_back(vertex + normal);
+
+            glm::vec3 biNormal = glm::cross(normalisedTangent, normal);
+            m_VerticesBinormals.push_back(vertex);
+            m_VerticesBinormals.push_back(vertex + biNormal);
         }
     }
 
@@ -105,6 +200,22 @@ void Rails::Update()
     m_VBO_pos->Bind();
     m_VBO_pos->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
     m_VBO_pos->Unbind();
+
+    m_VBO_tang->Bind();
+    m_VBO_tang->SetData(m_VerticesTangents.data(), m_VerticesTangents.size() * sizeof(glm::vec3));
+    m_VBO_tang->Unbind();
+
+    m_VBO_finalTang->Bind();
+    m_VBO_finalTang->SetData(m_VerticesFinalTangents.data(), m_VerticesFinalTangents.size() * sizeof(glm::vec3));
+    m_VBO_finalTang->Unbind();
+
+    m_VBO_norm->Bind();
+    m_VBO_norm->SetData(m_VerticesNormals.data(), m_VerticesNormals.size() * sizeof(glm::vec3));
+    m_VBO_norm->Unbind();
+
+    m_VBO_binormal->Bind();
+    m_VBO_binormal->SetData(m_VerticesBinormals.data(), m_VerticesBinormals.size() * sizeof(glm::vec3));
+    m_VBO_binormal->Unbind();
 
     if (m_Children.size() == 0)
         return;
@@ -122,10 +233,11 @@ void Rails::UpdateRails()
     m_Rails.clear();
 
     glm::vec3 prevPosition = m_Vertices[0];
-    std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
-    rail->m_Position = prevPosition;
+    std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", 0);
+    rail->SetPosition(prevPosition);
     m_Rails.push_back(rail);
 
+    int railIndex = 1;
     for (int i = 1; i < m_Vertices.size(); i++)
     {
         glm::vec3 currentPosition = m_Vertices[i];
@@ -134,21 +246,21 @@ void Rails::UpdateRails()
 
         if (glm::length(length) > RAIL_WIDTH)
         {
-            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj");
-            rail->m_Position = currentPosition;
+            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", railIndex++);
+            rail->SetPosition(currentPosition);
             m_Rails.push_back(rail);
             prevPosition = currentPosition;
 
-            float angleX = glm::atan(direction.z, direction.x);
-            float angleY = glm::atan(direction.z, direction.y);
-            float angleZ = glm::atan(direction.y, direction.x);
-            // if (direction.y < 0.0f)
-            //     angleZ = -angleZ;
+            // compute rotation
+            glm::vec3 tangent = m_VerticesFinalTangents[i];
+            glm::vec3 normal = m_VerticesNormals[i];
+            glm::vec3 binormal = m_VerticesBinormals[i];
 
-            glm::vec3 prevRotation = m_Rails[m_Rails.size() - 1].get()->m_Rotation;
-            rail->m_Rotation.x = prevRotation.x + angleX;
-            rail->m_Rotation.y = prevRotation.y + angleY;
-            rail->m_Rotation.z = prevRotation.z * angleZ;
+            // compute axis and angle
+            glm::vec3 axis = glm::cross(tangent, normal);
+            float angle = glm::acos(glm::dot(tangent, normal));
+
+            rail->Rotate(angle, axis);
         }
     }
 }
@@ -189,7 +301,6 @@ void Rails::LoadRails(const std::string filename)
 
     GenerateControlPoints(controlPoints);
     Update();
-    // UpdateRails();
 }
 
 bool Rails::ExportRails()

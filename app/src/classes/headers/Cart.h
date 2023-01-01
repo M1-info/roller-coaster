@@ -23,12 +23,22 @@ public:
     void SetRailsTangents(std::vector<glm::vec3> railsTangents);
     inline std::vector<glm::vec3> GetRailsTangents() { return m_RailsTangents; }
 
+    void SetRailsNormals(std::vector<glm::vec3> railsNormals);
+    inline std::vector<glm::vec3> GetRailsNormals() { return m_RailsNormals; }
+
+    void SetRailsBinormals(std::vector<glm::vec3> railsBinormals);
+    inline std::vector<glm::vec3> GetRailsBinormals() { return m_RailsBinormals; }
+
 private:
     glm::vec3 m_Velocity;
     std::vector<glm::vec3> m_RailsVertices;
     std::vector<glm::vec3> m_RailsTangents;
+    std::vector<glm::vec3> m_RailsNormals;
+    std::vector<glm::vec3> m_RailsBinormals;
     std::vector<glm::vec3>::iterator m_CurrentRailVertex;
     std::vector<glm::vec3>::iterator m_CurrentRailTangent;
+    std::vector<glm::vec3>::iterator m_CurrentRailNormal;
+    std::vector<glm::vec3>::iterator m_CurrentRailBinormal;
 };
 
 #endif // CART_H

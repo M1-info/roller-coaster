@@ -96,7 +96,9 @@ void UI::Render()
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
             std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
             cart->SetRailsVertices(rails->GetVertices());
-            cart->SetRailsTangents(rails->GetVerticesTangents());
+            cart->SetRailsTangents(rails->m_VerticesFinalTangents);
+            cart->SetRailsNormals(rails->m_VerticesNormals);
+            cart->SetRailsBinormals(rails->m_VerticesBinormals);
         }
     }
 
@@ -125,11 +127,11 @@ void UI::SceneGraph()
 
         if (mesh->GetType() == MeshType::RAILS)
         {
+            std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             if (ImGui::TreeNode(mesh->GetName().c_str()))
             {
                 if (mesh->GetType() == MeshType::RAILS)
                 {
-                    std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
                     ImGui::Dummy(ImVec2(5.0f, 5.0f));
                     if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
                         if (rails->m_DrawRails)
@@ -335,11 +337,11 @@ void UI::MeshInfo()
             MeshTransform("Position", vertex);
         }
         else
-            MeshTransform("Position", &m_SelectedMesh->m_Position);
+            MeshTransform("Position", m_SelectedMesh->GetPositionPtr());
         ImGui::Separator();
-        MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, 1.0f);
+        MeshTransform("Rotation", m_SelectedMesh->GetRotationPtr(), 1.0f);
         ImGui::Separator();
-        MeshTransform("Scale", &m_SelectedMesh->m_Scale, 0.1f, glm::vec3(1.0f));
+        MeshTransform("Scale", m_SelectedMesh->GetScalePtr(), 0.1f, glm::vec3(1.0f));
     }
     ImGui::End();
 }
@@ -368,6 +370,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, float step, glm:
 
     if (ImGui::DragFloat("##X", &value->x, step))
     {
+        m_SelectedMesh->m_IsDirty = true;
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
         {
@@ -395,6 +398,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, float step, glm:
 
     if (ImGui::DragFloat("##Y", &value->y, step))
     {
+        m_SelectedMesh->m_IsDirty = true;
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
         {
@@ -422,6 +426,7 @@ void UI::MeshTransform(std::string component, glm::vec3 *value, float step, glm:
 
     if (ImGui::DragFloat("##Z", &value->z, step))
     {
+        m_SelectedMesh->m_IsDirty = true;
         m_SelectedMesh->Update();
         if (m_SelectedMesh->GetParent() != nullptr)
         {
@@ -557,7 +562,7 @@ void UI::SwapCameraPosition()
     {
         if (camera->m_IsOnCart)
         {
-            camera->SetPosition(cart->m_Position + glm::vec3(0.0f, 2.0f, 0.0f));
+            camera->SetPosition(cart->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
             AddLog("Camera position is now on the chariot", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
         }
         else

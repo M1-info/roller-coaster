@@ -1,6 +1,6 @@
 #include "headers/Rail.h"
 
-Rail::Rail(const std::string filename)
+Rail::Rail(const std::string filename, int index)
 {
 
     m_VBO_norm = nullptr;
@@ -22,6 +22,7 @@ Rail::Rail(const std::string filename)
 
     m_Name = filename.substr(0, filename.find_last_of('.'));
     m_Name[0] = toupper(m_Name[0]);
+    m_Name += std::to_string(index);
 
     CreateMaterial("phong");
     m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));

@@ -76,6 +76,18 @@ void Cart::SetRailsTangents(std::vector<glm::vec3> railsTangents)
     m_CurrentRailTangent = m_RailsTangents.begin();
 }
 
+void Cart::SetRailsNormals(std::vector<glm::vec3> railsNormals)
+{
+    m_RailsNormals = railsNormals;
+    m_CurrentRailNormal = m_RailsNormals.begin();
+}
+
+void Cart::SetRailsBinormals(std::vector<glm::vec3> railsBinormals)
+{
+    m_RailsBinormals = railsBinormals;
+    m_CurrentRailBinormal = m_RailsBinormals.begin();
+}
+
 void Cart::Draw()
 {
     m_Material->GetShader()->Bind();
@@ -97,31 +109,50 @@ void Cart::Animate(float deltaTime)
 
         m_Position = *m_CurrentRailVertex;
         m_Position += glm::vec3(0.0f, 1.0f, 0.0f);
-        glm::vec3 direction = m_Position - prevPosition;
+        // glm::vec3 direction = m_Position - prevPosition;
         m_CurrentRailVertex++;
 
-        // use direction to rotate the cart
-        float angleX = glm::atan(direction.z, direction.x);
-        float angleY = glm::atan(direction.z, direction.y);
-        float angleZ = glm::atan(direction.y, direction.x);
-        angleX = glm::degrees(angleX);
-        angleY = glm::degrees(angleY);
-        angleZ = glm::degrees(angleZ);
-        m_Rotation = glm::vec3(0.0f, angleY, 0.0f);
-        m_Rotation.y += 90.0f;
+        // use the direction to find the three angles of rotation
+
+        float dotProduct = glm::dot(m_Position, prevPosition);
+
+        float normCurrentPosition = glm::length(m_Position);
+        float normPrevPosition = glm::length(prevPosition);
+
+        // // find the 3 angles
+        float angleX = glm::acos(dotProduct / (normCurrentPosition * normPrevPosition));
+        float angleY = glm::acos(dotProduct / (normCurrentPosition * normPrevPosition));
+        float angleZ = glm::acos(dotProduct / (normCurrentPosition * normPrevPosition));
+
+        glm::mat4 rotationX = glm::rotate(glm::mat4(1.0f), angleX, glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::mat4 rotationY = glm::rotate(glm::mat4(1.0f), angleY, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 rotationZ = glm::rotate(glm::mat4(1.0f), angleZ, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        glm::mat4 rotation = rotationX * rotationY * rotationZ;
+
+        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
+        glm::mat4 translation = glm::translate(glm::mat4(1.0f), m_Position);
+
+        m_Matrix = translation * rotation * scale;
+
+        // glm::vec3 tangent = *m_CurrentRailTangent;
+        // glm::vec3 normal = *m_CurrentRailNormal;
+        // glm::vec3 binormal = *m_CurrentRailBinormal;
+
+        // m_CurrentRailTangent++;
+        // m_CurrentRailNormal++;
+        // m_CurrentRailBinormal++;
+
+        // compute axis and angle
+        // glm::vec3 axis = glm::cross(tangent, normal);
+        // float angle = glm::acos(glm::dot(tangent, normal));
     }
     else
+    {
         m_CurrentRailVertex = m_RailsVertices.begin();
-
-    // if (m_CurrentRailTangent != m_RailsTangents.end())
-    // {
-    //     // use tangent to rotate the cart
-    //     float angleX = glm::acos(glm::dot(glm::vec3(1.0f, 0.0f, 0.0f), *m_CurrentRailTangent));
-    //     float angleY = glm::asin(glm::dot(glm::vec3(0.0f, 1.0f, 0.0f), *m_CurrentRailTangent));
-    //     float angleZ = glm::atan(glm::dot(glm::vec3(0.0f, 0.0f, 1.0f), *m_CurrentRailTangent));
-    //     m_Rotation = glm::vec3(angleX, angleY, angleZ);
-    //     m_CurrentRailTangent++;
-    // }
-    // else
-    //     m_CurrentRailTangent = m_RailsTangents.begin();
+        m_CurrentRailNormal = m_RailsNormals.begin();
+        m_CurrentRailTangent = m_RailsTangents.begin();
+        m_CurrentRailBinormal = m_RailsBinormals.begin();
+    }
 }

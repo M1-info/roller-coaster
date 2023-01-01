@@ -36,33 +36,54 @@ public:
     void SetUp();
     void Clear();
 
-    void SetName(std::string name);
-    void SetNormales(std::vector<glm::vec3> normales);
-    void SetIndices(std::vector<unsigned int> indices);
-    void CreateMaterial(std::string shaderFile);
-    void SetParent(std::shared_ptr<Mesh> parent);
-    void SetChildren(std::vector<std::shared_ptr<Mesh>>);
+    inline void SetName(std::string name) { m_Name = name; }
+    inline void SetNormales(std::vector<glm::vec3> normales) { m_Normales = normales; }
+    inline void SetIndices(std::vector<unsigned int> indices) { m_Indices = indices; }
+    inline void SetParent(std::shared_ptr<Mesh> parent) { m_Parent = parent; }
 
-    VertexArray *GetVAO() const;
-    VertexBuffer *GetVBO() const;
-    IndexBuffer *GetIBO() const;
-    glm::mat4 GetMatrix() const;
-    Material *GetMaterial() const;
+    inline void SetPosition(glm::vec3 position)
+    {
+        m_Position = position;
+        m_IsDirty = true;
+    }
+    inline void SetScale(glm::vec3 scale)
+    {
+        m_Scale = scale;
+        m_IsDirty = true;
+    }
+    inline void SetRotation(glm::vec3 rotation)
+    {
+        m_Rotation = rotation;
+        m_IsDirty = true;
+    }
 
-    std::string GetName() const;
-    std::vector<glm::vec3> GetVertices() const;
-    glm::vec3 *GetVertexPtr(int index);
-    std::vector<glm::vec3> GetNormales() const;
-    std::vector<unsigned int> GetIndices() const;
-    std::shared_ptr<Mesh> GetParent() const;
-    std::vector<std::shared_ptr<Mesh>> GetChildren() const;
-    glm::vec3 GetPosition() const;
-    glm::vec3 GetScale() const;
-    glm::vec3 GetRotation() const;
-    MeshType GetType() const;
+    inline std::string GetName() const { return m_Name; }
+
+    inline VertexArray *GetVAO() const { return m_VAO; }
+    inline VertexBuffer *GetVBO() const { return m_VBO_pos; }
+    inline IndexBuffer *GetIBO() const { return m_IBO; }
+    inline Material *GetMaterial() const { return m_Material; }
+
+    inline glm::vec3 GetPosition() const { return m_Position; }
+    inline glm::vec3 GetScale() const { return m_Scale; }
+    inline glm::vec3 GetRotation() const { return m_Rotation; }
+    inline glm::vec3 *GetPositionPtr() { return &m_Position; }
+    inline glm::vec3 *GetScalePtr() { return &m_Scale; }
+    inline glm::vec3 *GetRotationPtr() { return &m_Rotation; }
+    inline glm::mat4 GetMatrix() const { return m_Matrix; }
+
+    inline std::vector<glm::vec3> GetVertices() const { return m_Vertices; }
+    inline glm::vec3 *GetVertexPtr(int index) { return &m_Vertices[index]; }
+    inline std::vector<glm::vec3> GetNormales() const { return m_Normales; }
+    inline std::vector<unsigned int> GetIndices() const { return m_Indices; }
+    inline std::shared_ptr<Mesh> GetParent() const { return m_Parent; }
+    inline std::vector<std::shared_ptr<Mesh>> GetChildren() const { return m_Children; }
+    inline MeshType GetType() const { return m_Type; }
 
     void AddChildren(std::shared_ptr<Mesh> child);
     virtual void RemoveChildren(std::shared_ptr<Mesh> child);
+
+    void CreateMaterial(std::string shaderFile);
 
     void Translate(glm::vec3 translation);
     void Rotate(GLfloat angle, glm::vec3 axis);
@@ -88,6 +109,9 @@ protected:
     IndexBuffer *m_IBO;
     Material *m_Material;
 
+    glm::vec3 m_Position;
+    glm::vec3 m_Scale;
+    glm::vec3 m_Rotation;
     glm::mat4 m_Matrix;
 
     std::shared_ptr<Mesh> m_Parent;
@@ -96,9 +120,7 @@ protected:
     MeshType m_Type = MeshType::MESH;
 
 public:
-    glm::vec3 m_Position;
-    glm::vec3 m_Scale;
-    glm::vec3 m_Rotation;
+    bool m_IsDirty = false;
     bool m_IsSelected = false;
 };
 

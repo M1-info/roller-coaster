@@ -11,7 +11,7 @@ class Rail : public Mesh
 {
 
 public:
-    Rail(const std::string filename);
+    Rail(const std::string filename, int index);
 
     void SetUpShader();
 
