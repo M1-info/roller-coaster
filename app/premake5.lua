@@ -5,7 +5,7 @@ project "app"
         "src/**.h", 
         "src/**.cpp",
     }
-    includedirs { "../include/glad/include", "../include/glfw/include", "../include" }
+    includedirs { "../include/glad/include", "../include/glfw/include", "../include", "src/headers" }
     
     links { "glad", "glfw3", "stb_image", "imgui", "opengl32", "gdi32", "user32", "shell32" }
 

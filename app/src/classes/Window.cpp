@@ -1,4 +1,4 @@
-#include "headers/Window.h"
+#include "Window.h"
 
 Window::Window(float width, float height)
     : m_Width(width), m_Height(height), m_Camera(nullptr), m_Window(nullptr), m_IsMousePressed(0)
@@ -58,12 +58,30 @@ void Window::Init()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 }
 
 void Window::Destroy() const
 {
     glfwDestroyWindow(m_Window);
     glfwTerminate();
+}
+
+void Window::PollEvents() const
+{
+    glfwPollEvents();
+}
+
+void Window::SwapBuffers() const
+{
+    glfwSwapBuffers(m_Window);
+}
+
+void Window::Clear() const
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void Window::OnResize(GLFWwindow *window, int width, int height)
@@ -79,7 +97,7 @@ void Window::OnResize(GLFWwindow *window, int width, int height)
 
     // update camera
     float aspect;
-    if(width == 0 || height == 0)
+    if (width == 0 || height == 0)
         aspect = 1;
     else
         aspect = (float)width / (float)height;
@@ -114,7 +132,7 @@ void Window::OnMouseMove(GLFWwindow *window, double xpos, double ypos)
 void Window::OnMouseClick(GLFWwindow *window, int button, int action, int mods)
 {
     double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos); //getting cursor position
+    glfwGetCursorPos(window, &xpos, &ypos); // getting cursor position
 
     Window *win = (Window *)glfwGetWindowUserPointer(window);
 

@@ -1,5 +1,4 @@
-#include "headers/Camera.h"
-#include <iostream>
+#include "Camera.h"
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)
     : m_Fov(fov), m_AspectRatio(aspectRatio), m_NearPlane(nearPlane), m_FarPlane(farPlane),
@@ -36,11 +35,12 @@ Camera::~Camera()
 /*
     Initialize the camera with a position, a target and an up vector
 */
-void Camera::Init(glm::vec3 position, glm::vec3 target, glm::vec3 up)
+void Camera::Init()
 {
-    m_Position = position;
-    m_Target = target;
-    m_Up = up;
+
+    m_Position = glm::vec3(0.0f, 0.0f, 8.0f);;
+    m_Target =  glm::vec3(0.0f, 0.0f, 0.0f);
+    m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     Update();
 }

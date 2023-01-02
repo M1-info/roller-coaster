@@ -6,8 +6,7 @@ in vec3 v_position;
 in vec3 v_normals;
 
 uniform mat4 u_view;
-uniform vec3 u_cameraPos;
-uniform int u_isSelected;
+uniform vec3 u_cameraPosition;
 
 uniform struct Light
 {
@@ -19,15 +18,15 @@ uniform struct Light
 uniform struct Material
 {
     vec3 color;
-    vec3 coeffAmbient;
-    vec3 coeffDiffuse;
-    vec3 coeffSpecular;
-    float specularExponent;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
 }u_material;
 
 void main()
 {
-    vec3 ambient=u_light.color*u_material.coeffAmbient;
+    vec3 ambient=u_light.color*u_material.ambient;
     
     // // diffuse light
     vec3 normal=normalize(v_normals);
@@ -36,20 +35,24 @@ void main()
     vec3 lightDir=normalize(u_LightPosition-v_position);
     
     float diffuse=max(dot(normal,lightDir),0.);
-    vec3 diffuseLight=diffuse*u_material.coeffDiffuse;
+    vec3 diffuseLight=diffuse*u_material.diffuse;
     
     // specular light
-    vec3 camPos=(u_view*vec4(u_cameraPos,1.)).xyz;
+    vec3 camPos=(u_view*vec4(u_cameraPosition,1.)).xyz;
     vec3 viewDir=normalize(camPos-v_position);
     vec3 reflectDir=reflect(-lightDir,normal);
     
-    float specular=pow(max(dot(viewDir,reflectDir),0.),u_material.specularExponent);
-    vec3 specularLight=specular*u_material.coeffSpecular;
+    float specular=pow(max(dot(viewDir,reflectDir),0.),u_material.shininess);
+    vec3 specularLight=specular*u_material.specular;
     
-    vec3 result=(ambient+diffuseLight+specularLight)*u_light.intensity;
+    vec3 result=(ambient+diffuseLight+specularLight)*u_light.intensity*u_material.color;
     
-    if(u_isSelected==1)
-    out_color=vec4(1.,1.,0.,1.) * vec4(result,1.);
-    else
-    out_color=vec4(u_material.color,1.)*vec4(result,1.);
+    // compute light attenuation
+    float distance=distance(u_LightPosition,v_position);
+    float attenuation=1./(1.+.09*distance+.032*distance*distance);
+    
+    result*=attenuation;
+    
+    out_color=vec4(result,1.);
+    
 };

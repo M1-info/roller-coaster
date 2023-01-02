@@ -1,128 +1,78 @@
-#include "headers/Renderer.h"
+#include "Renderer.h"
 
-void GLClearError()
-{
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
-
-bool GLLogCall(const char *function, const char *file, int line)
-{
-	while (GLenum error = glGetError())
-	{
-		std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
-		return false;
-	}
-	return true;
-}
-
-Renderer::Renderer(Scene *scene)
-	: m_Scene(scene), m_Window(nullptr)
+Renderer::Renderer()
+	: m_Window(nullptr), m_Camera(nullptr), m_Scene(nullptr), m_FBO(nullptr), m_Light(nullptr)
 {
 }
 
 Renderer::~Renderer()
 {
 	m_Window->Destroy();
-	delete m_Window;
+	delete m_Window.get();
 	m_Window = nullptr;
-}
 
-void Renderer::Clear() const
-{
-	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+	delete m_FBO.get();
+	m_FBO = nullptr;
+
+	delete m_Light.get();
+	m_Light = nullptr;
+
+	delete m_UI.get();
+	m_UI = nullptr;
+
+	delete m_Scene.get();
+	m_Scene = nullptr;
 }
 
 void Renderer::Init()
 {
 	// init window
-	m_Window = new Window();
+	m_Window = std::make_shared<Window>();
 	m_Window->Init();
 
-	// init camera
+	// init Camera
 	float fov = 45.0f;
-	float aspect = (float)m_Window->GetWidth() / (float)m_Window->GetHeight();
+	float aspect = m_Window->GetWidth() / m_Window->GetHeight();
 	float near = 0.1f;
 	float far = 100.0f;
 	m_Camera = std::make_shared<Camera>(fov, aspect, near, far);
-
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 8.0f);
-	glm::vec3 target = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-	m_Camera->Init(position, target, up);
-
+	m_Camera->Init();
 	m_Window->SetCamera(m_Camera);
 
-	// init UI
-	m_UI = new UI();
-
 	// init lights
-	m_Light = new Light(glm::vec3(5.0f, 10.0f, 0.0f), glm::vec3(0.0), glm::vec3(0.0f, 1.0f, 0.0f), 1.0f);
-
-	m_UI->SetLight(m_Light);
+	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	float lightIntensity = 2.5f;
+	m_Light = std::make_shared<Light>(lightColor, lightIntensity);
+	m_Light->GetTransform()->SetPosition(glm::vec3(5.0f, 10.0f, 0.0f));
+	m_Light->GetTransform()->SetIsDirty(true);
+	m_Light->GetTransform()->ComputeMatrix();
 
 	// init frame buffer
-	m_FBO = new FrameBuffer(m_Window->GetWidth(), m_Window->GetHeight());
+	m_FBO = std::make_shared<FrameBuffer>(m_Window->GetWidth(), m_Window->GetHeight());
 	m_FBO->Init();
-	m_UI->SetFBO(m_FBO);
 	m_Window->SetFBO(m_FBO);
-}
 
-void Renderer::SetUpScene()
-{
+	// init scene
+	m_Scene = std::make_shared<Scene>();
+	m_Scene->Init();
+	m_Scene->SetUpObjectsShaders(m_Light);
 
-	glm::mat4 projectionView = m_Camera->GetProjection() * glm::mat4(glm::mat3(m_Camera->GetView()));
-
-	Skybox *skybox = m_Scene->GetSkybox();
-	Shader *skyboxShader = skybox->GetShader();
-	skyboxShader->Bind();
-	skyboxShader->SetUniformMat4f("u_projectionView", projectionView);
-	skyboxShader->SetUniform1i("u_texture", 0);
-	skyboxShader->Unbind();
-
-	for (auto mesh : m_Scene->GetObjects())
-	{
-		// rails don't need uniforms about light and material
-		if (mesh->GetType() == MeshType::RAILS)
-			continue;
-
-		Material *material = mesh->GetMaterial();
-		Shader *shader = material->GetShader();
-
-		shader->Bind();
-
-		// pass material infos
-		Color materialAmbient = material->GetAmbientColor();
-		Color materialDiffuse = material->GetDiffuseColor();
-		Color materialSpecular = material->GetSpecularColor();
-		Color materialColor = material->GetMaterialColor();
-		float specularExponent = material->GetSpecularExponent();
-
-		shader->SetUniform3f("u_material.color", materialColor.r, materialColor.g, materialColor.b);
-		shader->SetUniform3f("u_material.coeffAmbient", materialAmbient.r, materialAmbient.g, materialAmbient.b);
-		shader->SetUniform3f("u_material.coeffDiffuse", materialDiffuse.r, materialDiffuse.g, materialDiffuse.b);
-		shader->SetUniform3f("u_material.coeffSpecular", materialSpecular.r, materialSpecular.g, materialSpecular.b);
-		shader->SetUniform1f("u_material.specularExponent", specularExponent);
-
-		glm::vec3 lightPosition = m_Light->m_Position;
-		glm::vec3 lightColor = m_Light->m_Color;
-
-		shader->SetUniform1f("u_light.intensity", m_Light->GetIntensity());
-		shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
-		shader->SetUniform3f("u_light.color", lightColor.x, lightColor.y, lightColor.z);
-
-		shader->Unbind();
-	}
+	// init UI
+	m_UI = std::make_shared<UI>(m_Window, m_Scene, m_Light, m_FBO);
+	m_UI->Init();
 }
 
 void Renderer::Render()
 {
 
 	Skybox *skybox = m_Scene->GetSkybox();
-	SetUpScene();
+	std::shared_ptr<Mesh> cart = std::dynamic_pointer_cast<Mesh>(m_Scene->GetObjectByName("Cart"));
 	float lastTime = 0.0f;
-	float lastTimeCartRender = 0.0f;
+
+	Shader *shaderOutline = new Shader("outline");
+	glm::mat4 outlinedScaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.02f));
+
+	Shader *shaderPhong = new Shader("phong");
 
 	while (!glfwWindowShouldClose(m_Window->GetWindow()))
 	{
@@ -130,153 +80,110 @@ void Renderer::Render()
 		float deltaTime = currentTime - lastTime;
 		lastTime = currentTime;
 
-		// update camera
+		/* CAMERA */
 		m_Camera->Render(deltaTime);
 		if (m_Camera->m_IsOnCart)
 		{
-			std::shared_ptr<Mesh> cart = m_Scene->GetObjectByName("Chariot");
-			m_Camera->SetPosition(cart->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
+			m_Camera->SetPosition(cart->GetTransform()->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
 			m_Camera->Update();
 		}
 
 		glm::mat4 viewMatrix = m_Camera->GetView();
-		glm::mat4 projectionView = m_Camera->GetProjection() * viewMatrix;
-		glm::mat4 projectionViewSkyBox = m_Camera->GetProjection() * glm::mat4(glm::mat3(viewMatrix));
+		glm::mat4 projectionView = m_Camera->GetProjectionView();
+		glm::mat4 projectionViewSkyBox = m_Camera->GetProjection() * glm::mat4(glm::mat3(m_Camera->GetView()));
 
-		// clear scene
-		Clear();
+		/* CLEAR SCREEN AND BIND FBO */
+		m_Window->Clear();
 		m_FBO->Bind();
-		Clear();
+		m_Window->Clear();
 
 		/* SKYBOX */
-		Shader *skyboxShader = skybox->GetShader();
-		skyboxShader->Bind();
-		skyboxShader->SetUniformMat4f("u_projectionView", projectionViewSkyBox);
-		skyboxShader->Unbind();
+		skybox->GetMaterial()->UpdateShader(projectionViewSkyBox, glm::mat4(0.0f));
 		glDisable(GL_DEPTH_TEST);
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
 
-		if (m_UI->GetIsAnimating())
-		{
-			// animate cart if enough time has passed
-			if (currentTime - lastTimeCartRender > DELTA_TIME_CART_RENDER)
-			{
-				std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Chariot"));
-				cart->Animate(deltaTime);
-				lastTimeCartRender = currentTime;
-			}
-		}
-
 		/* SCENE OBJECTS */
 		for (auto mesh : m_Scene->GetObjects())
 		{
-			Material *material = mesh->GetMaterial();
-			Shader *shader = material->GetShader();
+
+			mesh->UpdateMatrix();
 
 			glm::vec3 cameraPosition = m_Camera->GetPosition();
-			glm::vec3 lightPosition = m_Light->m_Position;
+			glm::vec3 lightPosition = m_Light->GetTransform()->GetPosition();
+			glm::mat4 modelMatrix = mesh->GetTransform()->GetMatrix();
+			bool isSelected = mesh->m_IsSelected;
 
-			shader->Bind();
-
-			// rails is a container for other meshes
-			// so we don't need to pass camera and light position
-			if (mesh->GetType() != MeshType::RAILS)
-			{
-				shader->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-				shader->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
-				shader->SetUniformMat4f("u_view", viewMatrix);
-			}
-
-			shader->SetUniformMat4f("u_projectionView", projectionView);
-			shader->SetUniformMat4f("u_model", mesh->ComputeMatrix());
-
-			if (mesh->m_IsSelected)
-				shader->SetUniform1i("u_isSelected", 1);
+			if (mesh->GetType() == MeshType::RAILS)
+				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix);
 			else
-				shader->SetUniform1i("u_isSelected", 0);
-
-			shader->Unbind();
+				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected, viewMatrix, m_Light, cameraPosition);
 
 			/* OBJECT CHILDREN */
 			if (mesh->GetChildren().size() > 0)
 			{
-				// Rails need to draw also m_Rails (each rail is a mesh)
 				if (mesh->GetType() == MeshType::RAILS)
 				{
-
 					std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
-					rails->m_Material_tang->GetShader()->Bind();
-					rails->m_Material_tang->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
-					rails->m_Material_tang->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
-					rails->m_Material_tang->GetShader()->Unbind();
-
-					rails->m_Material_finalTang->GetShader()->Bind();
-					rails->m_Material_finalTang->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
-					rails->m_Material_finalTang->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
-					rails->m_Material_finalTang->GetShader()->Unbind();
-
-					rails->m_Material_norm->GetShader()->Bind();
-					rails->m_Material_norm->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
-					rails->m_Material_norm->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
-					rails->m_Material_norm->GetShader()->Unbind();
-
-					rails->m_Material_binormal->GetShader()->Bind();
-					rails->m_Material_binormal->GetShader()->SetUniformMat4f("u_projectionView", projectionView);
-					rails->m_Material_binormal->GetShader()->SetUniformMat4f("u_model", glm::mat4(1.0f));
-					rails->m_Material_binormal->GetShader()->Unbind();
+					glm::mat4 modelMatrix = rails->GetTransform()->GetMatrix();
+					rails->m_Material_curve->UpdateShader(projectionView, modelMatrix);
 
 					if (rails->m_DrawRails)
-					{
-
 						for (auto rail : rails->GetRails())
 						{
-							Shader *shaderRail = rail->GetMaterial()->GetShader();
-
-							shaderRail->Bind();
-
-							shaderRail->SetUniform3f("u_cameraPos", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-							shaderRail->SetUniform3f("u_light.position", lightPosition.x, lightPosition.y, lightPosition.z);
-
-							shaderRail->SetUniformMat4f("u_projectionView", projectionView);
-							shaderRail->SetUniformMat4f("u_view", viewMatrix);
-							shaderRail->SetUniformMat4f("u_model", rail->ComputeMatrix());
-
-							shaderRail->Unbind();
+							rail->UpdateMatrix();
+							glm::mat4 modelMatrix = rail->GetTransform()->GetMatrix();
+							bool isSelected = rail->m_IsSelected;
+							rail->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected, viewMatrix, m_Light, cameraPosition);
 						}
-					}
 					else
-					{
 						for (auto child : mesh->GetChildren())
 						{
-							Shader *childShader = child->GetMaterial()->GetShader();
-							childShader->Bind();
-
-							childShader->SetUniformMat4f("u_projectionView", projectionView);
-							childShader->SetUniformMat4f("u_model", child->ComputeMatrix());
-
-							if (child->m_IsSelected)
-								childShader->SetUniform1i("u_isSelected", 1);
-							else
-								childShader->SetUniform1i("u_isSelected", 0);
-
-							childShader->Unbind();
+							child->UpdateMatrix();
+							glm::mat4 modelMatrix = glm::mat4(1.0);
+							bool isSelected = child->m_IsSelected;
+							child->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected);
 						}
-					}
 				}
 			}
+
+			// if object is selected, use stencil buffer to draw outline
+			if (mesh->m_IsSelected)
+			{
+				glStencilFunc(GL_ALWAYS, 1, 0xFF);
+				glStencilMask(0xFF);
+			}
+
+			// draw object with own shader
 			mesh->Draw();
+
+			if (mesh->m_IsSelected)
+			{
+				mesh->GetMaterial()->SetShader(shaderOutline);
+				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+				glStencilMask(0x00);
+				glDisable(GL_DEPTH_TEST);
+				glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.02f));
+				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix * outlinedScaleMatrix);
+				mesh->Draw();
+				glStencilMask(0xFF);
+				glStencilFunc(GL_ALWAYS, 0, 0xFF);
+				glEnable(GL_DEPTH_TEST);
+			}
+
+			mesh->GetMaterial()->SetShader(shaderPhong);
 		}
 
+		// Unbind FBO after drawind scene on it
 		m_FBO->Unbind();
 
-		// Draw UI
+		// Draw UI after FBO is unbound (so it's not drawn on FBO)
 		m_UI->Render();
 
 		// Swap front and back buffers
-		glfwSwapBuffers(m_Window->GetWindow());
+		m_Window->SwapBuffers();
 
-		// Poll for and process events
-		glfwPollEvents();
+		// Poll process events
+		m_Window->PollEvents();
 	}
 }
