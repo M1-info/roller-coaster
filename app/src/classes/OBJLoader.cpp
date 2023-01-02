@@ -54,26 +54,60 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       unsigned int tex_coords[3];
       unsigned int normals[3];
       // unsigned vt1, vt2, vt3, vn1, vn2, vn3;
-      int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &vertices[0], &tex_coords[0], &normals[0], &vertices[1], &tex_coords[1], &normals[1], &vertices[2], &tex_coords[2], &normals[2]);
 
-      if (matches != 9)
+      // compute number of floats in line
+      int nb_floats = 0;
+      bool is_slash = false;
+      bool double_slash = false;
+      for (int i = 0; i < line.length(); i++)
       {
-        // Normals are optional
-        matches = sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &vertices[0], &tex_coords[0], &vertices[1], &tex_coords[1], &vertices[2], &tex_coords[2]);
-        if (matches == 3)
+        if (line[i] == '/')
         {
-          // Texture coordinates and normals are optional
-          matches = sscanf_s(line.c_str(), "f %d %d %d", &vertices[0], &vertices[1], &vertices[2]);
+          if (is_slash) // double slash
+          {
+            double_slash = true;
+            is_slash = false;
+          }
+          else
+          {
+            is_slash = true;
+            nb_floats++;
+          }
         }
         else
         {
-          // Only vertices are specified
+          is_slash = false;
+        }
+
+        if (line[i] == ' ')
+          nb_floats++;
+      }
+
+      if (nb_floats == 9)
+        sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &vertices[0], &tex_coords[0], &normals[0], &vertices[1], &tex_coords[1], &normals[1], &vertices[2], &tex_coords[2], &normals[2]);
+
+      else if (nb_floats == 6)
+      {
+        if (double_slash)
+        {
+          // Only vertices and normals are specified
           sscanf_s(line.c_str(), "f %d//%d %d//%d %d//%d", &vertices[0], &normals[0], &vertices[1], &normals[1], &vertices[2], &normals[2]);
           tex_coords[0] = 0;
           tex_coords[1] = 0;
           tex_coords[2] = 0;
         }
+        else
+        {
+          // vertices and texture coordinates are specified
+          sscanf_s(line.c_str(), "f %d/%d %d/%d %d/%d", &vertices[0], &tex_coords[0], &vertices[1], &tex_coords[1], &vertices[2], &tex_coords[2]);
+        }
       }
+      else // nb_floats == 3
+      {
+        // Only vertices are specified
+        sscanf_s(line.c_str(), "f %d %d %d", &vertices[0], &vertices[1], &vertices[2]);
+      }
+
       vertices[0]--;
       vertices[1]--;
       vertices[2]--;

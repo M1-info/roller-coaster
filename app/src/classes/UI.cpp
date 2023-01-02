@@ -339,7 +339,10 @@ void UI::MeshInfo()
         ImGui::Separator();
         MeshTransform("Rotation", &m_SelectedMesh->m_Rotation, 1.0f);
         ImGui::Separator();
-        MeshTransform("Scale", &m_SelectedMesh->m_Scale, 0.1f, glm::vec3(1.0f));
+        if (m_SelectedMesh->GetType() == MeshType::GROUND)
+            MeshTransform("Scale", &m_SelectedMesh->m_Scale, 0.1f, glm::vec3(50.0f));
+        else
+            MeshTransform("Scale", &m_SelectedMesh->m_Scale, 0.1f, glm::vec3(1.0f));
     }
     ImGui::End();
 }
