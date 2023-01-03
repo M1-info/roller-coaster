@@ -131,7 +131,7 @@ void Rails::Update()
                                        m_Children[i - 2].get()->GetVertices()[0],
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
-        Bspline curve(points);
+        BezierCurve curve(points);
         for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 curvePoint = curve.GetPoint(t);

@@ -63,10 +63,7 @@ void UI::Render()
     LightWindow();
     CameraWindow();
 
-    m_UIScene->SceneGraphWindow();
-    if (m_UIScene->GetSelectedMesh() != nullptr)
-        m_UIScene->SelectedMeshWindow();
-    m_UIScene->SceneWindow();
+    m_UIScene->Render();
 
     m_UIConsole->ConsoleWindow();
 
@@ -87,41 +84,88 @@ void UI::SetUpDockSpace()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
     // Begin Dockspace
-    ImGui::Begin("DockSpace", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
-
+    ImGui::Begin("MainDockspace", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
     ImGui::PopStyleVar(3);
 
-    ImGuiID mainDockespace_id = ImGui::GetID("MainDockSpace");
-    ImGui::DockSpace(mainDockespace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+    ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
-    static bool first = true;
-    if (first)
+    static bool firstMain = true;
+    if (firstMain)
     {
-        ImGui::DockBuilderRemoveNode(mainDockespace_id);
-        ImGui::DockBuilderAddNode(mainDockespace_id);
+        ImGui::DockBuilderRemoveNode(dockspace_id);
+        ImGui::DockBuilderAddNode(dockspace_id);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-        auto dock_id_top = ImGui::DockBuilderSplitNode(mainDockespace_id, ImGuiDir_Up, 0.2f, nullptr, &mainDockespace_id);
-        auto dock_id_down = ImGui::DockBuilderSplitNode(mainDockespace_id, ImGuiDir_Down, 0.15f, nullptr, &mainDockespace_id);
-        auto dock_id_right = ImGui::DockBuilderSplitNode(mainDockespace_id, ImGuiDir_Right, 0.8f, nullptr, &mainDockespace_id);
-        auto dock_id_left = ImGui::DockBuilderSplitNode(mainDockespace_id, ImGuiDir_Left, 0.2f, nullptr, &mainDockespace_id);
+        ImGuiID dock_main_id = dockspace_id;
+        ImGuiID dock_id_left, dock_id_right;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.8f, &dock_id_left, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, &dock_id_right, &dock_main_id);
 
-        ImGui::DockBuilderDockWindow("Scene", dock_id_right);
-        ImGui::DockBuilderDockWindow("Scene Graph", dock_id_left);
-        ImGui::DockBuilderDockWindow("Camera info", dock_id_left);
-        ImGui::DockBuilderDockWindow("Selected mesh info", dock_id_left);
-        ImGui::DockBuilderDockWindow("Console", dock_id_down);
+        ImGui::DockBuilderDockWindow("Scene Console dockspace", dock_id_left);
+        ImGui::DockBuilderDockWindow("Render dockspace", dock_id_right);
 
-        ImGui::DockBuilderFinish(mainDockespace_id);
-        first = false;
-        m_UIConsole->AddLog("Docking system initialized", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+        ImGui::DockBuilderFinish(dockspace_id);
+        firstMain = false;
     }
+    ImGui::End();
 
+    // Begin Dockspace
+    ImGui::Begin("Render dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGuiID render_dockspace_id = ImGui::GetID("Render dockspace");
+    ImGui::DockSpace(render_dockspace_id, ImVec2(0.0f, 0.0f));
+
+    static bool firstRender = true;
+    if (firstRender)
+    {
+        ImGui::DockBuilderRemoveNode(render_dockspace_id);
+        ImGui::DockBuilderAddNode(render_dockspace_id);
+
+        ImGuiID dock_main_id = render_dockspace_id;
+        ImGuiID dock_id_bottom1, dock_id_bottom2, dock_id_top;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.4f, &dock_id_bottom1, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.4f, &dock_id_bottom2, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.2f, &dock_id_top, &dock_main_id);
+
+        ImGui::DockBuilderDockWindow("Render infos", dock_id_top);
+        ImGui::DockBuilderDockWindow("Camera infos", dock_id_bottom1);
+        ImGui::DockBuilderDockWindow("Light infos", dock_id_bottom2);
+
+        ImGui::DockBuilderFinish(render_dockspace_id);
+        firstRender = false;
+    }
+    ImGui::End();
+
+    // Begin Dockspace
+    ImGui::Begin("Scene Console dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGuiID scene_console_dockspace_id = ImGui::GetID("Scene Console dockspace");
+    ImGui::DockSpace(scene_console_dockspace_id, ImVec2(0.0f, 0.0f));
+
+    static bool first_scene_console = true;
+    if (first_scene_console)
+    {
+        ImGui::DockBuilderRemoveNode(scene_console_dockspace_id);
+        ImGui::DockBuilderAddNode(scene_console_dockspace_id);
+
+        ImGuiID dock_main_id = scene_console_dockspace_id;
+        ImGuiID dock_id_bottom, dock_id_top;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.2f, &dock_id_bottom, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.8f, &dock_id_top, &dock_main_id);
+
+        ImGui::DockBuilderDockWindow("Scene dockspace", dock_id_top);
+        ImGui::DockBuilderDockWindow("Console logs", dock_id_bottom);
+
+        ImGui::DockBuilderFinish(scene_console_dockspace_id);
+        first_scene_console = false;
+    }
     ImGui::End();
 }
 
 void UI::RenderWindow()
 {
-    ImGui::Begin("Render");
+    ImGui::Begin("Render infos");
 
     // Is animation running
     ImGui::Checkbox("Animation", &m_IsAnimating);
@@ -173,97 +217,82 @@ void UI::CameraWindow()
     float *cameraSpeed = camera->GetMoveSpeedPtr();
     float *sensitivity = camera->GetMoveSensitivityPtr();
 
-    float resetValue = 0.0f;
+    ImGui::PushID(m_Light.get());
 
-    ImGui::PushID("Camera");
-
-    ImGui::Begin("Camera info");
+    ImGui::Begin("Camera infos");
 
     ImGui::Columns(2);
-    ImGui::SetColumnWidth(0, 80);
-    ImGui::Text("Move speed");
-    ImGui::NextColumn();
-    ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 2));
-
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-    if (ImGui::Button("Speed"))
-        *cameraSpeed = resetValue;
-    ImGui::PopStyleColor(3);
-
-    ImGui::SameLine();
-    ImGui::DragFloat("##Speed", cameraSpeed, 0.1f);
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-    if (ImGui::Button("Sensitivity"))
-        *sensitivity = resetValue;
-    ImGui::PopStyleColor(3);
-
-    ImGui::SameLine();
-    ImGui::DragFloat("##Sensitivity", sensitivity, 0.1f, 0.1f, 1.0f);
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
-
-    ImGui::NextColumn();
-    ImGui::Dummy(ImVec2(0.0f, 20.0f));
-
-    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+    ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Position").x + 10);
     ImGui::Text("Position");
+
     ImGui::NextColumn();
 
-    ImGui::Dummy(ImVec2(0.0f, 20.0f));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-    if (ImGui::Button("X"))
-        position->x = resetValue;
-    ImGui::PopStyleColor(3);
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(5, 0));
+    ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
-    ImGui::SameLine();
-    if (ImGui::DragFloat("##X", &position->x, 0.1f))
-        camera->Update();
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
+    const char *components[3] = {"X", "Y", "Z"};
+    float *values[3] = {&position->x, &position->y, &position->z};
+    ImVec4 colors[3][2] = {
+        // base color                    hovered color
+        {ImVec4(0.6f, 0.0f, 0.0f, 1.0f), ImVec4(1.0f, 0.0f, 0.0f, 1.0f)},
+        {ImVec4(0.0f, 0.6f, 0.0f, 1.0f), ImVec4(0.0f, 1.0f, 0.0f, 1.0f)},
+        {ImVec4(0.0f, 0.0f, 0.6f, 1.0f), ImVec4(0.0f, 0.0f, 1.0f, 1.0f)}};
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.8f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.9f, 0.0f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
-    if (ImGui::Button("Y"))
-        position->y = resetValue;
-    ImGui::PopStyleColor(3);
+    // iterate through components
+    for (int i = 0; i < 3; i++)
+    {
+        // reset button
+        ImGui::PushStyleColor(ImGuiCol_Button, colors[i][0]);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, colors[i][1]);
+        if (ImGui::Button(components[i]))
+        {
+            *values[i] = 1.0f;
+            m_Light->GetTransform()->SetIsDirty(true);
+        }
+        ImGui::PopStyleColor(2);
 
-    ImGui::SameLine();
-    if (ImGui::DragFloat("##Y", &position->y, 0.1f))
-        camera->Update();
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
+        ImGui::SameLine();
 
-    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.8f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.0f, 0.9f, 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.0f, 1.0f, 1.0f));
-    if (ImGui::Button("Z"))
-        position->z = resetValue;
-    ImGui::PopStyleColor(3);
+        // drag float
+        std::string label = "##" + std::string(components[i]);
+        ImGui::DragFloat(label.c_str(), values[i], 0.1f);
 
-    ImGui::SameLine();
-    if (ImGui::DragFloat("##Z", &position->z, 0.1f))
-        camera->Update();
-    ImGui::PopItemWidth();
-    ImGui::SameLine();
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+    }
 
     ImGui::PopStyleVar();
     ImGui::Columns(1);
 
-    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-    // SwapCameraPosition();
+    ImGui::Columns(2);
+
+    ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Speed").x + 10);
+    ImGui::Text("Speed");
+
+    ImGui::NextColumn();
+
+    ImGui::DragFloat("##Speed", cameraSpeed, 0.1f, 0.0f, 10.0f);
+
+    ImGui::Columns(1);
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    ImGui::Columns(2);
+
+    ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Sensitivity").x + 10);
+    ImGui::Text("Sensitivity");
+
+    ImGui::NextColumn();
+
+    ImGui::DragFloat("##Sensitivity", sensitivity, 0.1f, 0.0f, 10.0f);
+    ImGui::Columns(1);
 
     ImGui::End();
 
@@ -278,7 +307,7 @@ void UI::LightWindow()
 
     ImGui::PushID(m_Light.get());
 
-    ImGui::Begin("Light");
+    ImGui::Begin("Light infos");
 
     ImGui::Columns(2);
 

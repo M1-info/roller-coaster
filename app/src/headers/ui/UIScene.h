@@ -23,6 +23,9 @@ public:
     inline std::shared_ptr<Mesh> GetSelectedMesh() const { return m_SelectedMesh; }
     inline void SetFonts(std::map<std::string, ImFont *> fonts) { m_Fonts = fonts; }
 
+    void SetUpDockSpace();
+    void Render();
+
     void SceneWindow();
 
     void SceneGraphWindow();

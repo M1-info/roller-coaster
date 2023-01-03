@@ -169,9 +169,8 @@ void Renderer::Render()
 				glStencilMask(0xFF);
 				glStencilFunc(GL_ALWAYS, 0, 0xFF);
 				glEnable(GL_DEPTH_TEST);
+				mesh->GetMaterial()->SetShader(shaderPhong);
 			}
-
-			mesh->GetMaterial()->SetShader(shaderPhong);
 		}
 
 		// Unbind FBO after drawind scene on it

@@ -23,11 +23,76 @@ void UIScene::SetSelectedMesh(std::shared_ptr<Mesh> mesh)
     m_SelectedMesh->m_IsSelected = true;
 }
 
+void UIScene::SetUpDockSpace()
+{
+    ImGui::Begin("Scene dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGuiID scene_dockspace_id = ImGui::GetID("Scene Dockspace");
+    ImGui::DockSpace(ImGui::GetID("Scene Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
+
+    // dockspace window
+    static bool first_dockspace = true;
+    if (first_dockspace)
+    {
+        ImGui::DockBuilderRemoveNode(scene_dockspace_id);
+        ImGui::DockBuilderAddNode(scene_dockspace_id);
+
+        ImGuiID dock_main_id = scene_dockspace_id;
+        ImGuiID dock_id_left, dock_id_right;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, &dock_id_left, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.8f, &dock_id_right, &dock_main_id);
+
+        ImGui::DockBuilderDockWindow("Scene", dock_id_right);
+        ImGui::DockBuilderDockWindow("Scene infos", dock_id_left);
+
+        ImGui::DockBuilderFinish(scene_dockspace_id);
+        first_dockspace = false;
+    }
+
+    ImGui::End();
+
+    ImGui::Begin("Scene infos", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGuiID scene_graph_dockspace_id = ImGui::GetID("Scene Graph Dockspace");
+    ImGui::DockSpace(ImGui::GetID("Scene Graph Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
+
+    // dockspace window
+    static bool first_graph = true;
+    if (first_graph)
+    {
+        ImGui::DockBuilderRemoveNode(scene_graph_dockspace_id);
+        ImGui::DockBuilderAddNode(scene_graph_dockspace_id);
+
+        ImGuiID dock_main_id = scene_graph_dockspace_id;
+        ImGuiID dock_id_bottom, dock_id_top;
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.5f, &dock_id_bottom, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.5f, &dock_id_top, &dock_main_id);
+
+        ImGui::DockBuilderDockWindow("Scene graph", dock_id_top);
+        ImGui::DockBuilderDockWindow("Selected mesh", dock_id_bottom);
+
+        ImGui::DockBuilderFinish(scene_graph_dockspace_id);
+        first_graph = false;
+    }
+
+    ImGui::End();
+}
+
+void UIScene::Render()
+{
+    SetUpDockSpace();
+    SceneWindow();
+    SceneGraphWindow();
+
+    if (m_SelectedMesh != nullptr)
+        SelectedMeshWindow();
+}
+
 void UIScene::SceneWindow()
 {
-    float aspectRatio = m_Window->GetAspectRatio();
+    float aspectRatio = 16.0f / 9.0f;
     uint64_t textureID = m_FBO->GetColorBuffer();
-    ImGui::Begin("Scene", nullptr);
+    ImGui::Begin("Scene");
     ImGui::Image((ImTextureID)textureID,
                  ImVec2(ImGui::GetWindowWidth(), ImGui::GetWindowWidth() / aspectRatio),
                  ImVec2(0, 1),
@@ -37,7 +102,7 @@ void UIScene::SceneWindow()
 
 void UIScene::SceneGraphWindow()
 {
-    ImGui::Begin("Scene Graph");
+    ImGui::Begin("Scene graph", nullptr, ImGuiWindowFlags_NoTitleBar);
 
     ImGui::Dummy(ImVec2(0, 2.0f));
 
@@ -136,7 +201,9 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
 
 void UIScene::SelectedMeshWindow()
 {
-    ImGui::Begin("Selected Mesh");
+    ImGui::Begin("Selected mesh");
+    // docking selected mesh window to this one
+    ImGui::SetNextWindowDockID(ImGui::GetID("Scene Graph Dockspace"), ImGuiCond_FirstUseEver);
 
     ImGui::PushFont(m_Fonts["Title"]);
     ImGui::Text(m_SelectedMesh->GetName().c_str());
