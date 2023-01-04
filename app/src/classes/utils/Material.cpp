@@ -55,7 +55,7 @@ void Material::SetUpShader(std::shared_ptr<Light> light)
     m_Shader->Unbind();
 }
 
-void Material::UpdateShader(glm::mat4 projectionView, glm::mat4 model, bool isSelected, glm::mat4 view, std::shared_ptr<Light> light, glm::vec3 cameraPosition)
+void Material::UpdateShader(glm::mat4 projectionView, glm::mat4 model, glm::mat4 view, std::shared_ptr<Light> light, glm::vec3 cameraPosition)
 {
     m_Shader->Bind();
 

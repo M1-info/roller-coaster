@@ -138,3 +138,9 @@ GLint Shader::GetUniformLocation(const std::string &name) const
     m_UniformLocationCache[name] = location;
     return location;
 }
+
+bool Shader::HasUniform(const std::string &name)
+{
+    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+    return location != -1;
+}

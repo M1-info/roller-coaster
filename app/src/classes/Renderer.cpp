@@ -117,7 +117,7 @@ void Renderer::Render()
 			if (mesh->GetType() == MeshType::RAILS)
 				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix);
 			else
-				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected, viewMatrix, m_Light, cameraPosition);
+				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
 
 			/* OBJECT CHILDREN */
 			if (mesh->GetChildren().size() > 0)
@@ -134,7 +134,7 @@ void Renderer::Render()
 							rail->UpdateMatrix();
 							glm::mat4 modelMatrix = rail->GetTransform()->GetMatrix();
 							bool isSelected = rail->m_IsSelected;
-							rail->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected, viewMatrix, m_Light, cameraPosition);
+							rail->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
 						}
 					else
 						for (auto child : mesh->GetChildren())
@@ -142,7 +142,7 @@ void Renderer::Render()
 							child->UpdateMatrix();
 							glm::mat4 modelMatrix = glm::mat4(1.0);
 							bool isSelected = child->m_IsSelected;
-							child->GetMaterial()->UpdateShader(projectionView, modelMatrix, isSelected);
+							child->GetMaterial()->UpdateShader(projectionView, modelMatrix);
 						}
 				}
 			}

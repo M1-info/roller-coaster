@@ -41,7 +41,7 @@ public:
     void SetShader(Shader *shader);
     void AddShader(std::string filename);
     void SetUpShader(std::shared_ptr<Light> light);
-    void UpdateShader(glm::mat4 projectionView, glm::mat4 mesh = glm::mat4(1.0), bool isSelected = false, glm::mat4 view = glm::mat4(1.0f), std::shared_ptr<Light> light = nullptr, glm::vec3 cameraPosition = glm::vec3(0.0f));
+    void UpdateShader(glm::mat4 projectionView, glm::mat4 mesh = glm::mat4(1.0), glm::mat4 view = glm::mat4(1.0f), std::shared_ptr<Light> light = nullptr, glm::vec3 cameraPosition = glm::vec3(0.0f));
 
 private:
     Color m_MaterialColor;

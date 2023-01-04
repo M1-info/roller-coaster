@@ -66,6 +66,7 @@ public:
     void AddChildren(std::shared_ptr<Mesh> child);
     virtual void RemoveChildren(std::shared_ptr<Mesh> child);
 
+    void ToggleIsSelected();
     void UpdateMatrix();
     void CreateMaterial(std::string shaderFile);
 

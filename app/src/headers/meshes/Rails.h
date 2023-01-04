@@ -14,8 +14,10 @@
 #include "buffers/VertexArray.h"
 #include "buffers/VertexBuffer.h"
 
-#include "curves/BezierCurve.h"
+#include "curves/BezierCubic.h"
 #include "curves/Bspline.h"
+#include "curves/CatmullRom.h"
+#include "curves/Hermite.h"
 
 #include "meshes/Mesh.h"
 #include "meshes/Rail.h"

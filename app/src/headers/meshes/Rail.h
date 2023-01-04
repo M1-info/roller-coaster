@@ -6,7 +6,6 @@
 
 #include "meshes/Mesh.h"
 #include "utils/OBJLoader.h"
-#include "Light.h"
 
 class Rail : public Mesh
 {

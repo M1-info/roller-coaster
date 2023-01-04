@@ -82,26 +82,26 @@ void Rails::Draw()
         m_VBO_positions->Unbind();
         m_Material->GetShader()->Unbind();
 
-        // m_VAO_tangents->Bind();
-        // m_Material_curve->GetShader()->Bind();
-        // m_Material_curve->GetShader()->SetUniform3f("u_color", 1.0f, 1.0f, 0.0f);
-        // glDrawArrays(GL_LINES, 0, m_Tangents.size());
-        // m_VAO_tangents->Unbind();
-        // m_Material_curve->GetShader()->Unbind();
+        m_VAO_tangents->Bind();
+        m_Material_curve->GetShader()->Bind();
+        m_Material_curve->GetShader()->SetUniform3f("u_color", 1.0f, 1.0f, 0.0f);
+        glDrawArrays(GL_LINES, 0, m_Tangents.size());
+        m_VAO_tangents->Unbind();
+        m_Material_curve->GetShader()->Unbind();
 
-        // m_VAO_normals->Bind();
-        // m_Material_curve->GetShader()->Bind();
-        // m_Material_curve->GetShader()->SetUniform3f("u_color", 0.0f, 1.0f, 1.0f);
-        // glDrawArrays(GL_LINES, 0, m_Normals.size());
-        // m_VAO_normals->Unbind();
-        // m_Material_curve->GetShader()->Unbind();
+        m_VAO_normals->Bind();
+        m_Material_curve->GetShader()->Bind();
+        m_Material_curve->GetShader()->SetUniform3f("u_color", 0.0f, 1.0f, 1.0f);
+        glDrawArrays(GL_LINES, 0, m_Normals.size());
+        m_VAO_normals->Unbind();
+        m_Material_curve->GetShader()->Unbind();
 
-        // m_VAO_binormals->Bind();
-        // m_Material_curve->GetShader()->Bind();
-        // m_Material_curve->GetShader()->SetUniform3f("u_color", 1.0f, 0.0f, 1.0f);
-        // glDrawArrays(GL_LINES, 0, m_Binormals.size());
-        // m_VAO_binormals->Unbind();
-        // m_Material_curve->GetShader()->Bind();
+        m_VAO_binormals->Bind();
+        m_Material_curve->GetShader()->Bind();
+        m_Material_curve->GetShader()->SetUniform3f("u_color", 1.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_LINES, 0, m_Binormals.size());
+        m_VAO_binormals->Unbind();
+        m_Material_curve->GetShader()->Bind();
 
         for (auto child : m_Children)
             child->Draw();
@@ -118,12 +118,13 @@ void Rails::Draw()
 
 void Rails::Update()
 {
+
     m_Vertices.clear();
     m_Tangents.clear();
     m_Normals.clear();
     m_Binormals.clear();
 
-    for (int i = 4; i <= m_Children.size(); i++)
+    for (int i = 4; i <= m_Children.size(); i += 3)
     {
 
         std::vector<glm::vec3> points({m_Children[i - 4].get()->GetVertices()[0],
@@ -131,65 +132,22 @@ void Rails::Update()
                                        m_Children[i - 2].get()->GetVertices()[0],
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
-        BezierCurve curve(points);
-        for (float t = 0; t <= 1; t += 0.01)
+        CatmullRom curve(points);
+        for (float t = 0; t <= 1; t += 0.0001)
         {
-            glm::vec3 curvePoint = curve.GetPoint(t);
-            glm::vec3 vertex(curvePoint.x, curvePoint.y, curvePoint.z);
+            glm::vec3 currentPoint = curve.GetPoint(t);
+            glm::vec3 nextPoint = curve.GetPoint(t + 0.0001);
+            glm::vec3 vertex(currentPoint.x, currentPoint.y, currentPoint.z);
             m_Vertices.push_back(vertex);
 
-            glm::vec3 tangent = curve.GetTangent(t);
-            tangent = glm::normalize(tangent);
+            // compute TNB
+            glm::vec3 T = glm::normalize(nextPoint - currentPoint);
+            glm::vec3 B = glm::normalize(glm::cross(T, nextPoint + currentPoint));
+            glm::vec3 N = glm::normalize(glm::cross(B, T));
 
-            glm::vec3 normalisedTangent = curve.GetNormalisedTangent(t, curvePoint, tangent);
-            normalisedTangent = glm::normalize(normalisedTangent);
-
-            // ensure that the tangents are pointing in the same direction
-            if (m_Tangents.size() > 0)
-            {
-                glm::vec3 previousTangent = m_Tangents[m_Tangents.size() - 1] - m_Tangents[m_Tangents.size() - 2];
-                previousTangent = glm::normalize(previousTangent);
-
-                if (glm::dot(tangent, previousTangent) < 0)
-                    tangent *= -1.0f;
-            }
-
-            glm::vec3 normal = glm::cross(normalisedTangent, tangent);
-            normal = glm::normalize(normal);
-
-            if (m_Normals.size() > 0)
-            {
-                glm::vec3 previousNormal = m_Normals[m_Normals.size() - 1] - m_Normals[m_Normals.size() - 2];
-                previousNormal = glm::normalize(previousNormal);
-
-                if (glm::dot(normal, previousNormal) < 0)
-                    normal *= -1.0f;
-            }
-
-            glm::vec3 biNormal = normal * -1.0f;
-
-            // ensure that the binormals are pointing in the same direction
-
-            if (m_Binormals.size() > 0)
-            {
-                glm::vec3 previousBiNormal = m_Binormals[m_Binormals.size() - 1] - m_Binormals[m_Binormals.size() - 2];
-                previousBiNormal = glm::normalize(previousBiNormal);
-
-                if (glm::dot(biNormal, previousBiNormal) < 0)
-                    biNormal *= -1.0f;
-            }
-
-            // normalisedTangent *= 1.5f;
-            m_Tangents.push_back(vertex);
-            m_Tangents.push_back(vertex + normalisedTangent);
-
-            // normal *= 1.5f;
-            m_Normals.push_back(vertex);
-            m_Normals.push_back(vertex + normal);
-
-            // biNormal *= 1.5f;
-            m_Binormals.push_back(vertex);
-            m_Binormals.push_back(vertex + biNormal);
+            m_Tangents.push_back(T);
+            m_Normals.push_back(N);
+            m_Binormals.push_back(B);
         }
     }
 
@@ -251,23 +209,21 @@ void Rails::UpdateRails()
             glm::vec3 normal = m_Normals[i];
             glm::vec3 binormal = m_Binormals[i];
 
-            normal = glm::normalize(normal);
-            binormal = glm::normalize(binormal);
-            tangent = glm::normalize(tangent);
-
-            glm::mat3 rotationMatrix = glm::mat3(tangent, binormal, normal);
+            // use frene frame to compute rotation
+            glm::mat4 rotation = glm::mat4(1.0f);
+            rotation[0] = glm::vec4(tangent, 0.0f);
+            rotation[1] = glm::vec4(normal, 0.0f);
+            rotation[2] = glm::vec4(binormal, 0.0f);
+            rotation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
             // convert to quaternion
-            glm::quat rotation = glm::quat_cast(rotationMatrix);
+            glm::quat rotationQuat = glm::quat_cast(rotation);
 
             // convert to euler angles
-            float angleX = glm::degrees(glm::pitch(rotation));
-            float angleY = glm::degrees(glm::yaw(rotation));
-            float angleZ = glm::degrees(glm::roll(rotation));
+            glm::vec3 rotationEuler = glm::eulerAngles(rotationQuat);
 
             // set rotation
-            rail->GetTransform()->SetRotation(glm::vec3(angleX, angleY, angleZ));
-
+            rail->GetTransform()->SetRotation(rotationEuler);
             rail->GetTransform()->SetIsDirty(true);
         }
     }

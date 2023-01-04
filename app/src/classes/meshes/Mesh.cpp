@@ -38,6 +38,21 @@ void Mesh::CreateMaterial(std::string shaderFile)
     m_Material->AddShader(shaderFile);
 }
 
+void Mesh::ToggleIsSelected()
+{
+    m_IsSelected = !m_IsSelected;
+
+    if (m_Material->GetShader()->HasUniform("u_isSelected") == false)
+        return;
+
+    m_Material->GetShader()->Bind();
+    if (m_IsSelected)
+        m_Material->GetShader()->SetUniform1i("u_isSelected", 1);
+    else
+        m_Material->GetShader()->SetUniform1i("u_isSelected", 0);
+    m_Material->GetShader()->Unbind();
+}
+
 void Mesh::AddChildren(std::shared_ptr<Mesh> child)
 {
     m_Children.push_back(child);

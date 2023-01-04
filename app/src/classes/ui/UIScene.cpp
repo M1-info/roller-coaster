@@ -137,13 +137,16 @@ void UIScene::SceneGraphElement(std::shared_ptr<Mesh> mesh)
         if (m_SelectedMesh == mesh)
         {
             m_SelectedMesh.reset();
-            mesh->m_IsSelected = false;
+            m_SelectedMesh->ToggleIsSelected();
         }
         // add selection to new mesh if is not the same as the previous one
         else
         {
+            if (m_SelectedMesh != nullptr)
+                m_SelectedMesh->ToggleIsSelected();
+
             m_SelectedMesh = mesh;
-            mesh->m_IsSelected = true;
+            mesh->ToggleIsSelected();
         }
     }
 
@@ -399,6 +402,12 @@ void UIScene::RailsWindow(std::shared_ptr<Rails> rails)
 
         rails->AddChildren(std::make_shared<ControlPoint>(lastPosition, rails->GetChildren().size()));
         rails->Update();
+
+        if (m_SelectedMesh != nullptr)
+            m_SelectedMesh->ToggleIsSelected();
+    
+        m_SelectedMesh = rails->GetChildren().back();
+        m_SelectedMesh->ToggleIsSelected();
         m_UIConsole->AddLog("Control point added. You can set his position in the appropriate window", ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
     }
     ImGui::PopStyleColor(2);
