@@ -20,7 +20,9 @@ void Scene::Init()
 
     std::shared_ptr<Cart> cart = std::make_shared<Cart>("cart.obj");
     std::shared_ptr<Rails> rails = Rails::Create();
+    // std::shared_ptr<Ground> ground = std::make_shared<Ground>("island.obj");
 
+    // Add(ground);
     Add(cart);
     Add(rails);
 }

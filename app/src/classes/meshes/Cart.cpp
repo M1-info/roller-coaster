@@ -8,6 +8,11 @@ Cart::Cart(const std::string filename)
     m_Type = MeshType::CART;
 
     m_Transform = new Transform();
+    m_Transform->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+    m_Transform->SetIsDirty(true);
+
+    m_CurrentRail = {};
+    m_CurrentTangent = {};
 
     OBJLoader loader(filename);
 
@@ -64,4 +69,36 @@ void Cart::Draw()
 
 void Cart::Animate(float deltaTime)
 {
+
+    if (m_CurrentRail != m_Rails.end())
+    {
+        glm::vec3 prevPosition;
+        if (m_CurrentRail != m_Rails.begin())
+            prevPosition = *(m_CurrentRail - 1);
+        else
+            prevPosition = *(m_Rails.end() - 1);
+
+        glm::vec3 direction = *m_CurrentRail - prevPosition;
+
+        glm::vec3 tangent = *(m_CurrentTangent);
+
+        float pitch = glm::degrees(std::atan2(tangent.y, std::sqrt(tangent.x * tangent.x + tangent.z * tangent.z)));
+        float yaw = glm::degrees(std::atan2(tangent.x, tangent.z));
+        float roll = 0.0f;
+
+        if (direction.y < 0.0f)
+            pitch *= -1.0f;
+
+        m_Transform->SetPosition(*m_CurrentRail);
+        m_Transform->SetRotation(glm::vec3(pitch, yaw, roll));
+        m_Transform->SetIsDirty(true);
+
+        m_CurrentRail++;
+        m_CurrentTangent++;
+
+        return;
+    }
+
+    m_CurrentRail = m_Rails.begin();
+    m_CurrentTangent = m_Tangents.begin();
 }

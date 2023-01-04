@@ -41,9 +41,9 @@ void Renderer::Init()
 
 	// init lights
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	float lightIntensity = 2.5f;
+	float lightIntensity = 30.0;
 	m_Light = std::make_shared<Light>(lightColor, lightIntensity);
-	m_Light->GetTransform()->SetPosition(glm::vec3(5.0f, 10.0f, 0.0f));
+	m_Light->GetTransform()->SetPosition(glm::vec3(0.0f, 90.0f, 0.0f));
 	m_Light->GetTransform()->SetIsDirty(true);
 	m_Light->GetTransform()->ComputeMatrix();
 
@@ -108,6 +108,9 @@ void Renderer::Render()
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
 
+		if (m_UI->GetIsAnimating())
+			cart->Animate(deltaTime);
+
 		/* SCENE OBJECTS */
 		for (auto mesh : m_Scene->GetObjects())
 		{
@@ -130,8 +133,6 @@ void Renderer::Render()
 				if (mesh->GetType() == MeshType::RAILS)
 				{
 					std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
-					glm::mat4 modelMatrix = rails->GetTransform()->GetMatrix();
-					rails->m_Material_curve->UpdateShader(projectionView, modelMatrix);
 
 					if (rails->m_DrawRails)
 						for (auto rail : rails->GetRails())

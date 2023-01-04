@@ -14,6 +14,7 @@
 #include "meshes/Skybox.h"
 #include "meshes/Rails.h"
 #include "meshes/Cart.h"
+#include "meshes/Ground.h"
 
 class Scene
 {

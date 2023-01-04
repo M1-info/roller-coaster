@@ -38,8 +38,9 @@ Camera::~Camera()
 void Camera::Init()
 {
 
-    m_Position = glm::vec3(0.0f, 0.0f, 8.0f);;
-    m_Target =  glm::vec3(0.0f, 0.0f, 0.0f);
+    m_Position = glm::vec3(0.0f, 0.0f, 8.0f);
+    ;
+    m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
     m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     Update();

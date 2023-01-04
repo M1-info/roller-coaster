@@ -48,8 +48,9 @@ void main()
     vec3 result=(ambient+diffuseLight+specularLight)*u_light.intensity*u_material.color;
     
     // compute light attenuation
-    float distance=distance(u_LightPosition,v_position);
-    float attenuation=1./(1.+.09*distance+.032*distance*distance);
+    float distanceLight=distance(u_LightPosition,v_position);
+    float distanceCamera=distance(camPos,v_position);
+    float attenuation=1./(distanceLight+distanceCamera);
     
     result*=attenuation;
     

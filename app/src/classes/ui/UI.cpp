@@ -190,7 +190,20 @@ void UI::RenderWindow()
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // Is animation running
-    ImGui::Checkbox("Animation", &m_IsAnimating);
+    if (ImGui::Checkbox("Animation", &m_IsAnimating))
+    {
+        if (m_IsAnimating)
+        {
+            std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
+            std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Cart"));
+
+            cart->SetRails(rails->GetVertices());
+            cart->SetTangents(rails->GetTangents());
+            cart->SetCurrentRail(cart->GetRails().begin());
+            cart->SetCurrentTangent(cart->GetTangents().begin());
+        }
+    }
+
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // swap camera position
@@ -409,7 +422,7 @@ void UI::LightWindow()
 
     ImGui::NextColumn();
 
-    ImGui::DragFloat("##Intensity", intensity, 0.1f, 0.0f, 10.0f);
+    ImGui::DragFloat("##Intensity", intensity, 0.1f, 0.0f, 100.0f);
 
     ImGui::Columns(1);
 

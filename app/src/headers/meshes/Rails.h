@@ -41,27 +41,14 @@ public:
     void GenerateControlPoints(std::vector<glm::vec3> controlPoints);
 
     inline std::vector<std::shared_ptr<Rail>> GetRails() { return m_Rails; }
+    inline std::vector<glm::vec3> GetTangents() { return m_Tangents; }
 
 private:
     std::vector<std::shared_ptr<Rail>> m_Rails;
+    std::vector<glm::vec3> m_Tangents;
 
 public:
     bool m_DrawRails = false;
-    std::string m_ControlPointsFileName = "controlPoints";
-    std::vector<std::string> m_ControlPointsFiles;
-    std::string m_ControlPointsFileSelected = "";
-
-    Material *m_Material_curve;
-
-    VertexArray *m_VAO_tangents;
-    VertexBuffer *m_VBO_tangents;
-    std::vector<glm::vec3> m_Tangents;
-
-    VertexArray *m_VAO_normals;
-
-    VertexArray *m_VAO_binormals;
-    VertexBuffer *m_VBO_binormals;
-    std::vector<glm::vec3> m_Binormals;
 };
 
 #endif // RAILS_H
