@@ -25,7 +25,11 @@ void UIScene::SetSelectedMesh(std::shared_ptr<Mesh> mesh)
 
 void UIScene::SetUpDockSpace()
 {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Scene dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+    ImGui::PopStyleVar(3);
 
     ImGuiID scene_dockspace_id = ImGui::GetID("Scene Dockspace");
     ImGui::DockSpace(ImGui::GetID("Scene Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
@@ -104,6 +108,10 @@ void UIScene::SceneGraphWindow()
 {
     ImGui::Begin("Scene graph", nullptr, ImGuiWindowFlags_NoTitleBar);
 
+    ImGui::PushFont(m_Fonts["Title"]);
+    ImGui::Text("Scene graph");
+    ImGui::PopFont();
+
     ImGui::Dummy(ImVec2(0, 2.0f));
 
     for (auto &mesh : m_Scene->GetObjects())
@@ -130,14 +138,16 @@ void UIScene::SceneGraphElement(std::shared_ptr<Mesh> mesh)
 
     if (mesh->GetParent() == nullptr)
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 23.0f);
+    else
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX());
 
     if (ImGui::Selectable(mesh->GetName().c_str(), m_SelectedMesh == mesh))
     {
         // remove selection if already selected and clicked
         if (m_SelectedMesh == mesh)
         {
-            m_SelectedMesh.reset();
             m_SelectedMesh->ToggleIsSelected();
+            m_SelectedMesh.reset();
         }
         // add selection to new mesh if is not the same as the previous one
         else
@@ -204,8 +214,10 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
 
 void UIScene::SelectedMeshWindow()
 {
-    ImGui::Begin("Selected mesh");
-    // docking selected mesh window to this one
+    ImGui::Begin("Selected mesh", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::Dummy(ImVec2(0, 2.0f));
+
     ImGui::SetNextWindowDockID(ImGui::GetID("Scene Graph Dockspace"), ImGuiCond_FirstUseEver);
 
     ImGui::PushFont(m_Fonts["Title"]);
@@ -405,7 +417,7 @@ void UIScene::RailsWindow(std::shared_ptr<Rails> rails)
 
         if (m_SelectedMesh != nullptr)
             m_SelectedMesh->ToggleIsSelected();
-    
+
         m_SelectedMesh = rails->GetChildren().back();
         m_SelectedMesh->ToggleIsSelected();
         m_UIConsole->AddLog("Control point added. You can set his position in the appropriate window", ImVec4(1.0f, 1.0f, 1.0f, 1.0f));

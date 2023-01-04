@@ -62,6 +62,6 @@ void Cart::Draw()
     m_Material->GetShader()->Unbind();
 }
 
-void Cart::Animate(float deltaTime, Transform *transform)
+void Cart::Animate(float deltaTime)
 {
 }

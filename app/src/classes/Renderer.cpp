@@ -66,7 +66,7 @@ void Renderer::Render()
 {
 
 	Skybox *skybox = m_Scene->GetSkybox();
-	std::shared_ptr<Mesh> cart = std::dynamic_pointer_cast<Mesh>(m_Scene->GetObjectByName("Cart"));
+	std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Cart"));
 	float lastTime = 0.0f;
 
 	Shader *shaderOutline = new Shader("outline");
@@ -86,6 +86,11 @@ void Renderer::Render()
 		{
 			m_Camera->SetPosition(cart->GetTransform()->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
 			m_Camera->Update();
+		}
+
+		if (m_UI->GetIsAnimating())
+		{
+			cart->Animate(deltaTime);
 		}
 
 		glm::mat4 viewMatrix = m_Camera->GetView();

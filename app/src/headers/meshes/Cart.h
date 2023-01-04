@@ -11,7 +11,7 @@ public:
 
     void Draw() override;
     void Update() override{};
-    void Animate(float deltaTime, Transform *transform);
+    void Animate(float deltaTime);
 
     inline void SetVelocity(glm::vec3 velocity) { m_Velocity = velocity; }
     inline glm::vec3 GetVelocity() { return m_Velocity; }

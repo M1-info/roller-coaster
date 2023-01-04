@@ -6,6 +6,7 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   OBJMaterial material;
   std::string current_material;
   int face_index = 0;
+  int currentObject = 0;
 
   std::string obj_filepath;
 
@@ -53,7 +54,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       unsigned int vertices[3];
       unsigned int tex_coords[3];
       unsigned int normals[3];
-      // unsigned vt1, vt2, vt3, vn1, vn2, vn3;
       int matches = sscanf_s(line.c_str(), "f %d/%d/%d %d/%d/%d %d/%d/%d", &vertices[0], &tex_coords[0], &normals[0], &vertices[1], &tex_coords[1], &normals[1], &vertices[2], &tex_coords[2], &normals[2]);
 
       if (matches != 9)

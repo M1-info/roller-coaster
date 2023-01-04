@@ -53,7 +53,7 @@ glm::vec3 Curve::GetTangent(float t)
     return glm::vec3(dx, dy, dz);
 }
 
-glm::vec3 Curve::GetNormalisedTangent(float t, glm::vec3 point, glm::vec3 tangent, glm::mat4 matrix)
+glm::vec3 Curve::GetNormalisedTangent(float t, glm::vec3 point, glm::vec3 tangent)
 {
     glm::vec3 point2 = GetPoint(t + 0.001);
 

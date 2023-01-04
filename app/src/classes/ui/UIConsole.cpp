@@ -21,7 +21,14 @@ void UIConsole::AddLog(const std::string log, ImVec4 color)
 
 void UIConsole::ConsoleWindow()
 {
-    ImGui::Begin("Console logs");
+    ImGui::Begin("Console logs", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+    ImGui::Text("Console logs");
+    ImGui::PopFont();
+
+    ImGui::Separator();
+
     for (auto s : m_Logs)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, s.second.second);

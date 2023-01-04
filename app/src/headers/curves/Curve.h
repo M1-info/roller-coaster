@@ -32,7 +32,7 @@ public:
      1 is the end of the curve
      return the tangent normalised at the given t value
     */
-    glm::vec3 GetNormalisedTangent(float t, glm::vec3 point, glm::vec3 tangent, glm::mat4 matrix);
+    glm::vec3 GetNormalisedTangent(float t, glm::vec3 point, glm::vec3 tangent);
 
 protected:
     std::vector<glm::vec3> m_Points;

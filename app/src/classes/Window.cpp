@@ -19,16 +19,25 @@ void Window::Init()
         exit(-1);
     }
 
+    // make full screen but with border
+    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+
     // set up width and height if not set
     if (m_Width == 0 || m_Height == 0)
     {
-        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         m_Width = mode->width;
         m_Height = mode->height;
+        // glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        // glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        // glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        // glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        // glfwWindowHint(GLFW_DECORATED, GL_TRUE);
     }
 
     /* Create a windowed mode window and its OpenGL context */
     m_Window = glfwCreateWindow(m_Width, m_Height, "Roaller Coaster", NULL, NULL);
+    // glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
     if (!m_Window)
     {
         std::cerr << "Failed to create window" << std::endl;

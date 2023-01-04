@@ -132,11 +132,11 @@ void Rails::Update()
                                        m_Children[i - 2].get()->GetVertices()[0],
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
-        CatmullRom curve(points);
-        for (float t = 0; t <= 1; t += 0.0001)
+        BezierCubic curve(points);
+        for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 currentPoint = curve.GetPoint(t);
-            glm::vec3 nextPoint = curve.GetPoint(t + 0.0001);
+            glm::vec3 nextPoint = curve.GetPoint(t + 0.01);
             glm::vec3 vertex(currentPoint.x, currentPoint.y, currentPoint.z);
             m_Vertices.push_back(vertex);
 
@@ -145,9 +145,29 @@ void Rails::Update()
             glm::vec3 B = glm::normalize(glm::cross(T, nextPoint + currentPoint));
             glm::vec3 N = glm::normalize(glm::cross(B, T));
 
+            // m_Tangents.push_back(vertex);
             m_Tangents.push_back(T);
+
+            // m_Normals.push_back(vertex);
             m_Normals.push_back(N);
+
+            // m_Binormals.push_back(vertex);
             m_Binormals.push_back(B);
+
+            // glm::vec3 tangent = curve.GetTangent(t);
+            // glm::vec3 normalisedTangent = curve.GetNormalisedTangent(t, currentPoint, tangent);
+
+            // glm::vec3 T = glm::normalize(normalisedTangent);
+            // glm::vec3 N = glm::cross(T, tangent);
+            // N *= 0.01f;
+            // glm::vec3 B = N * -1.0f;
+
+            // m_Tangents.push_back(vertex);
+            // m_Tangents.push_back(vertex + normalisedTangent);
+            // m_Normals.push_back(vertex);
+            // m_Normals.push_back(vertex + N);
+            // m_Binormals.push_back(vertex);
+            // m_Binormals.push_back(vertex + B);
         }
     }
 
@@ -190,7 +210,9 @@ void Rails::UpdateRails()
     rail->GetTransform()->SetPosition(prevPosition);
     m_Rails.push_back(rail);
 
-    int railIndex = 1;
+    std::vector<glm::vec3> railsRotation;
+
+        int railIndex = 1;
     for (int i = 1; i < m_Vertices.size(); i++)
     {
         glm::vec3 currentPosition = m_Vertices[i];
@@ -209,18 +231,49 @@ void Rails::UpdateRails()
             glm::vec3 normal = m_Normals[i];
             glm::vec3 binormal = m_Binormals[i];
 
-            // use frene frame to compute rotation
-            glm::mat4 rotation = glm::mat4(1.0f);
-            rotation[0] = glm::vec4(tangent, 0.0f);
-            rotation[1] = glm::vec4(normal, 0.0f);
-            rotation[2] = glm::vec4(binormal, 0.0f);
-            rotation[3] = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+            float angleX = glm::degrees(acos(tangent.x));
+            float angleY = glm::degrees(atan(normal.y));
+            float angleZ = glm::degrees(-asin(tangent.z));
+
+            // glm::mat4 rotationX = glm::identity<glm::mat4>();
+            // rotationX[1][1] = cos(angleX);
+            // rotationX[1][2] = -(sin(angleX));
+            // rotationX[2][1] = sin(angleX);
+            // rotationX[2][2] = cos(angleX);
+
+            // glm::mat4 rotationY = glm::identity<glm::mat4>();
+            // rotationY[0][0] = cos(angleY);
+            // rotationY[0][2] = sin(angleY);
+            // rotationY[2][0] = -(sin(angleY));
+            // rotationY[2][2] = cos(angleY);
+
+            // glm::mat4 rotationZ = glm::identity<glm::mat4>();
+            // rotationZ[0][0] = cos(angleZ);
+            // rotationZ[0][1] = -(sin(angleZ));
+            // rotationZ[1][0] = sin(angleZ);
+            // rotationZ[1][1] = cos(angleZ);
+
+            // glm::mat4 rotation = rotationX * rotationZ;
+
+            // // convert to quaternion
+            // glm::quat rotationQuat = glm::quat_cast(rotation);
+
+            // // convert to euler angles
+            // glm::vec3 rotationEuler = glm::eulerAngles(rotationQuat);
+            // rotationEuler = glm::degrees(rotationEuler);
+
+            glm::mat4 rotation = glm::rotate(glm::mat4(1.0), glm::radians(angleX), glm::vec3(1.0f, 0.0f, 0.0f)) *
+                                 glm::rotate(glm::mat4(1.0), glm::radians(angleY), glm::vec3(0.0f, 1.0f, 0.0f)) *
+                                 glm::rotate(glm::mat4(1.0), glm::radians(angleZ), glm::vec3(0.0f, 0.0f, 1.0f));
 
             // convert to quaternion
             glm::quat rotationQuat = glm::quat_cast(rotation);
 
             // convert to euler angles
             glm::vec3 rotationEuler = glm::eulerAngles(rotationQuat);
+            rotationEuler = glm::degrees(rotationEuler);
+
+            railsRotation.push_back(rotationEuler);
 
             // set rotation
             rail->GetTransform()->SetRotation(rotationEuler);

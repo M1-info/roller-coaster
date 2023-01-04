@@ -46,10 +46,7 @@ void Mesh::ToggleIsSelected()
         return;
 
     m_Material->GetShader()->Bind();
-    if (m_IsSelected)
-        m_Material->GetShader()->SetUniform1i("u_isSelected", 1);
-    else
-        m_Material->GetShader()->SetUniform1i("u_isSelected", 0);
+    m_Material->GetShader()->SetUniform1i("u_isSelected", m_IsSelected);
     m_Material->GetShader()->Unbind();
 }
 

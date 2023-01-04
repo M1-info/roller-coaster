@@ -11,7 +11,18 @@ UIFilesController::~UIFilesController()
 
 void UIFilesController::SelectFileWindow()
 {
-    if (ImGui::BeginCombo("Selected File", m_FileSelected.c_str()))
+
+    ImGui::PushID("SelectFileWindow");
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+    ImGui::Text("Selected file");
+    ImGui::PopFont();
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    if (ImGui::BeginCombo("", m_FileSelected.c_str()))
     {
         for (auto file : m_Files)
         {
@@ -27,6 +38,8 @@ void UIFilesController::SelectFileWindow()
         }
         ImGui::EndCombo();
     }
+
+    ImGui::PopID();
 }
 
 void UIFilesController::SaveFileWindow(std::shared_ptr<Rails> rails)

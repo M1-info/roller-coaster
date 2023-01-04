@@ -99,8 +99,8 @@ void UI::SetUpDockSpace()
 
         ImGuiID dock_main_id = dockspace_id;
         ImGuiID dock_id_left, dock_id_right;
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.8f, &dock_id_left, &dock_main_id);
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, &dock_id_right, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.85f, &dock_id_left, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.15f, &dock_id_right, &dock_main_id);
 
         ImGui::DockBuilderDockWindow("Scene Console dockspace", dock_id_left);
         ImGui::DockBuilderDockWindow("Render dockspace", dock_id_right);
@@ -111,16 +111,21 @@ void UI::SetUpDockSpace()
     ImGui::End();
 
     // Begin Dockspace
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Render dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+    ImGui::PopStyleVar(3);
 
     ImGuiID render_dockspace_id = ImGui::GetID("Render dockspace");
-    ImGui::DockSpace(render_dockspace_id, ImVec2(0.0f, 0.0f));
+    ImGui::DockSpace(render_dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
 
     static bool firstRender = true;
     if (firstRender)
     {
         ImGui::DockBuilderRemoveNode(render_dockspace_id);
         ImGui::DockBuilderAddNode(render_dockspace_id);
+        ImGui::DockBuilderSetNodeSize(render_dockspace_id, viewport->Size);
 
         ImGuiID dock_main_id = render_dockspace_id;
         ImGuiID dock_id_bottom1, dock_id_bottom2, dock_id_top;
@@ -138,10 +143,14 @@ void UI::SetUpDockSpace()
     ImGui::End();
 
     // Begin Dockspace
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
     ImGui::Begin("Scene Console dockspace", nullptr, ImGuiWindowFlags_NoTitleBar);
+    ImGui::PopStyleVar(3);
 
     ImGuiID scene_console_dockspace_id = ImGui::GetID("Scene Console dockspace");
-    ImGui::DockSpace(scene_console_dockspace_id, ImVec2(0.0f, 0.0f));
+    ImGui::DockSpace(scene_console_dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
 
     static bool first_scene_console = true;
     if (first_scene_console)
@@ -151,8 +160,8 @@ void UI::SetUpDockSpace()
 
         ImGuiID dock_main_id = scene_console_dockspace_id;
         ImGuiID dock_id_bottom, dock_id_top;
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.2f, &dock_id_bottom, &dock_main_id);
-        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.8f, &dock_id_top, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.25f, &dock_id_bottom, &dock_main_id);
+        ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.9f, &dock_id_top, &dock_main_id);
 
         ImGui::DockBuilderDockWindow("Scene dockspace", dock_id_top);
         ImGui::DockBuilderDockWindow("Console logs", dock_id_bottom);
@@ -165,10 +174,24 @@ void UI::SetUpDockSpace()
 
 void UI::RenderWindow()
 {
-    ImGui::Begin("Render infos");
+    ImGui::Begin("Render infos", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::PushFont(m_Fonts["Title"]);
+    ImGui::Text("Roaller Coaster Simulation");
+    ImGui::PopFont();
+
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    ImGui::Text("Move the mouse and hold right click to orient the camera");
+    ImGui::Text("Use the WASD keys to move the camera");
+
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // Is animation running
     ImGui::Checkbox("Animation", &m_IsAnimating);
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // swap camera position
     std::shared_ptr<Camera> camera = m_Window->GetCamera();
@@ -188,6 +211,7 @@ void UI::RenderWindow()
             camera->Update();
             m_UIConsole->AddLog("Camera is now unlocked from the cart", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
         }
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
         if (rails->m_DrawRails)
@@ -203,6 +227,7 @@ void UI::RenderWindow()
                 m_UIConsole->AddLog("Rails drawn", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
             }
         }
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // Frame Rate
     ImGui::Text("Frame Rate: %.1f FPS", ImGui::GetIO().Framerate);
@@ -219,7 +244,14 @@ void UI::CameraWindow()
 
     ImGui::PushID(m_Light.get());
 
-    ImGui::Begin("Camera infos");
+    ImGui::Begin("Camera infos", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::PushFont(m_Fonts["Title"]);
+    ImGui::Text("Camera");
+    ImGui::PopFont();
+
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     ImGui::Columns(2);
 
@@ -307,7 +339,14 @@ void UI::LightWindow()
 
     ImGui::PushID(m_Light.get());
 
-    ImGui::Begin("Light infos");
+    ImGui::Begin("Light infos", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+    ImGui::PushFont(m_Fonts["Title"]);
+    ImGui::Text("Light");
+    ImGui::PopFont();
+
+    ImGui::Separator();
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     ImGui::Columns(2);
 
