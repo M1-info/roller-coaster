@@ -77,13 +77,13 @@ void Rails::Update()
     m_Vertices.clear();
     m_Tangents.clear();
 
-    for (int i = 3; i <= m_Children.size(); i += 3)
+    for (int i = 4; i <= m_Children.size(); i += 3)
     {
 
-        std::vector<glm::vec3> points({m_Children[i - 3].get()->GetVertices()[0],
+        std::vector<glm::vec3> points({m_Children[i - 4].get()->GetVertices()[0],
+                                       m_Children[i - 3].get()->GetVertices()[0],
                                        m_Children[i - 2].get()->GetVertices()[0],
-                                       m_Children[i - 1].get()->GetVertices()[0],
-                                       m_Children[i].get()->GetVertices()[0]});
+                                       m_Children[i - 1].get()->GetVertices()[0]});
 
         BezierCubic curve(points);
         for (float t = 0; t <= 1; t += 0.01)
@@ -122,15 +122,9 @@ void Rails::UpdateRails()
 {
     m_Rails.clear();
 
-    glm::vec3 prevPosition = m_Vertices[0];
-    std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", 0);
-    rail->GetTransform()->SetPosition(prevPosition);
-    m_Rails.push_back(rail);
+    glm::vec3 prevPosition = glm::vec3(0.0f);
 
-    std::vector<glm::vec3> railsRotation;
-
-    int railIndex = 1;
-    for (int i = 1; i < m_Vertices.size(); i++)
+    for (int i = 0; i < m_Vertices.size(); i++)
     {
         glm::vec3 currentPosition = m_Vertices[i];
         glm::vec3 direction = currentPosition - prevPosition;
@@ -138,15 +132,13 @@ void Rails::UpdateRails()
 
         if (glm::length(length) > RAIL_WIDTH)
         {
-            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", railIndex++);
+            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", i);
             rail->GetTransform()->SetPosition(currentPosition);
             m_Rails.push_back(rail);
             prevPosition = currentPosition;
 
             glm::vec3 tangent = m_Tangents[i];
 
-            // float pitch = glm::degrees(std::atan2(tangent.y, std::sqrt(tangent.x * tangent.x + tangent.z * tangent.z)));
-            float pitch = 0.0f;
             float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) - 90.0f;
             float roll = glm::degrees(atan2(direction.y, direction.x));
 
@@ -154,7 +146,7 @@ void Rails::UpdateRails()
                 roll *= -1.0f;
 
             // set rotation
-            rail->GetTransform()->SetRotation(glm::vec3(pitch, yaw, roll));
+            rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
             rail->GetTransform()->SetIsDirty(true);
         }
     }
