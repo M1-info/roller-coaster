@@ -6,7 +6,7 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   OBJMaterial material;
   std::string current_material;
   int face_index = 0;
-  int currentObject = 0;
+  int currentObject = -1;
 
   std::string obj_filepath;
 
@@ -134,11 +134,28 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       m_Face_id_to_material_map[face_index] = current_material;
       m_Face_to_material_map[face] = current_material;
       face_index++;
+
+      m_Objects[currentObject].AddFace(face);
+      m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[0]]);
+      m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[1]]);
+      m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[2]]);
+      m_Objects[currentObject].AddNormal(m_Normals[face.normals[0]]);
+      m_Objects[currentObject].AddNormal(m_Normals[face.normals[1]]);
+      m_Objects[currentObject].AddNormal(m_Normals[face.normals[2]]);
+      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[0]]);
+      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[1]]);
+      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[2]]);
+
     }
     else if (line.substr(0, 7) == "usemtl ")
     {
       // Material
       current_material = line.substr(7);
+      currentObject++;
+      Object Object;
+      Object.SetMaterial(m_Materials[currentObject]);
+      m_Objects.push_back(Object);
+      
     }
     else if (line.substr(0, 7) == "mtllib ")
     {
