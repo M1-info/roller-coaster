@@ -1,70 +1,83 @@
 #include "meshes/Cart.h"
 
-Cart::Cart(const std::string filename)
+Cart::Cart()
 {
 
-    m_IBO = nullptr;
-
     m_Type = MeshType::CART;
+    m_Name = "Cart";
 
     m_Transform = new Transform();
-    m_Transform->SetRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-    m_Transform->SetIsDirty(true);
 
     m_CurrentRail = {};
     m_CurrentTangent = {};
+}
 
-    OBJLoader loader(filename);
+std::shared_ptr<Cart> Cart::Create()
+{
+    std::shared_ptr<Cart> cart = std::make_shared<Cart>();
 
-    std::vector<glm::vec3> vertices = loader.GetVertices();
-    std::vector<glm::vec3> normals = loader.GetNormals();
-    std::vector<IndexesFace> indices = loader.GetFaces();
-    OBJMaterial material = loader.GetMaterials()[0];
+    OBJLoader loader("cart.obj");
 
-    m_Name = "Cart";
+    std::vector<Object> objects = loader.GetObjects();
+    Object main = objects[0];
 
-    CreateMaterial("phong");
-    m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
-    m_Material->SetAmbientColor(material.ambient_color);
-    m_Material->SetDiffuseColor(material.diffuse_color);
-    m_Material->SetSpecularColor(material.specular_color);
-    m_Material->SetShininess(material.shininess);
+    cart->m_Vertices = main.GetVertices();
+    cart->m_Normals = main.GetNormals();
+    cart->m_Indices = main.GetFacesIndices();
+    OBJMaterial material = main.GetMaterial();
 
-    for (auto i : indices)
+    cart->CreateMaterial("phong");
+    cart->m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
+    cart->m_Material->SetAmbientColor(material.ambient_color);
+    cart->m_Material->SetDiffuseColor(material.diffuse_color);
+    cart->m_Material->SetSpecularColor(material.specular_color);
+    cart->m_Material->SetShininess(material.shininess);
+
+    for (auto object = objects.begin() + 1; object != objects.end(); object++)
     {
-        m_Vertices.push_back(vertices[i.vertices[0]]);
-        m_Vertices.push_back(vertices[i.vertices[1]]);
-        m_Vertices.push_back(vertices[i.vertices[2]]);
+        std::shared_ptr<Object3D> child = std::make_shared<Object3D>("cart child");
 
-        m_Normals.push_back(normals[i.normals[0]]);
-        m_Normals.push_back(normals[i.normals[1]]);
-        m_Normals.push_back(normals[i.normals[2]]);
+        child->SetVertices(object->GetVertices());
+        child->SetNormals(object->GetNormals());
+        child->SetIndices(object->GetFacesIndices());
+        OBJMaterial object_material = object->GetMaterial();
+
+        child->CreateMaterial("phong");
+        child->GetMaterial()->SetMaterialColor(Color(1.0f, 1.0f, 0.0f));
+        child->GetMaterial()->SetAmbientColor(object_material.ambient_color);
+        child->GetMaterial()->SetDiffuseColor(object_material.diffuse_color);
+        child->GetMaterial()->SetSpecularColor(object_material.specular_color);
+        child->GetMaterial()->SetShininess(object_material.shininess);
+
+        cart->AddChildren(child);
+
+        child->SetUpBuffers();
     }
 
-    // create vertex array
-    m_VAO = new VertexArray();
-
-    // create vertex buffer for positions
-    m_VBO_positions = new VertexBuffer(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
-    VertexBufferLayout layout_positions;
-    layout_positions.Push<float>(3); // positions
-    m_VAO->AddBuffer(*m_VBO_positions, layout_positions);
-
-    m_VBO_normals = new VertexBuffer(m_Normals.data(), m_Normals.size() * sizeof(glm::vec3));
-    VertexBufferLayout layout_normals;
-    layout_normals.Push<float>(3); // normals
-    m_VAO->AddBuffer(*m_VBO_normals, layout_normals, 1);
-
-    Clear();
+    cart->SetUpBuffers();
+    return cart;
 }
 
 void Cart::Draw()
 {
     m_Material->GetShader()->Bind();
     m_VAO->Bind();
-    glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+    m_IBO->Bind();
+    glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
     m_VAO->Unbind();
+    m_IBO->Unbind();
     m_Material->GetShader()->Unbind();
+
+    for (auto child : m_Children)
+        child->Draw();
+}
+
+void Cart::Update()
+{
+    m_Transform->SetIsDirty(true);
+
+    for (auto child : m_Children)
+        child->GetTransform()->SetIsDirty(true);
 }
 
 void Cart::Animate(float deltaTime)

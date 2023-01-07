@@ -1,9 +1,7 @@
 #include "meshes/Ground.h"
 
-Ground::Ground(const std::string filename)
+Ground::Ground()
 {
-    m_IBO = nullptr;
-
     m_Type = MeshType::GROUND;
 
     m_Transform = new Transform();
@@ -11,56 +9,74 @@ Ground::Ground(const std::string filename)
     m_Transform->SetPosition(glm::vec3(0.0f, -10.0f, 0.0f));
     m_Transform->SetIsDirty(true);
 
-    OBJLoader loader(filename);
-
-    std::vector<glm::vec3> vertices = loader.GetVertices();
-    std::vector<glm::vec3> normales = loader.GetNormals();
-    std::vector<IndexesFace> indices = loader.GetFaces();
-    OBJMaterial material = loader.GetMaterials()[0];
-
     m_Name = "Ground";
+}
 
-    CreateMaterial("phong");
-    m_Material->SetMaterialColor(Color(0.3f, 0.3f, 0.3f));
-    m_Material->SetAmbientColor(material.ambient_color);
-    m_Material->SetDiffuseColor(material.diffuse_color);
-    m_Material->SetSpecularColor(material.specular_color);
-    m_Material->SetShininess(material.shininess);
+std::shared_ptr<Ground> Ground::Create()
+{
+    std::shared_ptr<Ground> ground = std::make_shared<Ground>();
 
-    for (auto i : indices)
+    OBJLoader loader("island.obj");
+
+    std::vector<Object> objects = loader.GetObjects();
+    Object main = objects[0];
+
+    ground->m_Vertices = main.GetVertices();
+    ground->m_Normals = main.GetNormals();
+    ground->m_Indices = main.GetFacesIndices();
+    OBJMaterial material = main.GetMaterial();
+
+    ground->CreateMaterial("phong");
+    ground->m_Material->SetMaterialColor(Color(0.0f, 1.0f, 0.0f));
+    ground->m_Material->SetAmbientColor(material.ambient_color);
+    ground->m_Material->SetDiffuseColor(material.diffuse_color);
+    ground->m_Material->SetSpecularColor(material.specular_color);
+    ground->m_Material->SetShininess(material.shininess);
+
+    for (auto object = objects.begin() + 1; object != objects.end(); object++)
     {
-        m_Vertices.push_back(vertices[i.vertices[0]]);
-        m_Vertices.push_back(vertices[i.vertices[1]]);
-        m_Vertices.push_back(vertices[i.vertices[2]]);
+        std::shared_ptr<Object3D> child = std::make_shared<Object3D>("ground child");
 
-        m_Normals.push_back(normales[i.normals[0]]);
-        m_Normals.push_back(normales[i.normals[1]]);
-        m_Normals.push_back(normales[i.normals[2]]);
+        child->SetVertices(object->GetVertices());
+        child->SetNormals(object->GetNormals());
+        child->SetIndices(object->GetFacesIndices());
+        OBJMaterial object_material = object->GetMaterial();
+
+        child->CreateMaterial("phong");
+        child->GetMaterial()->SetMaterialColor(Color(0.2f, 0.04f, 0.017f));
+        child->GetMaterial()->SetAmbientColor(object_material.ambient_color);
+        child->GetMaterial()->SetDiffuseColor(object_material.diffuse_color);
+        child->GetMaterial()->SetSpecularColor(object_material.specular_color);
+        child->GetMaterial()->SetShininess(object_material.shininess);
+
+        ground->AddChildren(child);
+
+        child->SetUpBuffers();
+        child->GetTransform()->SetIsDirty(true);
     }
 
-    // create vertex array
-    m_VAO = new VertexArray();
+    ground->SetUpBuffers();
+    return ground;
+}
 
-    // create vertex buffer for positions
-    m_VBO_positions = new VertexBuffer(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
-    VertexBufferLayout layout_pos;
-    layout_pos.Push<float>(3); // position
-    m_VAO->AddBuffer(*m_VBO_positions, layout_pos);
+void Ground::Update()
+{
+    m_Transform->SetIsDirty(true);
 
-    // create vertex buffer for normals
-    m_VBO_normals = new VertexBuffer(m_Normals.data(), m_Normals.size() * sizeof(glm::vec3));
-    VertexBufferLayout layout_norm;
-    layout_norm.Push<float>(3); // normals
-    m_VAO->AddBuffer(*m_VBO_normals, layout_norm, 1);
-
-    Clear();
+    for (auto child : m_Children)
+        child->GetTransform()->SetIsDirty(true);
 }
 
 void Ground::Draw()
 {
     m_Material->GetShader()->Bind();
     m_VAO->Bind();
-    glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+    m_IBO->Bind();
+    glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
     m_VAO->Unbind();
+    m_IBO->Unbind();
     m_Material->GetShader()->Unbind();
+
+    for (auto child : m_Children)
+        child->Draw();
 }

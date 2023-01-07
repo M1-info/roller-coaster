@@ -7,6 +7,7 @@ Transform::Transform()
     m_Scale = glm::vec3(1.0f, 1.0f, 1.0f);
     m_IsDirty = true;
 
+    m_ParentTransform = nullptr;
     m_Matrix = ComputeMatrix();
 }
 
@@ -31,6 +32,10 @@ glm::mat4 Transform::ComputeMatrix()
     glm::mat4 scaleMatrix = glm::scale(identity, m_Scale);
 
     m_Matrix = translationMatrix * rotationMatrix * scaleMatrix;
+
+    if (m_ParentTransform != nullptr)
+        m_Matrix = m_ParentTransform->GetMatrix() * m_Matrix;
+
     m_IsDirty = false;
     return m_Matrix;
 }

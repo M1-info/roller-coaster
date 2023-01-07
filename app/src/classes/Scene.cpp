@@ -18,11 +18,11 @@ void Scene::Init()
     m_Skybox = new Skybox();
     m_Skybox->Init();
 
-    std::shared_ptr<Cart> cart = std::make_shared<Cart>("cart.obj");
+    std::shared_ptr<Ground> ground = Ground::Create();
+    std::shared_ptr<Cart> cart = Cart::Create();
     std::shared_ptr<Rails> rails = Rails::Create();
-    // std::shared_ptr<Ground> ground = std::make_shared<Ground>("island.obj");
 
-    // Add(ground);
+    Add(ground);
     Add(cart);
     Add(rails);
 }
@@ -36,7 +36,11 @@ void Scene::SetUpObjectsShaders(std::shared_ptr<Light> light)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             for (auto rail : rails->GetRails())
+            {
                 rail->GetMaterial()->SetUpShader(light);
+                for (auto child : rail->GetChildren())
+                    child->GetMaterial()->SetUpShader(light);
+            }
 
             continue;
         }

@@ -28,7 +28,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
   {
     if (line.substr(0, 2) == "v ")
     {
-      // glm::vec3
       glm::vec3 vertex;
       sscanf_s(line.c_str(), "v %f %f %f", &vertex.x, &vertex.y, &vertex.z);
       m_Vertices.push_back(vertex);
@@ -139,13 +138,17 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[0]]);
       m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[1]]);
       m_Objects[currentObject].AddVertex(m_Vertices[face.vertices[2]]);
+
       m_Objects[currentObject].AddNormal(m_Normals[face.normals[0]]);
       m_Objects[currentObject].AddNormal(m_Normals[face.normals[1]]);
       m_Objects[currentObject].AddNormal(m_Normals[face.normals[2]]);
-      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[0]]);
-      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[1]]);
-      m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[2]]);
 
+      if (m_TexCoords.size() > 0)
+      {
+        m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[0]]);
+        m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[1]]);
+        m_Objects[currentObject].AddTextureCoordinate(m_TexCoords[face.texCoords[2]]);
+      }
     }
     else if (line.substr(0, 7) == "usemtl ")
     {
@@ -155,7 +158,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
       Object Object;
       Object.SetMaterial(m_Materials[currentObject]);
       m_Objects.push_back(Object);
-      
     }
     else if (line.substr(0, 7) == "mtllib ")
     {
@@ -244,31 +246,6 @@ OBJLoader::OBJLoader(const std::string &obj_filename)
     }
   }
   obj_file.close();
-}
-
-std::vector<glm::vec3> OBJLoader::GetVertices()
-{
-  return m_Vertices;
-}
-
-std::vector<glm::vec2> OBJLoader::GetTextureCoordinates()
-{
-  return m_TexCoords;
-}
-
-std::vector<glm::vec3> OBJLoader::GetNormals()
-{
-  return m_Normals;
-}
-
-std::vector<IndexesFace> OBJLoader::GetFaces()
-{
-  return m_Faces;
-}
-
-std::vector<OBJMaterial> OBJLoader::GetMaterials()
-{
-  return m_Materials;
 }
 
 OBJLoader::~OBJLoader()

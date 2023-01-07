@@ -4,11 +4,13 @@ std::shared_ptr<Rails> Rails::Create()
 {
     std::shared_ptr<Rails> rails = std::make_shared<Rails>();
 
-    rails->Update();
+    rails->m_Type = MeshType::RAILS;
+    rails->m_Transform = new Transform();
+    rails->m_DrawRails = false;
 
     rails->CreateMaterial("controlPoints");
 
-    rails->SetName("Rails");
+    rails->m_Name = "Rails";
 
     VertexBufferLayout layout;
     layout.Push<float>(3);
@@ -24,15 +26,9 @@ std::shared_ptr<Rails> Rails::Create()
 
 Rails::Rails()
 {
-    m_VAO = nullptr;
-    m_VBO_positions = nullptr;
     m_VBO_normals = nullptr;
     m_IBO = nullptr;
-    m_Material = nullptr;
     m_Parent = nullptr;
-    m_Type = MeshType::RAILS;
-    m_DrawRails = false;
-    m_Transform = new Transform();
 }
 
 void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
@@ -72,6 +68,22 @@ void Rails::Draw()
 }
 
 void Rails::Update()
+{
+    UpdateControlPoints();
+
+    if (m_DrawRails)
+        UpdateRails();
+
+    m_Transform->SetIsDirty(true);
+
+    for (auto rail : m_Rails)
+        rail->GetTransform()->SetIsDirty(true);
+
+    for (auto child : m_Children)
+        child->GetTransform()->SetIsDirty(true);
+}
+
+void Rails::UpdateControlPoints()
 {
 
     m_Vertices.clear();
@@ -123,7 +135,7 @@ void Rails::UpdateRails()
     m_Rails.clear();
 
     glm::vec3 prevPosition = glm::vec3(0.0f);
-
+    int index = 0;
     for (int i = 0; i < m_Vertices.size(); i++)
     {
         glm::vec3 currentPosition = m_Vertices[i];
@@ -132,9 +144,11 @@ void Rails::UpdateRails()
 
         if (glm::length(length) > RAIL_WIDTH)
         {
-            std::shared_ptr<Rail> rail = std::make_shared<Rail>("rail.obj", i);
+            std::shared_ptr<Rail> rail = Rail::Create(index);
             rail->GetTransform()->SetPosition(currentPosition);
             m_Rails.push_back(rail);
+            rail->SetParent(shared_from_this());
+            rail->GetTransform()->SetParentTransform(m_Transform);
             prevPosition = currentPosition;
 
             glm::vec3 tangent = m_Tangents[i];
@@ -148,6 +162,11 @@ void Rails::UpdateRails()
             // set rotation
             rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
             rail->GetTransform()->SetIsDirty(true);
+
+            for (auto child : rail->GetChildren())
+                child->GetTransform()->SetIsDirty(true);
+
+            index++;
         }
     }
 }

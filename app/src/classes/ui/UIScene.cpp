@@ -189,17 +189,42 @@ void UIScene::SceneGraphElement(std::shared_ptr<Mesh> mesh)
 
 void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
 {
+
+    if (m_SelectedMesh == mesh)
+    {
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        ImU32 col = ImColor(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+        ImGui::RenderFrame(pos, ImVec2(pos.x + ImGui::GetContentRegionMax().x, pos.y + ImGui::GetTextLineHeight()), col, false);
+    }
+
     if (ImGui::TreeNode(mesh->GetName().c_str()))
     {
+        if (m_SelectedMesh == nullptr)
+        {
+            // if (m_SelectedMesh != nullptr)
+            //     m_SelectedMesh->m_IsSelected = false;
+            m_SelectedMesh = mesh;
+            mesh->m_IsSelected = true;
+        }
+
         if (mesh->GetType() == MeshType::RAILS)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             RailsWindow(rails);
+            for (auto &child : rails->GetRails())
+            {
+                if (child->GetChildren().size() > 0)
+                    SceneGraphElementTree(child);
+                else
+                    SceneGraphElement(child);
+
+                if (child != m_SelectedMesh)
+                    child->m_IsSelected = false;
+            }
         }
 
         for (auto &child : mesh->GetChildren())
         {
-
             if (child->GetChildren().size() > 0)
                 SceneGraphElementTree(child);
             else
@@ -209,6 +234,14 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
                 child->m_IsSelected = false;
         }
         ImGui::TreePop();
+    }
+    else
+    {
+        if (m_SelectedMesh == mesh)
+        {
+            m_SelectedMesh.reset();
+            mesh->m_IsSelected = false;
+        }
     }
 }
 
@@ -305,7 +338,9 @@ void UIScene::SelectedMeshTransformComponent(std::string component, float *x, fl
         if (ImGui::Button(components[i]))
         {
             *values[i] = resetValue;
-            m_SelectedMesh->GetTransform()->SetIsDirty(true);
+            m_SelectedMesh->Update();
+            if (m_SelectedMesh->GetParent() != nullptr)
+                m_SelectedMesh->GetParent()->Update();
         }
         ImGui::PopStyleColor(2);
 
@@ -315,13 +350,9 @@ void UIScene::SelectedMeshTransformComponent(std::string component, float *x, fl
         std::string label = "##" + std::string(components[i]);
         if (ImGui::DragFloat(label.c_str(), values[i], step))
         {
-            m_SelectedMesh->GetTransform()->SetIsDirty(true);
             m_SelectedMesh->Update();
             if (m_SelectedMesh->GetParent() != nullptr)
-            {
-                m_SelectedMesh->GetParent()->GetTransform()->SetIsDirty(true);
                 m_SelectedMesh->GetParent()->Update();
-            }
         }
 
         ImGui::PopItemWidth();
@@ -413,7 +444,7 @@ void UIScene::RailsWindow(std::shared_ptr<Rails> rails)
             lastPosition = *rails->GetChildren().back()->GetVertexPtr(0);
 
         rails->AddChildren(std::make_shared<ControlPoint>(lastPosition, rails->GetChildren().size()));
-        rails->Update();
+        rails->UpdateControlPoints();
 
         if (m_SelectedMesh != nullptr)
             m_SelectedMesh->ToggleIsSelected();

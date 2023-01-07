@@ -33,10 +33,12 @@ class Rails : public Mesh
 public:
     Rails();
     static std::shared_ptr<Rails> Create();
+    
     void RemoveChildren(std::shared_ptr<Mesh> child) override;
     void Draw() override;
     void Update() override;
     void UpdateRails();
+    void UpdateControlPoints();
 
     void GenerateControlPoints(std::vector<glm::vec3> controlPoints);
 

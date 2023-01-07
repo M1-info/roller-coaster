@@ -34,7 +34,7 @@ void Renderer::Init()
 	float fov = 45.0f;
 	float aspect = m_Window->GetWidth() / m_Window->GetHeight();
 	float near = 0.1f;
-	float far = 100.0f;
+	float far = 150.0f;
 	m_Camera = std::make_shared<Camera>(fov, aspect, near, far);
 	m_Camera->Init();
 	m_Window->SetCamera(m_Camera);
@@ -115,12 +115,11 @@ void Renderer::Render()
 		for (auto mesh : m_Scene->GetObjects())
 		{
 
-			mesh->UpdateMatrix();
+			mesh->GetTransform()->ComputeMatrix();
 
 			glm::vec3 cameraPosition = m_Camera->GetPosition();
 			glm::vec3 lightPosition = m_Light->GetTransform()->GetPosition();
 			glm::mat4 modelMatrix = mesh->GetTransform()->GetMatrix();
-			bool isSelected = mesh->m_IsSelected;
 
 			if (mesh->GetType() == MeshType::RAILS)
 				mesh->GetMaterial()->UpdateShader(projectionView, modelMatrix);
@@ -137,19 +136,34 @@ void Renderer::Render()
 					if (rails->m_DrawRails)
 						for (auto rail : rails->GetRails())
 						{
-							rail->UpdateMatrix();
+							rail->GetTransform()->ComputeMatrix();
 							glm::mat4 modelMatrix = rail->GetTransform()->GetMatrix();
-							bool isSelected = rail->m_IsSelected;
 							rail->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
+
+							for (auto child : rail->GetChildren())
+							{
+								child->GetTransform()->ComputeMatrix();
+								glm::mat4 modelMatrix = child->GetTransform()->GetMatrix();
+								child->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
+							}
 						}
+				}
+
+				for (auto child : mesh->GetChildren())
+				{
+					child->GetTransform()->ComputeMatrix();
+					glm::mat4 modelMatrix;
+
+					if (mesh->GetType() == MeshType::RAILS)
+					{
+						modelMatrix = glm::mat4(1.0f);
+						child->GetMaterial()->UpdateShader(projectionView, modelMatrix);
+					}
 					else
-						for (auto child : mesh->GetChildren())
-						{
-							child->UpdateMatrix();
-							glm::mat4 modelMatrix = glm::mat4(1.0);
-							bool isSelected = child->m_IsSelected;
-							child->GetMaterial()->UpdateShader(projectionView, modelMatrix);
-						}
+					{
+						modelMatrix = child->GetTransform()->GetMatrix();
+						child->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
+					}
 				}
 			}
 

@@ -21,9 +21,9 @@ struct IndexesFace
     bool operator<(const IndexesFace &other) const
     {
         if (vertices[0] != other.vertices[0])
-        return vertices[0] < other.vertices[0];
+            return vertices[0] < other.vertices[0];
         if (vertices[1] != other.vertices[1])
-        return vertices[1] < other.vertices[1];
+            return vertices[1] < other.vertices[1];
         return vertices[2] < other.vertices[2];
     }
 };
@@ -55,27 +55,33 @@ struct OBJMaterial
 class Object
 {
 public:
-
     Object() : vertices(), texCoords(), normals(), faces(), material(OBJMaterial()) {}
- 
+
     Object(const std::vector<glm::vec3> &vertices,
-         const std::vector<glm::vec2> &texCoords,
-         const std::vector<glm::vec3> &normals,
-         const std::vector<IndexesFace> &faces,
-         const OBJMaterial &material)
+           const std::vector<glm::vec2> &texCoords,
+           const std::vector<glm::vec3> &normals,
+           const std::vector<IndexesFace> &faces,
+           const OBJMaterial &material)
         : vertices(vertices), texCoords(texCoords), normals(normals), faces(faces), material(material) {}
 
+    inline void AddVertex(const glm::vec3 &vertex) { vertices.push_back(vertex); }
+    inline void AddTextureCoordinate(const glm::vec2 &texCoord) { texCoords.push_back(texCoord); }
+    inline void AddNormal(const glm::vec3 &normal) { normals.push_back(normal); }
+    inline void AddFace(const IndexesFace &face) { faces.push_back(face); }
+    inline void SetMaterial(const OBJMaterial &material) { this->material = material; }
 
-    void AddVertex(const glm::vec3 &vertex) { vertices.push_back(vertex); }
-    void AddTextureCoordinate(const glm::vec2 &texCoord) { texCoords.push_back(texCoord); }
-    void AddNormal(const glm::vec3 &normal) { normals.push_back(normal); }
-    void AddFace(const IndexesFace &face) { faces.push_back(face); }
-    void SetMaterial(const OBJMaterial &material) { this->material = material; }
-    std::vector<glm::vec3> GetVertices() const { return vertices; }
-    std::vector<glm::vec2> GetTextureCoordinates() const { return texCoords; }
-    std::vector<glm::vec3> GetNormals() const { return normals; }
-    std::vector<IndexesFace> GetFaces() const { return faces; }
-    OBJMaterial GetMaterial() const { return material; }
+    inline std::vector<glm::vec3> GetVertices() const { return vertices; }
+    inline std::vector<glm::vec2> GetTextureCoordinates() const { return texCoords; }
+    inline std::vector<glm::vec3> GetNormals() const { return normals; }
+    inline std::vector<IndexesFace> GetFaces() const { return faces; }
+    inline std::vector<unsigned int> GetFacesIndices() const
+    {
+        std::vector<unsigned int> indices;
+        for (int i = 0; i < vertices.size(); i++)
+            indices.push_back(i);
+        return indices;
+    }
+    inline OBJMaterial GetMaterial() const { return material; }
 
 private:
     std::vector<glm::vec3> vertices;

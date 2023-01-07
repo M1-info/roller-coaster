@@ -4,14 +4,16 @@
 
 #include <glm/glm.hpp>
 #include "Mesh.h"
+#include "Object3D.h"
 
 class Ground : public Mesh
 {
 public:
-    Ground(const std::string filename);
+    Ground();
+    static std::shared_ptr<Ground> Create();
 
     void Draw() override;
-    void Update() override{};
+    void Update() override;
 };
 
 #endif // GROUND_H

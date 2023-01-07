@@ -12,8 +12,6 @@
 #include "Object.h"
 #include <glm/glm.hpp>
 
-
-
 class OBJLoader
 {
 public:
@@ -21,16 +19,16 @@ public:
   ~OBJLoader();
 
   std::string ToString();
-  std::vector<glm::vec3> GetVertices();
-  std::vector<glm::vec2> GetTextureCoordinates();
-  std::vector<glm::vec3> GetNormals();
-  std::vector<IndexesFace> GetFaces();
-  std::vector<OBJMaterial> GetMaterials();
+  inline std::vector<Object> GetObjects() const { return m_Objects; }
+  inline std::vector<glm::vec3> GetVertices() const { return m_Vertices; }
+  inline std::vector<glm::vec2> GetTextureCoordinates() const { return m_TexCoords; }
+  inline std::vector<glm::vec3> GetNormals() const { return m_Normals; }
+  inline std::vector<IndexesFace> GetFaces() const { return m_Faces; }
+  inline std::vector<OBJMaterial> GetMaterials() const { return m_Materials; }
   OBJMaterial GetMaterialsFromFaceId(int faceId);
   OBJMaterial GetMaterialsFromFace(IndexesFace &face);
 
 private:
-
   std::vector<Object> m_Objects;
   std::vector<glm::vec3> m_Vertices;
   std::vector<glm::vec2> m_TexCoords;

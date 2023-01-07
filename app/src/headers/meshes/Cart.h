@@ -3,14 +3,16 @@
 #define CART_H
 
 #include "Mesh.h"
+#include "Object3D.h"
 
 class Cart : public Mesh
 {
 public:
-    Cart(const std::string filename);
+    Cart();
+    static std::shared_ptr<Cart> Create();
 
     void Draw() override;
-    void Update() override{};
+    void Update() override;
     void Animate(float deltaTime);
 
     inline void SetVelocity(glm::vec3 velocity) { m_Velocity = velocity; }

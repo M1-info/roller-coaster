@@ -36,12 +36,13 @@ public:
     Mesh() = default;
     virtual ~Mesh();
 
+    void SetUpBuffers();
     void SetUp();
     void Clear();
 
     inline void SetName(std::string name) { m_Name = name; }
     inline void SetVertices(std::vector<glm::vec3> vertices) { m_Vertices = vertices; }
-    inline void SetNormales(std::vector<glm::vec3> normals) { m_Normals = normals; }
+    inline void SetNormals(std::vector<glm::vec3> normals) { m_Normals = normals; }
     inline void SetIndices(std::vector<unsigned int> indices) { m_Indices = indices; }
     inline void SetParent(std::shared_ptr<Mesh> parent) { m_Parent = parent; }
     inline void SetMaterial(Material *material) { m_Material = material; }
@@ -68,7 +69,6 @@ public:
     virtual void RemoveChildren(std::shared_ptr<Mesh> child);
 
     void ToggleIsSelected();
-    void UpdateMatrix();
     void CreateMaterial(std::string shaderFile);
 
     virtual void Draw() = 0;

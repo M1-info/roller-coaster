@@ -44,6 +44,8 @@ public:
 
     inline glm::mat4 GetMatrix() const { return m_Matrix; }
 
+    inline void SetParentTransform(Transform *parentTransform) { m_ParentTransform = parentTransform; }
+
     glm::mat4 ComputeMatrix();
 
 private:
@@ -58,6 +60,8 @@ private:
     glm::vec3 m_Forward = glm::vec3(0.0f, 0.0f, 1.0f);
     glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 m_Right = glm::vec3(1.0f, 0.0f, 0.0f);
+
+    Transform *m_ParentTransform;
 };
 
 #endif // !TRANSFORM_H

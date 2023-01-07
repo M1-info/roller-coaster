@@ -206,7 +206,7 @@ void UIFilesController::LoadFile(std::shared_ptr<Rails> rails)
     }
 
     rails->GenerateControlPoints(controlPoints);
-    rails->Update();
+    rails->UpdateControlPoints();
 
     message = "File " + m_FileSelected + " loaded successfully";
     color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);

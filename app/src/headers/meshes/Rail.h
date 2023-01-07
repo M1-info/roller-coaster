@@ -4,17 +4,19 @@
 
 #include <string>
 
-#include "meshes/Mesh.h"
+#include "Mesh.h"
+#include "Object3D.h"
 #include "utils/OBJLoader.h"
 
 class Rail : public Mesh
 {
 
 public:
-    Rail(const std::string filename, int index);
+    Rail(int index);
+    static std::shared_ptr<Rail> Create(int index);
 
     void Draw() override;
-    void Update() override{};
+    void Update() override;
 };
 
 #endif // RAIL_H

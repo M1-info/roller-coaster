@@ -1,63 +1,78 @@
 #include "meshes/Rail.h"
 
-Rail::Rail(const std::string filename, int index)
+Rail::Rail(int index)
 {
-
-    m_IBO = nullptr;
-
     m_Type = MeshType::RAIL;
-
-    m_Transform = new Transform();
-
-    OBJLoader loader(filename);
-
-    std::vector<glm::vec3> vertices = loader.GetVertices();
-    std::vector<glm::vec3> normales = loader.GetNormals();
-    std::vector<IndexesFace> indices = loader.GetFaces();
-    OBJMaterial material = loader.GetMaterials()[0];
-
     m_Name = "Rail_" + std::to_string(index);
+    m_Transform = new Transform();
+}
 
-    CreateMaterial("phong");
-    m_Material->SetMaterialColor(Color(.5f, 0.5f, 0.5f));
-    m_Material->SetAmbientColor(material.ambient_color);
-    m_Material->SetDiffuseColor(material.diffuse_color);
-    m_Material->SetSpecularColor(material.specular_color);
-    m_Material->SetShininess(material.shininess);
+std::shared_ptr<Rail> Rail::Create(int index)
+{
+    std::shared_ptr<Rail> rail = std::make_shared<Rail>(index);
 
-    for (auto i : indices)
+    OBJLoader loader("rail.obj");
+
+    std::vector<Object> objects = loader.GetObjects();
+    Object mainObject = objects[0];
+
+    rail->m_Vertices = mainObject.GetVertices();
+    rail->m_Normals = mainObject.GetNormals();
+    rail->m_Indices = mainObject.GetFacesIndices();
+
+    OBJMaterial material = mainObject.GetMaterial();
+    rail->CreateMaterial("phong");
+    rail->m_Material->SetMaterialColor(Color(.3f, 0.12f, 0.06f));
+    rail->m_Material->SetAmbientColor(material.ambient_color);
+    rail->m_Material->SetDiffuseColor(material.diffuse_color);
+    rail->m_Material->SetSpecularColor(material.specular_color);
+    rail->m_Material->SetShininess(material.shininess);
+
+    int children_index = 0;
+    for (auto object = objects.begin() + 1; object != objects.end(); object++)
     {
-        m_Vertices.push_back(vertices[i.vertices[0]]);
-        m_Vertices.push_back(vertices[i.vertices[1]]);
-        m_Vertices.push_back(vertices[i.vertices[2]]);
+        std::string name = "rail " + std::to_string(index) + " child " + std::to_string(children_index++);
+        std::shared_ptr<Object3D> child = std::make_shared<Object3D>(name);
 
-        m_Normals.push_back(normales[i.normals[0]]);
-        m_Normals.push_back(normales[i.normals[1]]);
-        m_Normals.push_back(normales[i.normals[2]]);
+        child->SetVertices(object->GetVertices());
+        child->SetNormals(object->GetNormals());
+        child->SetIndices(object->GetFacesIndices());
+        OBJMaterial object_material = object->GetMaterial();
+
+        child->CreateMaterial("phong");
+        child->GetMaterial()->SetMaterialColor(Color(0.3f, 0.3f, 0.3f));
+        child->GetMaterial()->SetAmbientColor(object_material.ambient_color);
+        child->GetMaterial()->SetDiffuseColor(object_material.diffuse_color);
+        child->GetMaterial()->SetSpecularColor(object_material.specular_color);
+        child->GetMaterial()->SetShininess(object_material.shininess);
+
+        rail->AddChildren(child);
+
+        child->SetUpBuffers();
     }
 
-    // create vertex array
-    m_VAO = new VertexArray();
-    m_VBO_positions = new VertexBuffer(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
-
-    // create vertex buffer for positions
-    VertexBufferLayout layout_pos;
-    layout_pos.Push<float>(3); // position
-    m_VAO->AddBuffer(*m_VBO_positions, layout_pos);
-
-    m_VBO_normals = new VertexBuffer(m_Normals.data(), m_Normals.size() * sizeof(glm::vec3));
-    VertexBufferLayout layout_normals;
-    layout_normals.Push<float>(3); // normals
-    m_VAO->AddBuffer(*m_VBO_normals, layout_normals, 1);
-
-    Clear();
+    rail->SetUpBuffers();
+    return rail;
 }
 
 void Rail::Draw()
 {
     m_Material->GetShader()->Bind();
     m_VAO->Bind();
-    glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
-    m_Material->GetShader()->Unbind();
+    m_IBO->Bind();
+    glDrawElements(GL_TRIANGLES, m_IBO->GetCount(), GL_UNSIGNED_INT, nullptr);
     m_VAO->Unbind();
+    m_IBO->Unbind();
+    m_Material->GetShader()->Unbind();
+
+    for (auto child : m_Children)
+        child->Draw();
+}
+
+void Rail::Update()
+{
+    m_Transform->SetIsDirty(true);
+
+    for (auto child : m_Children)
+        child->GetTransform()->SetIsDirty(true);
 }
