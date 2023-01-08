@@ -9,8 +9,8 @@ Cart::Cart()
     m_Transform = new Transform();
     m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    m_CurrentRail = {};
-    m_CurrentTangent = {};
+    // m_CurrentRail = {};
+    // m_CurrentTangent = {};
 }
 
 std::shared_ptr<Cart> Cart::Create()
@@ -81,9 +81,49 @@ void Cart::Update()
         child->GetTransform()->SetIsDirty(true);
 }
 
-void Cart::Animate(float deltatime)
+void Cart::Animate()
 {
 
-    
+    if (m_CurrentCurveIndex < m_CurveCount)
+    {
+        m_CurrentCurve = &m_Curves.at(m_CurrentCurveIndex);
+        glm::vec3 currentPosition = m_Transform->GetPosition();
 
+        // get curve point
+        glm::vec3 point = m_CurrentCurve->GetPoint(m_CurrentCurveTime) + glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 direction = point - currentPosition;
+
+        // get curve tangent
+        glm::vec3 tangent = m_CurrentCurve->GetTangent(m_CurrentCurveTime);
+
+        float pitch = 0.0f;
+        float yaw = glm::degrees(std::atan2(tangent.x, tangent.z));
+        float roll = glm::degrees(std::atan2(tangent.y, glm::length(glm::vec2(tangent.x, tangent.z))));
+
+        // compute acceleration and velocity
+        glm::vec3 acceleration = direction * 0.1f;
+        m_Velocity += acceleration * GRAVITY * 0.01f;
+
+        // compute new position
+        currentPosition = point + m_Velocity;
+
+        // set rotation
+        m_Transform->SetRotation(glm::vec3(pitch, yaw, roll));
+        m_Transform->SetPosition(currentPosition);
+        Update();
+
+        if (m_CurrentCurveTime >= 1.0f)
+        {
+            m_CurrentCurveIndex++;
+            m_CurrentCurveTime = 0.0f;
+        }
+        else
+            m_CurrentCurveTime += 0.01f;
+    }
+    else
+    {
+        m_CurrentCurveIndex = 0;
+        m_CurrentCurve = &m_Curves.at(m_CurrentCurveIndex);
+        m_CurrentCurveTime = 0.0f;
+    }
 }

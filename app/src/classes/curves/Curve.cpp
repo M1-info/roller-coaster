@@ -53,15 +53,27 @@ glm::vec3 Curve::GetTangent(float t)
     return glm::vec3(dx, dy, dz);
 }
 
-glm::vec3 Curve::GetNormalisedTangent(float t, glm::vec3 point, glm::vec3 tangent)
+glm::vec3 Curve::GetNormal(float t, glm::vec3 point, glm::vec3 tangent)
 {
-    glm::vec3 point2 = GetPoint(t + 0.001);
 
-    glm::vec3 tangent2 = GetTangent(t + 0.001);
+    glm::vec3 binormal = GetBinormal(t, point, tangent);
 
-    tangent2 += point - point2;
+    return glm::cross(binormal, glm::normalize(tangent));
+}
 
-    tangent2 = glm::normalize(tangent2);
+glm::vec3 Curve::GetNormal(glm::vec3 binormal, glm::vec3 tangent)
+{
+    return glm::cross(binormal, glm::normalize(tangent));
+}
 
-    return glm::cross(tangent, tangent2);
+glm::vec3 Curve::GetBinormal(float t, glm::vec3 point, glm::vec3 tangent)
+{
+    glm::vec3 nearPoint = GetPoint(t + 0.001);
+    glm::vec3 nearPointTangent = GetTangent(t + 0.001);
+
+    glm::vec3 unitTangent = glm::normalize(tangent);
+
+    glm::vec3 binormal = glm::cross(unitTangent, nearPointTangent) / glm::length(glm::cross(unitTangent, nearPointTangent));
+
+    return binormal;
 }

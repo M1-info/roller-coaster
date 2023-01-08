@@ -44,10 +44,12 @@ public:
 
     inline std::vector<std::shared_ptr<Rail>> GetRails() { return m_Rails; }
     inline std::vector<glm::vec3> GetTangents() { return m_Tangents; }
+    inline std::vector<Curve> GetCurves() { return m_Curves; }
 
 private:
     std::vector<std::shared_ptr<Rail>> m_Rails;
     std::vector<glm::vec3> m_Tangents;
+    std::vector<Curve> m_Curves;
 
 public:
     bool m_DrawRails = false;

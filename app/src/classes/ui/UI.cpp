@@ -200,10 +200,9 @@ void UI::RenderWindow()
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
             std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Cart"));
 
-            cart->SetRails(rails->GetVertices());
-            cart->SetTangents(rails->GetTangents());
-            cart->SetCurrentRail(cart->GetRails().begin());
-            cart->SetCurrentTangent(cart->GetTangents().begin());
+            cart->SetCurves(rails->GetCurves());
+            cart->SetCurrentCurveIndex(0);
+            cart->SetCurveCount(rails->GetCurves().size());
         }
     }
 

@@ -110,10 +110,11 @@ void Rails::UpdateControlPoints()
         else if (m_CurveType == CurveType::BSPLINE)
             curve = Bspline(points);
 
+        m_Curves.push_back(curve);
+
         for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 currentPoint = curve.GetPoint(t);
-            glm::vec3 nextPoint = curve.GetPoint(t + 0.01);
             glm::vec3 vertex(currentPoint.x, currentPoint.y, currentPoint.z);
             m_Vertices.push_back(vertex);
 
@@ -165,14 +166,25 @@ void Rails::UpdateRails()
 
             glm::vec3 tangent = m_Tangents[i];
 
+            // if (m_CurveType == CurveType::BEZIER)
+            // {
             float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) - 90.0f;
-            float roll = glm::degrees(atan2(direction.y, direction.x));
+            float roll = glm::degrees(std::atan2(direction.y, direction.x));
 
             if (direction.y < 0.0f)
                 roll *= -1.0f;
 
             // set rotation
             rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
+            // }
+            // else if (m_CurveType == CurveType::BSPLINE)
+            // {
+            //     glm::mat4 lookAt = glm::lookAt(currentPosition, currentPosition + tangent, glm::vec3(0.0f, 1.0f, 0.0f));
+
+            //     // set rotation from lookAt matrix
+            //     rail->GetTransform()->SetRotation(glm::vec3(glm::degrees(lookAt[0][0]), glm::degrees(lookAt[1][0]), glm::degrees(lookAt[2][0])));
+            // }
+
             rail->GetTransform()->SetIsDirty(true);
 
             for (auto child : rail->GetChildren())

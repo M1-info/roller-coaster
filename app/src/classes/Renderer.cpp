@@ -89,9 +89,7 @@ void Renderer::Render()
 		}
 
 		if (m_UI->GetIsAnimating())
-		{
-			cart->Animate(deltaTime);
-		}
+			cart->Animate();
 
 		glm::mat4 viewMatrix = m_Camera->GetView();
 		glm::mat4 projectionView = m_Camera->GetProjectionView();
@@ -107,9 +105,6 @@ void Renderer::Render()
 		glDisable(GL_DEPTH_TEST);
 		skybox->Draw();
 		glEnable(GL_DEPTH_TEST);
-
-		if (m_UI->GetIsAnimating())
-			cart->Animate(deltaTime);
 
 		/* SCENE OBJECTS */
 		for (auto mesh : m_Scene->GetObjects())
