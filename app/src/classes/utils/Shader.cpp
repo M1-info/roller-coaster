@@ -128,13 +128,17 @@ void Shader::SetUniformMat4f(const std::string &name, const glm::mat4 matrix)
 
 GLint Shader::GetUniformLocation(const std::string &name) const
 {
+    // we store the uniform location in a cache
+    // so we don't have to query the GPU every time
     if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
         return m_UniformLocationCache[name];
 
+    // if the uniform doesn't exist, we get -1
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
     if (location == -1)
         std::cout << "Warning: uniform '" << name << "' doesn't exist!" << std::endl;
 
+    // we store the uniform location in the cache before returning it
     m_UniformLocationCache[name] = location;
     return location;
 }

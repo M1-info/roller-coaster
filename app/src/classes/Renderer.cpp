@@ -159,6 +159,8 @@ void Renderer::Render()
 						modelMatrix = child->GetTransform()->GetMatrix();
 						child->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
 
+						// for sub sub children
+						// TODO: make this recursive
 						if (child->GetChildren().size() > 0)
 							for (auto child2 : child->GetChildren())
 							{

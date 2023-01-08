@@ -21,7 +21,7 @@ public:
     inline CubeTexture *GetTexture() const { return m_Texture; }
 
     void Draw() override;
-    void Update() override;
+    void Update() override{};
 
 private:
     CubeTexture *m_Texture;

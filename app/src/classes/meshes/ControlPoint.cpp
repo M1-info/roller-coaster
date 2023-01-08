@@ -21,9 +21,7 @@ ControlPoint::ControlPoint(glm::vec3 point, int index)
 
     VertexBufferLayout layout;
     layout.Push<float>(3);
-
     m_VAO->AddBuffer(*m_VBO_positions, layout);
-
     m_VAO->Unbind();
     m_VBO_positions->Unbind();
 }

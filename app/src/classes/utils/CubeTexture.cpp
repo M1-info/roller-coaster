@@ -6,6 +6,7 @@ CubeTexture::CubeTexture(std::vector<std::string> files)
     glGenTextures(1, &m_TextureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_TextureID);
 
+    // Load all the textures
     for (unsigned int i = 0; i < m_Files.size(); i++)
     {
         m_LocalBuffer = stbi_load(m_Files[i].c_str(), &m_Width, &m_Height, &m_BitsPerPixel, 0);
@@ -13,6 +14,7 @@ CubeTexture::CubeTexture(std::vector<std::string> files)
         stbi_image_free(m_LocalBuffer);
     }
 
+    // Set the texture parameters for the cube map
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

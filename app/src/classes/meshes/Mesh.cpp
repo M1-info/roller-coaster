@@ -23,6 +23,8 @@ void Mesh::SetUpBuffers()
 
     m_VAO = new VertexArray();
 
+    // VBO for positions
+
     VertexBufferLayout layout_position;
     layout_position.Push<float>(3);
 
@@ -31,6 +33,8 @@ void Mesh::SetUpBuffers()
     m_VAO->AddBuffer(*m_VBO_positions, layout_position);
     m_VBO_positions->Unbind();
     m_VAO->Unbind();
+
+    // VBO for normals
 
     VertexBufferLayout layout_normals;
     layout_normals.Push<float>(3);
@@ -41,10 +45,13 @@ void Mesh::SetUpBuffers()
     m_VBO_normals->Unbind();
     m_VAO->Unbind();
 
+    // IBO for indices
+
     m_VAO->Bind();
     m_IBO = new IndexBuffer(m_Indices.data(), m_Indices.size() * sizeof(unsigned int));
     m_VAO->Unbind();
 
+    // Unbind all buffers
     Clear();
 }
 

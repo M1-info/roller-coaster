@@ -29,6 +29,7 @@ void UIConsole::ConsoleWindow()
 
     ImGui::Separator();
 
+    // Display logs
     for (auto s : m_Logs)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, s.second.second);

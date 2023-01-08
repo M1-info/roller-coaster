@@ -18,6 +18,7 @@ Transform::~Transform()
 glm::mat4 Transform::ComputeMatrix()
 {
 
+    // is dirty is used to avoid computing the matrix if it's not needed
     if (!m_IsDirty)
         return m_Matrix;
 
@@ -33,6 +34,7 @@ glm::mat4 Transform::ComputeMatrix()
 
     m_Matrix = translationMatrix * rotationMatrix * scaleMatrix;
 
+    // if the transform has a parent, we need to multiply the matrix by the parent's matrix
     if (m_ParentTransform != nullptr)
         m_Matrix = m_ParentTransform->GetMatrix() * m_Matrix;
 

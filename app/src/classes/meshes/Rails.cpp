@@ -33,8 +33,10 @@ Rails::Rails()
 
 void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
 {
+    // Remove the child from the list of children
     Mesh::RemoveChildren(child);
 
+    // Update the control points to rename them correctly
     for (int i = 0; i < m_Children.size(); i++)
     {
         m_Children[i].get()->SetName("ControlPoint_" + std::to_string(i));
@@ -52,15 +54,15 @@ void Rails::Draw()
     m_VBO_positions->Unbind();
     m_Material->GetShader()->Unbind();
 
+    // Draw the control points
     for (auto child : m_Children)
         child->Draw();
 
-    if (!m_DrawRails)
+    // If we don't want to draw the rails, return
+    if (!m_DrawRails || m_Rails.size() == 0)
         return;
 
-    if (m_Rails.size() == 0)
-        return;
-
+    // Draw the rails
     for (auto rail : m_Rails)
         rail->Draw();
 }
@@ -88,6 +90,7 @@ void Rails::UpdateControlPoints()
     m_Tangents.clear();
     m_Curves.clear();
 
+    // step is 3 for bezier and 1 for bspline and catmull rom
     int step = 3;
 
     if (m_CurveType == CurveType::BSPLINE || m_CurveType == CurveType::CATMULL_ROM)
@@ -96,6 +99,7 @@ void Rails::UpdateControlPoints()
     for (int i = 4; i <= m_Children.size(); i += step)
     {
 
+        // Get the points for the curve
         std::vector<glm::vec3> points({m_Children[i - 4].get()->GetVertices()[0],
                                        m_Children[i - 3].get()->GetVertices()[0],
                                        m_Children[i - 2].get()->GetVertices()[0],
@@ -111,6 +115,7 @@ void Rails::UpdateControlPoints()
 
         m_Curves.push_back(curve);
 
+        // Get the points for the curve
         for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 currentPoint = curve.GetPoint(t);
@@ -125,6 +130,7 @@ void Rails::UpdateControlPoints()
     if (m_VBO_positions == nullptr)
         return;
 
+    // Update the VBO for the curve
     m_VBO_positions->Bind();
     m_VBO_positions->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
     m_VBO_positions->Unbind();
@@ -132,6 +138,7 @@ void Rails::UpdateControlPoints()
     if (m_Children.size() == 0)
         return;
 
+    // update the VBO for the control points
     for (auto point : m_Children)
     {
         point->GetVBOPositions()->Bind();
@@ -144,14 +151,18 @@ void Rails::UpdateRails()
 {
     m_Rails.clear();
 
+    // Create the rails
+
     glm::vec3 prevPosition = glm::vec3(0.0f);
     int index = 0;
     for (int i = 0; i < m_Vertices.size(); i++)
     {
+        // Get the current position
         glm::vec3 currentPosition = m_Vertices[i];
         glm::vec3 direction = currentPosition - prevPosition;
         float length = glm::length(direction);
 
+        // If the length is greater than the rail width, create a new rail
         if (glm::length(length) > RAIL_WIDTH)
         {
             std::shared_ptr<Rail> rail = Rail::Create(index);
@@ -162,12 +173,15 @@ void Rails::UpdateRails()
             rail->GetTransform()->SetParentTransform(m_Transform);
             prevPosition = currentPosition;
 
+            // get the tangent
             glm::vec3 tangent = m_Tangents[i];
 
+            // use the tangent to calculate the rotation
             float pitch = 0.0f;
             float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) + 90.0f;
             float roll = glm::degrees(std::atan2(direction.y, direction.x));
 
+            // correct the yaw if the direction is negative
             if (direction.z < 0 && direction.x < 0)
                 yaw *= -1;
 
@@ -176,6 +190,7 @@ void Rails::UpdateRails()
 
             // rail->GeneratePlots(index);
 
+            // update all children
             for (auto child : rail->GetChildren())
                 child->GetTransform()->SetIsDirty(true);
 

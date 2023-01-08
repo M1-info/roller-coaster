@@ -18,7 +18,7 @@ glm::vec3 Curve::GetPoint(float t)
     // T Matrix with t^3, t^2, t, 1
     glm::vec4 T = glm::vec4(t * t * t, t * t, t, 1.0f);
 
-    // M Matrix based on bernstein polynomials
+    // M Matrix with the basis matrix (depends on the curve type)
     glm::mat4 M = m_Matrix;
 
     // P Matrix with the control points
@@ -37,10 +37,6 @@ glm::vec3 Curve::GetTangent(float t, glm::vec3 point)
 
     glm::vec3 nextTangent = nextPoint - point;
     nextTangent = glm::normalize(nextTangent);
-
-    // // ensure that the tangent is pointing up
-    // if (nextTangent.y < 0)
-    //     nextTangent = -nextTangent;
 
     return nextTangent;
 }

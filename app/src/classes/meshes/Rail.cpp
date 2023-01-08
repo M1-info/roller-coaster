@@ -11,15 +11,19 @@ std::shared_ptr<Rail> Rail::Create(int index)
 {
     std::shared_ptr<Rail> rail = std::make_shared<Rail>(index);
 
+    // Load rail from obj file
     OBJLoader loader("rail.obj");
 
+    // Get objects
     std::vector<Object> objects = loader.GetObjects();
     Object mainObject = objects[0];
 
+    // Set vertices, normals and indices
     rail->m_Vertices = mainObject.GetVertices();
     rail->m_Normals = mainObject.GetNormals();
     rail->m_Indices = mainObject.GetFacesIndices();
 
+    // Set material
     OBJMaterial material = mainObject.GetMaterial();
     rail->CreateMaterial("phong");
     rail->m_Material->SetMaterialColor(Color(.3f, 0.12f, 0.06f));
@@ -28,17 +32,20 @@ std::shared_ptr<Rail> Rail::Create(int index)
     rail->m_Material->SetSpecularColor(material.specular_color);
     rail->m_Material->SetShininess(material.shininess);
 
+    // Add children
     int children_index = 0;
     for (auto object = objects.begin() + 1; object != objects.end(); object++)
     {
         std::string name = "rail " + std::to_string(index) + " child " + std::to_string(children_index++);
         std::shared_ptr<Object3D> child = std::make_shared<Object3D>(name);
 
+        // Set vertices, normals and indices
         child->SetVertices(object->GetVertices());
         child->SetNormals(object->GetNormals());
         child->SetIndices(object->GetFacesIndices());
         OBJMaterial object_material = object->GetMaterial();
 
+        // Set material
         child->CreateMaterial("phong");
         child->GetMaterial()->SetMaterialColor(Color(0.3f, 0.3f, 0.3f));
         child->GetMaterial()->SetAmbientColor(object_material.ambient_color);

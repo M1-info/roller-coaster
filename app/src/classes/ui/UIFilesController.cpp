@@ -9,6 +9,8 @@ UIFilesController::~UIFilesController()
 {
 }
 
+/* WINDOWS METHODS*/
+
 void UIFilesController::SelectFileWindow()
 {
 
@@ -22,6 +24,7 @@ void UIFilesController::SelectFileWindow()
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+    // Display files in combo box
     if (ImGui::BeginCombo("", m_FileSelected.c_str()))
     {
         for (auto file : m_Files)
@@ -30,6 +33,8 @@ void UIFilesController::SelectFileWindow()
             if (ImGui::Selectable(file.c_str(), is_selected))
             {
                 m_FileSelected = file;
+
+                // Add log with selected file
                 std::string message = "File selected: " + m_FileSelected;
                 m_UIConsole->AddLog(message.c_str(), ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
             }
@@ -54,7 +59,7 @@ void UIFilesController::SaveFileWindow(std::shared_ptr<Rails> rails)
             return;
         }
 
-        // cast children to control points
+        // Empty vector to store control points
         std::vector<std::shared_ptr<ControlPoint>> controlPoints;
 
         for (auto child : children)
@@ -63,8 +68,13 @@ void UIFilesController::SaveFileWindow(std::shared_ptr<Rails> rails)
             controlPoints.push_back(controlPoint);
         }
 
+        // Save control points
         SaveFile(controlPoints);
+
+        // Reload files list with new file
         LoadFiles();
+
+        // Restore default file name
         m_FileName = "controlPoints";
     }
 }
@@ -97,13 +107,18 @@ void UIFilesController::DeleteFileWindow()
         }
         else
         {
+            // Delete file
             DeleteFile();
+
+            // Reload files list
             LoadFiles();
             m_FileSelected = "";
         }
     }
     ImGui::PopStyleColor(2);
 }
+
+/* FUNCTIONNALITY METHODS */
 
 void UIFilesController::LoadFiles()
 {
@@ -124,6 +139,9 @@ void UIFilesController::SaveFile(std::vector<std::shared_ptr<ControlPoint>> cont
     bool exists = true;
     int i = 0;
     struct stat buf;
+
+    // check if file with same name exists
+    // if so, add number to filename and check again
     while (exists)
     {
         std::string file = FILEPATH_RAILS + filename;
@@ -136,6 +154,7 @@ void UIFilesController::SaveFile(std::vector<std::shared_ptr<ControlPoint>> cont
             exists = false;
     }
 
+    // compose file path
     m_FileName = FILEPATH_RAILS + filename;
 
     std::ofstream file(m_FileName);
@@ -146,6 +165,7 @@ void UIFilesController::SaveFile(std::vector<std::shared_ptr<ControlPoint>> cont
         return;
     }
 
+    // write control points to file
     for (auto point : controlPoints)
     {
         glm::vec3 vertex = point.get()->GetVertices()[0];
@@ -154,6 +174,7 @@ void UIFilesController::SaveFile(std::vector<std::shared_ptr<ControlPoint>> cont
 
     file.close();
 
+    // Add log with saved file
     std::string message = "File saved successfully: " + filename;
     m_UIConsole->AddLog(message.c_str(), ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
 }
@@ -197,6 +218,7 @@ void UIFilesController::LoadFile(std::shared_ptr<Rails> rails)
 
     std::vector<glm::vec3> controlPoints;
 
+    // read file line by line and add control points
     while (std::getline(file, line))
     {
         glm::vec3 vertex;
@@ -205,9 +227,11 @@ void UIFilesController::LoadFile(std::shared_ptr<Rails> rails)
         controlPoints.push_back(point);
     }
 
+    // update control points in rails
     rails->GenerateControlPoints(controlPoints);
     rails->UpdateControlPoints();
 
+    // Add log with loaded file
     message = "File " + m_FileSelected + " loaded successfully";
     color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
     m_UIConsole->AddLog(message.c_str(), color);

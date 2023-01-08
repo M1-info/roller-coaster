@@ -34,7 +34,7 @@ void UIScene::SetUpDockSpace()
     ImGuiID scene_dockspace_id = ImGui::GetID("Scene Dockspace");
     ImGui::DockSpace(ImGui::GetID("Scene Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
 
-    // dockspace window
+    // dockspace window for scene et scene infos
     static bool first_dockspace = true;
     if (first_dockspace)
     {
@@ -60,7 +60,7 @@ void UIScene::SetUpDockSpace()
     ImGuiID scene_graph_dockspace_id = ImGui::GetID("Scene Graph Dockspace");
     ImGui::DockSpace(ImGui::GetID("Scene Graph Dockspace"), ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_NoTabBar);
 
-    // dockspace window
+    // dockspace window for scene graph and selected mesh
     static bool first_graph = true;
     if (first_graph)
     {
@@ -94,6 +94,7 @@ void UIScene::Render()
 
 void UIScene::SceneWindow()
 {
+    // show the scene in a window with a FBO (frame buffer object)
     float aspectRatio = 16.0f / 9.0f;
     uint64_t textureID = m_FBO->GetColorBuffer();
     ImGui::Begin("Scene");
@@ -208,22 +209,14 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
     if (ImGui::TreeNodeEx(mesh->GetName().c_str(), ImGuiTreeNodeFlags_OpenOnArrow))
     {
 
+        // if mesh is a rails, display the rails window with file controller for control points
         if (mesh->GetType() == MeshType::RAILS)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             RailsWindow(rails);
-            // for (auto &child : rails->GetRails())
-            // {
-            //     if (child->GetChildren().size() > 0)
-            //         SceneGraphElementTree(child);
-            //     else
-            //         SceneGraphElement(child);
-
-            //     if (child != m_SelectedMesh)
-            //         child->m_IsSelected = false;
-            // }
         }
 
+        // recursively display children of mesh
         for (auto &child : mesh->GetChildren())
         {
             if (child->GetChildren().size() > 0)
@@ -261,11 +254,13 @@ void UIScene::SelectedMeshWindow()
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+    // display mesh transform controls
     SelectedMeshTransforms();
 
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, 5.0f));
 
+    // display mesh material controls
     SelectedMeshMaterial();
 
     ImGui::End();
@@ -284,18 +279,22 @@ void UIScene::SelectedMeshTransforms()
     ImGui::Separator();
     ImGui::Dummy(ImVec2(x_spacing, y_spacing));
 
+    // for control points we don't use the transform component,
+    // so we need to get the position from the vertex instead
     glm::vec3 *position;
     if (m_SelectedMesh->GetType() == MeshType::CONTROL_POINT)
         position = m_SelectedMesh->GetVertexPtr(0);
     else
         position = m_SelectedMesh->GetTransform()->GetPositionPtr();
 
+    // position component
     SelectedMeshTransformComponent("Position", &position->x, &position->y, &position->z);
 
     ImGui::Dummy(ImVec2(x_spacing, y_spacing));
     ImGui::Separator();
     ImGui::Dummy(ImVec2(x_spacing, y_spacing));
 
+    // rotation component
     glm::vec3 *rotation = m_SelectedMesh->GetTransform()->GetRotationPtr();
     SelectedMeshTransformComponent("Rotation", &rotation->x, &rotation->y, &rotation->z, 1.0f, 0.0f);
 
@@ -303,6 +302,7 @@ void UIScene::SelectedMeshTransforms()
     ImGui::Separator();
     ImGui::Dummy(ImVec2(x_spacing, y_spacing));
 
+    // scale component
     glm::vec3 *scale = m_SelectedMesh->GetTransform()->GetScalePtr();
     SelectedMeshTransformComponent("Scale", &scale->x, &scale->y, &scale->z, 0.1f, 1.0f);
 }
@@ -440,6 +440,8 @@ void UIScene::RailsWindow(std::shared_ptr<Rails> rails)
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
     if (ImGui::Button("Add control point"))
     {
+        // when adding a new control point, we set its position
+        // to the last control point position
         glm::vec3 lastPosition = glm::vec3(0.0f, 0.0f, 0.0f);
         if (rails->GetChildren().size() > 0)
             lastPosition = *rails->GetChildren().back()->GetVertexPtr(0);

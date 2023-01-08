@@ -17,6 +17,9 @@ UI::~UI()
 
 void UI::Init()
 {
+
+    // Setup Dear ImGui context
+
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -24,6 +27,7 @@ void UI::Init()
 
     ImGui::StyleColorsDark();
 
+    // Add fonts
     std::string titleFont = FILEPATH_FONTS + std::string("Roboto-Black.ttf");
     m_Fonts["Title"] = io.Fonts->AddFontFromFileTTF(titleFont.c_str(), 22.0f);
 
@@ -35,9 +39,11 @@ void UI::Init()
 
     m_UIScene->SetFonts(m_Fonts);
 
+    // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(m_Window->GetWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
+    // Set default font
     io.FontDefault = m_Fonts["Text"];
 
     // enable docking
@@ -83,13 +89,14 @@ void UI::SetUpDockSpace()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 
-    // Begin Dockspace
+    // Main dockspace full screen
     ImGui::Begin("MainDockspace", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground);
     ImGui::PopStyleVar(3);
 
     ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
     ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
+    // Split dockspace in two parts
     static bool firstMain = true;
     if (firstMain)
     {
@@ -102,6 +109,7 @@ void UI::SetUpDockSpace()
         ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.85f, &dock_id_left, &dock_main_id);
         ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.15f, &dock_id_right, &dock_main_id);
 
+        // Add windows to dockspaces
         ImGui::DockBuilderDockWindow("Scene Console dockspace", dock_id_left);
         ImGui::DockBuilderDockWindow("Render dockspace", dock_id_right);
 
@@ -110,7 +118,7 @@ void UI::SetUpDockSpace()
     }
     ImGui::End();
 
-    // Begin Dockspace
+    // Right dockspace for render informations window
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -142,7 +150,7 @@ void UI::SetUpDockSpace()
     }
     ImGui::End();
 
-    // Begin Dockspace
+    // Dockspace for scene, scene graph and console
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -193,6 +201,7 @@ void UI::RenderWindow()
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // Is animation running
+
     if (ImGui::Checkbox("Animation", &m_IsAnimating))
     {
         if (m_IsAnimating)
@@ -208,7 +217,8 @@ void UI::RenderWindow()
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
-    // swap camera position
+    // Swap camera position
+
     std::shared_ptr<Camera> camera = m_Window->GetCamera();
     std::shared_ptr<Cart> cart = std::dynamic_pointer_cast<Cart>(m_Scene->GetObjectByName("Cart"));
     std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(m_Scene->GetObjectByName("Rails"));
@@ -228,6 +238,8 @@ void UI::RenderWindow()
         }
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    // Change curve type
 
     ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
     ImGui::Text("Curve type");
@@ -262,6 +274,8 @@ void UI::RenderWindow()
     }
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    // Draw / Hide rails
 
     if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
         if (rails->m_DrawRails)
@@ -356,6 +370,7 @@ void UI::CameraWindow()
 
     ImGui::Columns(2);
 
+    // Camera speed
     ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Speed").x + 10);
     ImGui::Text("Speed");
 
@@ -371,6 +386,7 @@ void UI::CameraWindow()
 
     ImGui::Columns(2);
 
+    // Camera sensitivity
     ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Sensitivity").x + 10);
     ImGui::Text("Sensitivity");
 
@@ -403,6 +419,7 @@ void UI::LightWindow()
 
     ImGui::Columns(2);
 
+    // Light position
     ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Position").x + 10);
     ImGui::Text("Position");
 
@@ -449,6 +466,7 @@ void UI::LightWindow()
     ImGui::Separator();
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
+    // Light color
     ImGui::ColorEdit3("Color", (float *)color);
 
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
@@ -457,6 +475,7 @@ void UI::LightWindow()
 
     ImGui::Columns(2);
 
+    // Light intensity
     ImGui::SetColumnWidth(0, ImGui::CalcTextSize("Intensity").x + 10);
     ImGui::Text("Intensity");
 

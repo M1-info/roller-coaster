@@ -13,6 +13,9 @@ Skybox::Skybox()
 void Skybox::Init()
 {
 
+    m_Type = MeshType::SKYBOX;
+
+    // skybox vertices
     std::vector<float> vertices = {
         -1.0f, 1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -102,8 +105,4 @@ void Skybox::Draw()
     m_Material->GetShader()->Bind();
     m_VAO->Unbind();
     m_Texture->Unbind();
-}
-
-void Skybox::Update()
-{
 }

@@ -4,6 +4,10 @@
 
 #include "Mesh.h"
 
+/**
+ * @brief The Object3D class
+ * Utility for 3D objects with no special properties
+ */
 class Object3D : public Mesh
 {
 public:

@@ -59,6 +59,8 @@ void Material::UpdateShader(glm::mat4 projectionView, glm::mat4 model, glm::mat4
 {
     m_Shader->Bind();
 
+    // some model don't use phong lighting
+    // so we don't pass the light to the shader
     if (light != nullptr)
     {
         glm::vec3 lightPosition = light->GetTransform()->GetPosition();
@@ -80,6 +82,8 @@ void Material::UpdateShader(glm::mat4 projectionView, glm::mat4 model, glm::mat4
         m_Shader->SetUniform1f("u_material.shininess", m_Shininess);
     }
 
+    // some model like the skybox have no model matrix
+    // so we pass just the identity matrix
     if (model != glm::mat4(0.0))
     {
         m_Shader->SetUniformMat4f("u_model", model);

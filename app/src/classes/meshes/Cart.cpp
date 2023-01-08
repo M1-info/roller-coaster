@@ -14,16 +14,20 @@ std::shared_ptr<Cart> Cart::Create()
 {
     std::shared_ptr<Cart> cart = std::make_shared<Cart>();
 
+    // Load the model
     OBJLoader loader("cart.obj");
 
+    // Get the objects
     std::vector<Object> objects = loader.GetObjects();
     Object main = objects[0];
 
+    // Set the vertices, normals and indices
     cart->m_Vertices = main.GetVertices();
     cart->m_Normals = main.GetNormals();
     cart->m_Indices = main.GetFacesIndices();
     OBJMaterial material = main.GetMaterial();
 
+    // Set the material
     cart->CreateMaterial("phong");
     cart->m_Material->SetMaterialColor(Color(1.0f, 0.0f, 0.0f));
     cart->m_Material->SetAmbientColor(material.ambient_color);
@@ -31,15 +35,18 @@ std::shared_ptr<Cart> Cart::Create()
     cart->m_Material->SetSpecularColor(material.specular_color);
     cart->m_Material->SetShininess(material.shininess);
 
+    // Add the children
     for (auto object = objects.begin() + 1; object != objects.end(); object++)
     {
         std::shared_ptr<Object3D> child = std::make_shared<Object3D>("cart child");
 
+        // Set the vertices, normals and indices
         child->SetVertices(object->GetVertices());
         child->SetNormals(object->GetNormals());
         child->SetIndices(object->GetFacesIndices());
         OBJMaterial object_material = object->GetMaterial();
 
+        // Set the material
         child->CreateMaterial("phong");
         child->GetMaterial()->SetMaterialColor(Color(1.0f, 1.0f, 0.0f));
         child->GetMaterial()->SetAmbientColor(object_material.ambient_color);

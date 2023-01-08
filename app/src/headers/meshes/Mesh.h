@@ -31,6 +31,11 @@ enum MeshType
     PLOT
 };
 
+
+/**
+ * @brief The Mesh class
+ * Base class used for all meshes
+ */
 class Mesh : public std::enable_shared_from_this<Mesh>
 {
 public:

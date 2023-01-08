@@ -28,16 +28,11 @@ void Window::Init()
     {
         m_Width = mode->width;
         m_Height = mode->height;
-        // glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-        // glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-        // glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-        // glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-        // glfwWindowHint(GLFW_DECORATED, GL_TRUE);
     }
 
     /* Create a windowed mode window and its OpenGL context */
     m_Window = glfwCreateWindow(m_Width, m_Height, "Roaller Coaster", NULL, NULL);
-    // glfwSetWindowMonitor(m_Window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+
     if (!m_Window)
     {
         std::cerr << "Failed to create window" << std::endl;
@@ -132,6 +127,7 @@ void Window::OnMouseMove(GLFWwindow *window, double xpos, double ypos)
     win->GetCamera()->SetLastX(x);
     win->GetCamera()->SetLastY(y);
 
+    // if mouse is not pressed, return
     if (!win->GetIsMousePressed())
         return;
 
@@ -153,18 +149,6 @@ void Window::OnMouseClick(GLFWwindow *window, int button, int action, int mods)
     {
         win->m_IsMousePressed = false;
     }
-
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, win->GetFBO());
-    // glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-    // PixelInfo Pixel;
-    // glReadPixels(xpos, ypos, 1, 1, GL_RGB, GL_FLOAT, &Pixel);
-
-    // glReadBuffer(GL_NONE);
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-
-    // //print the pixel info
-    // std::cout << "Pixel Info: " << Pixel.ObjectID << " " << Pixel.DrawID << " " << Pixel.PrimID << std::endl;
 }
 
 void Window::OnKeyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
