@@ -197,30 +197,31 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
         ImGui::RenderFrame(pos, ImVec2(pos.x + ImGui::GetContentRegionMax().x, pos.y + ImGui::GetTextLineHeight()), col, false);
     }
 
-    if (ImGui::TreeNode(mesh->GetName().c_str()))
+    if (m_SelectedMesh == nullptr)
     {
-        // if (m_SelectedMesh == nullptr)
-        // {
-        //     // if (m_SelectedMesh != nullptr)
-        //     //     m_SelectedMesh->m_IsSelected = false;
+        if (m_SelectedMesh != nullptr)
+            m_SelectedMesh->m_IsSelected = false;
         m_SelectedMesh = mesh;
         mesh->m_IsSelected = true;
-        // }
+    }
+
+    if (ImGui::TreeNodeEx(mesh->GetName().c_str(), ImGuiTreeNodeFlags_OpenOnArrow))
+    {
 
         if (mesh->GetType() == MeshType::RAILS)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             RailsWindow(rails);
-            for (auto &child : rails->GetRails())
-            {
-                if (child->GetChildren().size() > 0)
-                    SceneGraphElementTree(child);
-                else
-                    SceneGraphElement(child);
+            // for (auto &child : rails->GetRails())
+            // {
+            //     if (child->GetChildren().size() > 0)
+            //         SceneGraphElementTree(child);
+            //     else
+            //         SceneGraphElement(child);
 
-                if (child != m_SelectedMesh)
-                    child->m_IsSelected = false;
-            }
+            //     if (child != m_SelectedMesh)
+            //         child->m_IsSelected = false;
+            // }
         }
 
         for (auto &child : mesh->GetChildren())

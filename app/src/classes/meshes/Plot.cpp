@@ -34,7 +34,7 @@ std::shared_ptr<Plot> Plot::Create(int index, Transform *parent_transform)
 
     plot->m_Transform->SetParentTransform(parent_transform);
 
-    if (parent_transform->GetRotationZ() < 0.0f)
+    if (parent_transform->GetRotationZ() < 0.0f || parent_transform->GetRotationX() < 0.0f)
         plot->m_Transform->SetRotation(plot->m_Transform->GetRotation() - parent_transform->GetRotation());
     else
         plot->m_Transform->SetRotation(plot->m_Transform->GetRotation() + parent_transform->GetRotation());

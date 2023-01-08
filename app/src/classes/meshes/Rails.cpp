@@ -68,7 +68,9 @@ void Rails::Draw()
 void Rails::Update()
 {
     UpdateControlPoints();
-    UpdateRails();
+
+    if (m_DrawRails)
+        UpdateRails();
 
     m_Transform->SetIsDirty(true);
 
@@ -172,7 +174,7 @@ void Rails::UpdateRails()
             rail->GetTransform()->SetRotation(glm::vec3(pitch, yaw, roll));
             rail->GetTransform()->SetIsDirty(true);
 
-            rail->GeneratePlots(index);
+            // rail->GeneratePlots(index);
 
             for (auto child : rail->GetChildren())
                 child->GetTransform()->SetIsDirty(true);

@@ -38,6 +38,10 @@ glm::vec3 Curve::GetTangent(float t, glm::vec3 point)
     glm::vec3 nextTangent = nextPoint - point;
     nextTangent = glm::normalize(nextTangent);
 
+    // // ensure that the tangent is pointing up
+    // if (nextTangent.y < 0)
+    //     nextTangent = -nextTangent;
+
     return nextTangent;
 }
 
