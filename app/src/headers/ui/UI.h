@@ -59,6 +59,7 @@ private:
     std::map<std::string, ImFont *> m_Fonts;
 
     bool m_IsAnimating = false;
+    const char * m_CurveSelected = "Bezier";
 };
 
 #endif // UI_H

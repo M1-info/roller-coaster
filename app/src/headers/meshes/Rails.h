@@ -14,6 +14,7 @@
 #include "buffers/VertexArray.h"
 #include "buffers/VertexBuffer.h"
 
+#include "curves/Curve.h"
 #include "curves/BezierCubic.h"
 #include "curves/Bspline.h"
 #include "curves/CatmullRom.h"
@@ -32,7 +33,7 @@ class Rails : public Mesh
 public:
     Rails();
     static std::shared_ptr<Rails> Create();
-    
+
     void RemoveChildren(std::shared_ptr<Mesh> child) override;
     void Draw() override;
     void Update() override;
@@ -50,6 +51,7 @@ private:
 
 public:
     bool m_DrawRails = false;
+    CurveType m_CurveType = CurveType::BEZIER;
 };
 
 #endif // RAILS_H

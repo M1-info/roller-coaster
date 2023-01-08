@@ -89,10 +89,12 @@ void Rails::UpdateControlPoints()
     m_Vertices.clear();
     m_Tangents.clear();
 
-    // get total length of curve with all control points
-    float totalLength = 0.0f;
+    int step = 3;
 
-    for (int i = 4; i <= m_Children.size(); i += 3)
+    if (m_CurveType == CurveType::BSPLINE || m_CurveType == CurveType::CATMULL_ROM)
+        step = 1;
+
+    for (int i = 4; i <= m_Children.size(); i += step)
     {
 
         std::vector<glm::vec3> points({m_Children[i - 4].get()->GetVertices()[0],
@@ -100,7 +102,14 @@ void Rails::UpdateControlPoints()
                                        m_Children[i - 2].get()->GetVertices()[0],
                                        m_Children[i - 1].get()->GetVertices()[0]});
 
-        BezierCubic curve(points);
+        Curve curve;
+        if (m_CurveType == CurveType::BEZIER)
+            curve = BezierCubic(points);
+        else if (m_CurveType == CurveType::CATMULL_ROM)
+            curve = CatmullRom(points);
+        else if (m_CurveType == CurveType::BSPLINE)
+            curve = Bspline(points);
+
         for (float t = 0; t <= 1; t += 0.01)
         {
             glm::vec3 currentPoint = curve.GetPoint(t);

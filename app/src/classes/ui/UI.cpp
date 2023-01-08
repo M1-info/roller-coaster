@@ -174,6 +174,9 @@ void UI::SetUpDockSpace()
 
 void UI::RenderWindow()
 {
+
+    ImGui::PushID("Render window");
+
     ImGui::Begin("Render infos", nullptr, ImGuiWindowFlags_NoTitleBar);
 
     ImGui::PushFont(m_Fonts["Title"]);
@@ -224,6 +227,41 @@ void UI::RenderWindow()
             camera->Update();
             m_UIConsole->AddLog("Camera is now unlocked from the cart", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
         }
+
+    ImGui::Dummy(ImVec2(0.0f, 2.0f));
+
+    ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);
+    ImGui::Text("Curve type");
+    ImGui::PopFont();
+
+    ImGui::Dummy(ImVec2(0.0f, 1.0f));
+
+    const char *curveTypes[] = {"Bezier", "Catmull-Rom", "B-Spline"};
+    if (ImGui::BeginCombo("##", m_CurveSelected))
+    {
+        for (int n = 0; n < IM_ARRAYSIZE(curveTypes); n++)
+        {
+            bool is_selected = (m_CurveSelected == curveTypes[n]);
+            if (ImGui::Selectable(curveTypes[n], is_selected))
+            {
+                m_CurveSelected = curveTypes[n];
+                if (m_CurveSelected == "Bezier")
+                    rails->m_CurveType = CurveType::BEZIER;
+                else if (m_CurveSelected == "Catmull-Rom")
+                    rails->m_CurveType = CurveType::CATMULL_ROM;
+                else if (m_CurveSelected == "B-Spline")
+                    rails->m_CurveType = CurveType::BSPLINE;
+
+                rails->Update();
+                m_UIConsole->AddLog("Curve type changed to " + std::string(m_CurveSelected), ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+            }
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+
+        ImGui::EndCombo();
+    }
+
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     if (ImGui::Checkbox("Draw rails", &rails->m_DrawRails))
@@ -240,12 +278,15 @@ void UI::RenderWindow()
                 m_UIConsole->AddLog("Rails drawn", ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
             }
         }
+
     ImGui::Dummy(ImVec2(0.0f, 2.0f));
 
     // Frame Rate
     ImGui::Text("Frame Rate: %.1f FPS", ImGui::GetIO().Framerate);
 
     ImGui::End();
+
+    ImGui::PopID();
 }
 
 void UI::CameraWindow()

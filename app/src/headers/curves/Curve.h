@@ -6,12 +6,21 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+enum CurveType
+{
+    BEZIER,
+    BSPLINE,
+    CATMULL_ROM,
+};
+
 class Curve
 {
 public:
     Curve();
     Curve(std::vector<glm::vec3> points);
     virtual ~Curve();
+
+    inline void SetPoints(std::vector<glm::vec3> points) { m_Points = points; }
 
     /* t is a value between 0 and 1
      0 is the start of the curve
