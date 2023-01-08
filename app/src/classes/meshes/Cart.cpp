@@ -89,6 +89,7 @@ void Cart::Animate()
         // get curve point
         glm::vec3 point = m_CurrentCurve->GetPoint(m_CurrentCurveTime) + glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 direction = point - currentPosition;
+        m_Transform->SetPosition(point);
 
         // get curve tangent
         glm::vec3 tangent = m_CurrentCurve->GetTangent(m_CurrentCurveTime, point);
@@ -101,18 +102,19 @@ void Cart::Animate()
         if (direction.y < 0.0f)
             roll = -roll;
 
-        // compute acceleration and velocity
-        // glm::vec3 tangentCurrentPosition = {std::cos(point.x), std::sin(point.y), std::tan(point.z)};
-        // glm::vec3 gravity(0.0f, GRAVITY, 0.0f);
-        // glm::vec3 normalForce = glm::cross(tangentCurrentPosition, gravity);
-        // glm::vec3 acceleration = normalForce / CART_MASS;
+        // Calculate acceleration based on curvature of track
+        glm::vec3 acceleration = glm::cross(tangent, glm::cross(point - currentPosition, tangent));
+        acceleration *= 1.0f / glm::length(point - currentPosition);
 
-        // m_Velocity += acceleration * TIME_STEP;
-        currentPosition = point += m_Velocity;
+        // Include gravity in acceleration
+        acceleration += GRAVITY * TIME_STEP * glm::vec3(0.0f, -1.0f, 0.0f);
 
-        // set rotation
+        // Update velocity using explicit Euler method
+        m_Velocity += acceleration * TIME_STEP;
+
+        // Set rotation and position of cart
+        m_Transform->SetPosition(m_Transform->GetPosition() + (m_Velocity * TIME_STEP));
         m_Transform->SetRotation(glm::vec3(pitch, yaw, roll));
-        m_Transform->SetPosition(currentPosition);
         Update();
 
         if (m_CurrentCurveTime >= 1.0f)
@@ -121,7 +123,7 @@ void Cart::Animate()
             m_CurrentCurveTime = 0.0f;
         }
         else
-            m_CurrentCurveTime += 0.01f;
+            m_CurrentCurveTime += TIME_STEP;
     }
     else
     {
