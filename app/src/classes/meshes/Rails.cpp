@@ -21,12 +21,6 @@ std::shared_ptr<Rails> Rails::Create()
     rails->m_VBO_positions->Unbind();
     rails->m_VAO->Unbind();
 
-    rails->m_VAO_tangents = new VertexArray();
-    rails->m_VBO_tangents = new VertexBuffer(rails->m_Tangents.data(), rails->m_Tangents.size() * sizeof(glm::vec3));
-    rails->m_VAO_tangents->AddBuffer(*rails->m_VBO_tangents, layout);
-    rails->m_VBO_tangents->Unbind();
-    rails->m_VAO_tangents->Unbind();
-
     return rails;
 }
 
@@ -53,19 +47,9 @@ void Rails::Draw()
     m_VAO->Bind();
     m_VBO_positions->Bind();
     m_Material->GetShader()->Bind();
-    m_Material->GetShader()->SetUniform4f("u_color", 1.0f, 1.0f, 1.0f, 1.0f);
     glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
     m_VAO->Unbind();
     m_VBO_positions->Unbind();
-    m_Material->GetShader()->Unbind();
-
-    m_VAO_tangents->Bind();
-    m_VBO_tangents->Bind();
-    m_Material->GetShader()->Bind();
-    m_Material->GetShader()->SetUniform4f("u_color", 1.0f, 0.0f, 0.0f, 1.0f);
-    glDrawArrays(GL_LINES, 0, m_Tangents.size());
-    m_VAO_tangents->Unbind();
-    m_VBO_tangents->Unbind();
     m_Material->GetShader()->Unbind();
 
     for (auto child : m_Children)
@@ -143,10 +127,6 @@ void Rails::UpdateControlPoints()
     m_VBO_positions->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
     m_VBO_positions->Unbind();
 
-    m_VBO_tangents->Bind();
-    m_VBO_tangents->SetData(m_Tangents.data(), m_Tangents.size() * sizeof(glm::vec3));
-    m_VBO_tangents->Unbind();
-
     if (m_Children.size() == 0)
         return;
 
@@ -191,6 +171,8 @@ void Rails::UpdateRails()
 
             rail->GetTransform()->SetRotation(glm::vec3(pitch, yaw, roll));
             rail->GetTransform()->SetIsDirty(true);
+
+            rail->GeneratePlots(index);
 
             for (auto child : rail->GetChildren())
                 child->GetTransform()->SetIsDirty(true);

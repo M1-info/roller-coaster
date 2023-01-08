@@ -55,6 +55,12 @@ std::shared_ptr<Rail> Rail::Create(int index)
     return rail;
 }
 
+void Rail::GeneratePlots(int index)
+{
+    std::shared_ptr<Plot> plot = Plot::Create(index, m_Transform);
+    AddChildren(plot);
+}
+
 void Rail::Draw()
 {
     m_Material->GetShader()->Bind();

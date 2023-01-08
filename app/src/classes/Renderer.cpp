@@ -158,6 +158,14 @@ void Renderer::Render()
 					{
 						modelMatrix = child->GetTransform()->GetMatrix();
 						child->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
+
+						if (child->GetChildren().size() > 0)
+							for (auto child2 : child->GetChildren())
+							{
+								child2->GetTransform()->ComputeMatrix();
+								glm::mat4 modelMatrix = child2->GetTransform()->GetMatrix();
+								child2->GetMaterial()->UpdateShader(projectionView, modelMatrix, viewMatrix, m_Light, cameraPosition);
+							}
 					}
 				}
 			}

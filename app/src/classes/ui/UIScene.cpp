@@ -199,28 +199,28 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
 
     if (ImGui::TreeNode(mesh->GetName().c_str()))
     {
-        if (m_SelectedMesh == nullptr)
-        {
-            // if (m_SelectedMesh != nullptr)
-            //     m_SelectedMesh->m_IsSelected = false;
-            m_SelectedMesh = mesh;
-            mesh->m_IsSelected = true;
-        }
+        // if (m_SelectedMesh == nullptr)
+        // {
+        //     // if (m_SelectedMesh != nullptr)
+        //     //     m_SelectedMesh->m_IsSelected = false;
+        m_SelectedMesh = mesh;
+        mesh->m_IsSelected = true;
+        // }
 
         if (mesh->GetType() == MeshType::RAILS)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             RailsWindow(rails);
-            // for (auto &child : rails->GetRails())
-            // {
-            //     if (child->GetChildren().size() > 0)
-            //         SceneGraphElementTree(child);
-            //     else
-            //         SceneGraphElement(child);
+            for (auto &child : rails->GetRails())
+            {
+                if (child->GetChildren().size() > 0)
+                    SceneGraphElementTree(child);
+                else
+                    SceneGraphElement(child);
 
-            //     if (child != m_SelectedMesh)
-            //         child->m_IsSelected = false;
-            // }
+                if (child != m_SelectedMesh)
+                    child->m_IsSelected = false;
+            }
         }
 
         for (auto &child : mesh->GetChildren())

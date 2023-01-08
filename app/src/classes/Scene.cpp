@@ -46,6 +46,14 @@ void Scene::SetUpObjectsShaders(std::shared_ptr<Light> light)
         }
 
         mesh->GetMaterial()->SetUpShader(light);
+
+        for (auto child : mesh->GetChildren())
+        {
+            child->GetMaterial()->SetUpShader(light);
+
+            for (auto child2 : child->GetChildren())
+                child2->GetMaterial()->SetUpShader(light);
+        }
     }
 }
 

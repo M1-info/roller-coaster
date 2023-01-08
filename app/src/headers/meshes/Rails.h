@@ -51,9 +51,6 @@ private:
     std::vector<glm::vec3> m_Tangents;
     std::vector<Curve> m_Curves;
 
-    VertexArray *m_VAO_tangents;
-    VertexBuffer *m_VBO_tangents;
-
 public:
     bool m_DrawRails = false;
     CurveType m_CurveType = CurveType::BEZIER;
