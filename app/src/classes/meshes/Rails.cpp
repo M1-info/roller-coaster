@@ -21,6 +21,12 @@ std::shared_ptr<Rails> Rails::Create()
     rails->m_VBO_positions->Unbind();
     rails->m_VAO->Unbind();
 
+    rails->m_VAO_tangents = new VertexArray();
+    rails->m_VBO_tangents = new VertexBuffer(rails->m_Tangents.data(), rails->m_Tangents.size() * sizeof(glm::vec3));
+    rails->m_VAO_tangents->AddBuffer(*rails->m_VBO_tangents, layout);
+    rails->m_VBO_tangents->Unbind();
+    rails->m_VAO_tangents->Unbind();
+
     return rails;
 }
 
@@ -44,21 +50,29 @@ void Rails::RemoveChildren(std::shared_ptr<Mesh> child)
 void Rails::Draw()
 {
 
+    m_VAO->Bind();
+    m_VBO_positions->Bind();
+    m_Material->GetShader()->Bind();
+    m_Material->GetShader()->SetUniform4f("u_color", 1.0f, 1.0f, 1.0f, 1.0f);
+    glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
+    m_VAO->Unbind();
+    m_VBO_positions->Unbind();
+    m_Material->GetShader()->Unbind();
+
+    m_VAO_tangents->Bind();
+    m_VBO_tangents->Bind();
+    m_Material->GetShader()->Bind();
+    m_Material->GetShader()->SetUniform4f("u_color", 1.0f, 0.0f, 0.0f, 1.0f);
+    glDrawArrays(GL_LINES, 0, m_Tangents.size());
+    m_VAO_tangents->Unbind();
+    m_VBO_tangents->Unbind();
+    m_Material->GetShader()->Unbind();
+
+    for (auto child : m_Children)
+        child->Draw();
+
     if (!m_DrawRails)
-    {
-        m_VAO->Bind();
-        m_VBO_positions->Bind();
-        m_Material->GetShader()->Bind();
-        glDrawArrays(GL_LINE_STRIP, 0, m_Vertices.size());
-        m_VAO->Unbind();
-        m_VBO_positions->Unbind();
-        m_Material->GetShader()->Unbind();
-
-        for (auto child : m_Children)
-            child->Draw();
-
         return;
-    }
 
     if (m_Rails.size() == 0)
         return;
@@ -70,9 +84,7 @@ void Rails::Draw()
 void Rails::Update()
 {
     UpdateControlPoints();
-
-    if (m_DrawRails)
-        UpdateRails();
+    UpdateRails();
 
     m_Transform->SetIsDirty(true);
 
@@ -119,9 +131,7 @@ void Rails::UpdateControlPoints()
             glm::vec3 vertex(currentPoint.x, currentPoint.y, currentPoint.z);
             m_Vertices.push_back(vertex);
 
-            glm::vec3 tangent = curve.GetTangent(t);
-            tangent = glm::normalize(tangent);
-
+            glm::vec3 tangent = curve.GetTangent(t, currentPoint);
             m_Tangents.push_back(tangent);
         }
     }
@@ -132,6 +142,10 @@ void Rails::UpdateControlPoints()
     m_VBO_positions->Bind();
     m_VBO_positions->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(glm::vec3));
     m_VBO_positions->Unbind();
+
+    m_VBO_tangents->Bind();
+    m_VBO_tangents->SetData(m_Tangents.data(), m_Tangents.size() * sizeof(glm::vec3));
+    m_VBO_tangents->Unbind();
 
     if (m_Children.size() == 0)
         return;
@@ -168,24 +182,14 @@ void Rails::UpdateRails()
 
             glm::vec3 tangent = m_Tangents[i];
 
-            if (m_CurveType == CurveType::BEZIER)
-            {
-                float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) - 90.0f;
-                float roll = glm::degrees(std::atan2(direction.y, direction.x));
+            float pitch = 0.0f;
+            float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) + 90.0f;
+            float roll = glm::degrees(std::atan2(direction.y, direction.x));
 
-                if (direction.y < 0.0f)
-                    roll *= -1.0f;
+            if (direction.z < 0 && direction.x < 0)
+                yaw *= -1;
 
-                rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
-            }
-            else if (m_CurveType == CurveType::BSPLINE)
-            {
-                glm::mat4 lookAt = glm::lookAt(currentPosition, currentPosition + tangent, glm::vec3(0.0f, 1.0f, 0.0f));
-
-                // set rotation from lookAt matrix
-                rail->GetTransform()->SetRotation(glm::vec3(glm::degrees(lookAt[0][0]), glm::degrees(lookAt[1][0]), glm::degrees(lookAt[2][0])));
-            }
-
+            rail->GetTransform()->SetRotation(glm::vec3(pitch, yaw, roll));
             rail->GetTransform()->SetIsDirty(true);
 
             for (auto child : rail->GetChildren())

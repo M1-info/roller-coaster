@@ -38,6 +38,8 @@ public:
     inline void SetCurrentTangent(glm::vec3 currentTangent) { m_CurrentTangent = currentTangent; }
     inline glm::vec3 GetCurrentTangent() { return m_CurrentTangent; }
 
+    inline float GetCurrentCurveTime() { return m_CurrentCurveTime; }
+
 private:
     glm::vec3 m_Velocity;
     glm::vec3 m_Destination;

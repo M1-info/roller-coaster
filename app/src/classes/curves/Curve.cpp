@@ -30,27 +30,15 @@ glm::vec3 Curve::GetPoint(float t)
     return T * M * P;
 }
 
-glm::vec3 Curve::GetTangent(float t)
+glm::vec3 Curve::GetTangent(float t, glm::vec3 point)
 {
-    float dx_a = 3 * (m_Points[1].x - m_Points[0].x);
-    float dx_b = 3 * (m_Points[2].x - m_Points[1].x);
-    float dx_c = 3 * (m_Points[3].x - m_Points[2].x);
 
-    float dx = dx_a * pow(1 - t, 2.0) + 2 * dx_b * (1 - t) * t + dx_c * pow(t, 2.0);
+    glm::vec3 nextPoint = GetPoint(t + 0.001);
 
-    float dy_a = 3 * (m_Points[1].y - m_Points[0].y);
-    float dy_b = 3 * (m_Points[2].y - m_Points[1].y);
-    float dy_c = 3 * (m_Points[3].y - m_Points[2].y);
+    glm::vec3 nextTangent = nextPoint - point;
+    nextTangent = glm::normalize(nextTangent);
 
-    float dy = dy_a * pow(1 - t, 2.0) + 2 * dy_b * (1 - t) * t + dy_c * pow(t, 2.0);
-
-    float dz_a = 3 * (m_Points[1].z - m_Points[0].z);
-    float dz_b = 3 * (m_Points[2].z - m_Points[1].z);
-    float dz_c = 3 * (m_Points[3].z - m_Points[2].z);
-
-    float dz = dz_a * pow(1 - t, 2.0) + 2 * dz_b * (1 - t) * t + dz_c * pow(t, 2.0);
-
-    return glm::vec3(dx, dy, dz);
+    return nextTangent;
 }
 
 glm::vec3 Curve::GetNormal(float t, glm::vec3 point, glm::vec3 tangent)
@@ -69,7 +57,7 @@ glm::vec3 Curve::GetNormal(glm::vec3 binormal, glm::vec3 tangent)
 glm::vec3 Curve::GetBinormal(float t, glm::vec3 point, glm::vec3 tangent)
 {
     glm::vec3 nearPoint = GetPoint(t + 0.001);
-    glm::vec3 nearPointTangent = GetTangent(t + 0.001);
+    glm::vec3 nearPointTangent = GetTangent(t + 0.001, point);
 
     glm::vec3 unitTangent = glm::normalize(tangent);
 

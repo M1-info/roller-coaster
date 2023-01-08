@@ -23,8 +23,8 @@ void Scene::Init()
     std::shared_ptr<Rails> rails = Rails::Create();
 
     Add(ground);
-    Add(cart);
     Add(rails);
+    Add(cart);
 }
 
 void Scene::SetUpObjectsShaders(std::shared_ptr<Light> light)

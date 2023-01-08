@@ -30,7 +30,7 @@ public:
     /*
      return the tangent at the given t value
     */
-    glm::vec3 GetTangent(float t);
+    glm::vec3 GetTangent(float t, glm::vec3 point);
 
     /*
      return the normal at the given t value

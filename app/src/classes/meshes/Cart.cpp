@@ -91,19 +91,24 @@ void Cart::Animate()
         glm::vec3 direction = point - currentPosition;
 
         // get curve tangent
-        glm::vec3 tangent = m_CurrentCurve->GetTangent(m_CurrentCurveTime);
+        glm::vec3 tangent = m_CurrentCurve->GetTangent(m_CurrentCurveTime, point);
         m_CurrentTangent = tangent;
 
         float pitch = 0.0f;
         float yaw = glm::degrees(std::atan2(tangent.x, tangent.z));
-        float roll = glm::degrees(std::atan2(tangent.y, glm::length(glm::vec2(tangent.x, tangent.z))));
+        float roll = glm::degrees(std::atan2(direction.y, (float)sqrt(direction.x * direction.x + direction.z * direction.z)));
+
+        if (direction.y < 0.0f)
+            roll = -roll;
 
         // compute acceleration and velocity
-        glm::vec3 acceleration = direction * 0.1f;
-        m_Velocity += acceleration * GRAVITY * 0.01f;
+        // glm::vec3 tangentCurrentPosition = {std::cos(point.x), std::sin(point.y), std::tan(point.z)};
+        // glm::vec3 gravity(0.0f, GRAVITY, 0.0f);
+        // glm::vec3 normalForce = glm::cross(tangentCurrentPosition, gravity);
+        // glm::vec3 acceleration = normalForce / CART_MASS;
 
-        // compute new position
-        currentPosition = point + m_Velocity;
+        // m_Velocity += acceleration * TIME_STEP;
+        currentPosition = point += m_Velocity;
 
         // set rotation
         m_Transform->SetRotation(glm::vec3(pitch, yaw, roll));

@@ -66,9 +66,13 @@ void Camera::Update(std::shared_ptr<Cart> cart)
 {
     // get current tangent of the cart
     glm::vec3 tangent = cart->GetCurrentTangent();
+    int offset = 1.0f;
+    if (tangent.y > 0.95f)
+        offset = -1.0f;
 
-    // compute the view matrix from the tangent
-    m_View = glm::lookAt(m_Position, m_Position + tangent, m_Up);
+    glm::vec3 target = glm::vec3(tangent.x * 5.0f, tangent.y + offset, tangent.z * 5.0);
+
+    m_View = glm::lookAt(m_Position, m_Position + target, m_Up);
 }
 
 void Camera::OnMouseMove(float x, float y)

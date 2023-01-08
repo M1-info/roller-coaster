@@ -25,9 +25,9 @@ glm::mat4 Transform::ComputeMatrix()
 
     glm::mat4 translationMatrix = glm::translate(identity, m_Position);
 
-    glm::mat4 rotationMatrix = glm::rotate(identity, glm::radians(m_Rotation.x), m_Right) *
-                               glm::rotate(identity, glm::radians(m_Rotation.y), m_Up) *
-                               glm::rotate(identity, glm::radians(m_Rotation.z), m_Forward);
+    glm::mat4 rotationMatrix = glm::rotate(identity, glm::radians(m_Rotation.z), m_Forward) *
+                               glm::rotate(identity, glm::radians(m_Rotation.x), m_Right) *
+                               glm::rotate(identity, glm::radians(m_Rotation.y), m_Up);
 
     glm::mat4 scaleMatrix = glm::scale(identity, m_Scale);
 
