@@ -8,7 +8,6 @@
 #include "Shader.h"
 #include "OBJLoader.h"
 #include "Light.h"
-#include "Camera.h"
 
 class Material
 {

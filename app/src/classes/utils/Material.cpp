@@ -83,10 +83,6 @@ void Material::UpdateShader(glm::mat4 projectionView, glm::mat4 model, glm::mat4
     if (model != glm::mat4(0.0))
     {
         m_Shader->SetUniformMat4f("u_model", model);
-        // if (isSelected)
-        //     m_Shader->SetUniform1i("u_isSelected", 1);
-        // else
-        //     m_Shader->SetUniform1i("u_isSelected", 0);
     }
 
     m_Shader->SetUniformMat4f("u_projectionView", projectionView);

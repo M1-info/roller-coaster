@@ -8,9 +8,6 @@ Cart::Cart()
 
     m_Transform = new Transform();
     m_Velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    // m_CurrentRail = {};
-    // m_CurrentTangent = {};
 }
 
 std::shared_ptr<Cart> Cart::Create()
@@ -95,6 +92,7 @@ void Cart::Animate()
 
         // get curve tangent
         glm::vec3 tangent = m_CurrentCurve->GetTangent(m_CurrentCurveTime);
+        m_CurrentTangent = tangent;
 
         float pitch = 0.0f;
         float yaw = glm::degrees(std::atan2(tangent.x, tangent.z));

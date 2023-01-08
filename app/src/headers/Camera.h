@@ -2,9 +2,13 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <algorithm>
+#include <memory>
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include <algorithm>
+
+#include "meshes/Cart.h"
 
 #define BASE_SPEED 20.0f
 #define BASE_SENSITIVITY 0.2f
@@ -90,19 +94,16 @@ public:
     inline void SetRight(glm::vec3 right) { m_Right = right; };
     inline void SetUp(glm::vec3 up) { m_Up = up; };
 
-    /* Return the camera orientation based on Yaw and Pitch values */
-    glm::mat4 GetOrientation();
-
     void OnMouseMove(float x, float y);
 
     void Move(CameraMovement direction, float deltaTime);
     void Update();
+    void Update(std::shared_ptr<Cart> cart);
 
     /* Called once per frame */
     void Render(float deltaTime);
 
 private:
-
     /* Camera projection values */
     float m_Fov;
     float m_AspectRatio;

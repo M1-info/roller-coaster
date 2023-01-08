@@ -39,19 +39,10 @@ void Camera::Init()
 {
 
     m_Position = glm::vec3(0.0f, 0.0f, 8.0f);
-    ;
     m_Target = glm::vec3(0.0f, 0.0f, 0.0f);
     m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
     Update();
-}
-
-glm::mat4 Camera::GetOrientation()
-{
-    glm::mat4 orientation = glm::mat4(1.0f);
-    orientation = glm::rotate(orientation, glm::radians(m_Pitch), glm::vec3(1.0f, 0.0f, 0.0f));
-    orientation = glm::rotate(orientation, glm::radians(m_Yaw), glm::vec3(0.0f, 1.0f, 0.0f));
-    return orientation;
 }
 
 /**
@@ -69,6 +60,15 @@ void Camera::Update()
     m_Up = glm::normalize(glm::cross(m_Right, m_Front));
 
     m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
+}
+
+void Camera::Update(std::shared_ptr<Cart> cart)
+{
+    // get current tangent of the cart
+    glm::vec3 tangent = cart->GetCurrentTangent();
+
+    // compute the view matrix from the tangent
+    m_View = glm::lookAt(m_Position, m_Position + tangent, m_Up);
 }
 
 void Camera::OnMouseMove(float x, float y)

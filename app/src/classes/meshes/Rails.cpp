@@ -88,6 +88,7 @@ void Rails::UpdateControlPoints()
 
     m_Vertices.clear();
     m_Tangents.clear();
+    m_Curves.clear();
 
     int step = 3;
 
@@ -159,6 +160,7 @@ void Rails::UpdateRails()
         {
             std::shared_ptr<Rail> rail = Rail::Create(index);
             rail->GetTransform()->SetPosition(currentPosition);
+
             m_Rails.push_back(rail);
             rail->SetParent(shared_from_this());
             rail->GetTransform()->SetParentTransform(m_Transform);
@@ -166,24 +168,23 @@ void Rails::UpdateRails()
 
             glm::vec3 tangent = m_Tangents[i];
 
-            // if (m_CurveType == CurveType::BEZIER)
-            // {
-            float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) - 90.0f;
-            float roll = glm::degrees(std::atan2(direction.y, direction.x));
+            if (m_CurveType == CurveType::BEZIER)
+            {
+                float yaw = glm::degrees(std::atan2(tangent.x, tangent.z)) - 90.0f;
+                float roll = glm::degrees(std::atan2(direction.y, direction.x));
 
-            if (direction.y < 0.0f)
-                roll *= -1.0f;
+                if (direction.y < 0.0f)
+                    roll *= -1.0f;
 
-            // set rotation
-            rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
-            // }
-            // else if (m_CurveType == CurveType::BSPLINE)
-            // {
-            //     glm::mat4 lookAt = glm::lookAt(currentPosition, currentPosition + tangent, glm::vec3(0.0f, 1.0f, 0.0f));
+                rail->GetTransform()->SetRotation(glm::vec3(0.0f, yaw, roll));
+            }
+            else if (m_CurveType == CurveType::BSPLINE)
+            {
+                glm::mat4 lookAt = glm::lookAt(currentPosition, currentPosition + tangent, glm::vec3(0.0f, 1.0f, 0.0f));
 
-            //     // set rotation from lookAt matrix
-            //     rail->GetTransform()->SetRotation(glm::vec3(glm::degrees(lookAt[0][0]), glm::degrees(lookAt[1][0]), glm::degrees(lookAt[2][0])));
-            // }
+                // set rotation from lookAt matrix
+                rail->GetTransform()->SetRotation(glm::vec3(glm::degrees(lookAt[0][0]), glm::degrees(lookAt[1][0]), glm::degrees(lookAt[2][0])));
+            }
 
             rail->GetTransform()->SetIsDirty(true);
 

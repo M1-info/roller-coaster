@@ -85,7 +85,7 @@ void Renderer::Render()
 		if (m_Camera->m_IsOnCart)
 		{
 			m_Camera->SetPosition(cart->GetTransform()->GetPosition() + glm::vec3(0.0f, 2.0f, 0.0f));
-			m_Camera->Update();
+			m_Camera->Update(cart);
 		}
 
 		if (m_UI->GetIsAnimating())
