@@ -17,7 +17,6 @@
 #include "curves/BezierCubic.h"
 #include "curves/Bspline.h"
 #include "curves/CatmullRom.h"
-#include "curves/Hermite.h"
 
 #include "meshes/Mesh.h"
 #include "meshes/Rail.h"

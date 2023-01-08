@@ -89,6 +89,9 @@ void Rails::UpdateControlPoints()
     m_Vertices.clear();
     m_Tangents.clear();
 
+    // get total length of curve with all control points
+    float totalLength = 0.0f;
+
     for (int i = 4; i <= m_Children.size(); i += 3)
     {
 

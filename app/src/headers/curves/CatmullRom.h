@@ -2,7 +2,7 @@
 #ifndef CATMULLROM_H
 #define CATMULLROM_H
 
-#define CATMLLROM_MATRIX glm::mat4(0.0f, 1.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.5f, 0.0f, 1.0f, -2.5f, 2.0f, -0.5f, -0.5f, 1.5f, -1.5f, 0.5f)
+#define CATMLLROM_MATRIX glm::mat4(-1.0f, 3.0f, -3.0f, 1.0f, 2.0f, -5.0f, 4.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f)
 
 #include "Curve.h"
 

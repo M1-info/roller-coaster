@@ -2,9 +2,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#define GRAVITY 9.81f
-#define DELTA_TIME_CART_RENDER 0.01f
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

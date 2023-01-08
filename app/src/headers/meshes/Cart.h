@@ -2,6 +2,11 @@
 #ifndef CART_H
 #define CART_H
 
+#define GRAVITY 9.81f
+#define CART_MASS 1.0f
+#define CART_FRICTION 0.1f
+#define TIME_STEP 0.01f
+
 #include "Mesh.h"
 #include "Object3D.h"
 
@@ -28,6 +33,7 @@ public:
 
 private:
     glm::vec3 m_Velocity;
+    glm::vec3 m_Destination;
 
     std::vector<glm::vec3> m_Rails;
     std::vector<glm::vec3> m_Tangents;

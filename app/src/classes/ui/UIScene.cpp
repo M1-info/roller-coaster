@@ -211,16 +211,16 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
         {
             std::shared_ptr<Rails> rails = std::dynamic_pointer_cast<Rails>(mesh);
             RailsWindow(rails);
-            for (auto &child : rails->GetRails())
-            {
-                if (child->GetChildren().size() > 0)
-                    SceneGraphElementTree(child);
-                else
-                    SceneGraphElement(child);
+            // for (auto &child : rails->GetRails())
+            // {
+            //     if (child->GetChildren().size() > 0)
+            //         SceneGraphElementTree(child);
+            //     else
+            //         SceneGraphElement(child);
 
-                if (child != m_SelectedMesh)
-                    child->m_IsSelected = false;
-            }
+            //     if (child != m_SelectedMesh)
+            //         child->m_IsSelected = false;
+            // }
         }
 
         for (auto &child : mesh->GetChildren())
