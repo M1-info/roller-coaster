@@ -4,8 +4,6 @@ if "%1"=="" goto :EOF
 if "%1"=="help" goto :HELP
 if "%1"=="vs" goto :VS
 if "%1"=="gmake" goto :GMAKE
-if "%1"=="runDebug" goto :RUNDEBUG
-if "%1"=="runRelease" goto :RUNRELEASE
 if "%1"=="clean" goto :CLEAN
 
 :VS
@@ -16,18 +14,6 @@ exit /b
 :GMAKE
 echo Generating Makefiles...
 .\scripts\bin\premake5.exe gmake
-exit /b
-
-:RUNDEBUG
-echo Running in debug mode...
-if exist app\bin\VisualStudio\Debug\ app\bin\VisualStudio\Debug\app.exe 
-else app\bin\MinGW\Debug\app.exe
-exit /b
-
-:RUNRELEASE
-echo Running in release mode...
-if exist app\bin\VisualStudio\Release\ app\bin\VisualStudio\Release\app.exe 
-else app\bin\MinGW\Release\app.exe
 exit /b
 
 :CLEAN

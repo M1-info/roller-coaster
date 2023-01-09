@@ -3,16 +3,16 @@
 ## Setup
 
 Lancer le script './scripts/script.bat' pour créer le projet.
-(Pensez à mettre les droits dans vos fichiers)
+(Pensez à mettre les droits exécution/écriture sur ce projet)
 
 Pour le lancer vous devez passer un parametre.
 Parmis les choix disponibles :
 
 - vs => il vous créé une solution pour visual studio 2022
-- makefile => il vous créé les makefiles pour compiler avec mingw
-- runDebug => il vous lance l'executable créé en configuration de debug
-- runRelease => il vous lance l'executable créé en configuration release
+- gmake => il vous créé les makefiles pour compiler avec mingw
 - clean => il supprimes tous les fichier créés .sln ou makefile
+
+Les exécutables sont générés dans le dossier app/bin/VisualStudio ou app/bin/Mingw
 
 ## Description
 
