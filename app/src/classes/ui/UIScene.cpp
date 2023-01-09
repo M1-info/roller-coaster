@@ -198,16 +198,15 @@ void UIScene::SceneGraphElementTree(std::shared_ptr<Mesh> mesh)
         ImGui::RenderFrame(pos, ImVec2(pos.x + ImGui::GetContentRegionMax().x, pos.y + ImGui::GetTextLineHeight()), col, false);
     }
 
-    if (m_SelectedMesh == nullptr)
-    {
-        if (m_SelectedMesh != nullptr)
-            m_SelectedMesh->m_IsSelected = false;
-        m_SelectedMesh = mesh;
-        mesh->m_IsSelected = true;
-    }
-
     if (ImGui::TreeNodeEx(mesh->GetName().c_str(), ImGuiTreeNodeFlags_OpenOnArrow))
     {
+        if (m_SelectedMesh == nullptr)
+        {
+            if (m_SelectedMesh != nullptr)
+                m_SelectedMesh->m_IsSelected = false;
+            m_SelectedMesh = mesh;
+            mesh->m_IsSelected = true;
+        }
 
         // if mesh is a rails, display the rails window with file controller for control points
         if (mesh->GetType() == MeshType::RAILS)

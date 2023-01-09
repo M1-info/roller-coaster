@@ -3,8 +3,8 @@
 #define CART_H
 
 #define GRAVITY 9.81f
-#define CART_MASS 1.0f
-#define CART_FRICTION 0.1f
+#define CART_MASS 10.0f
+#define CART_FRICTION 1.2f
 #define TIME_STEP 0.01f
 
 #include "Mesh.h"

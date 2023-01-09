@@ -110,17 +110,22 @@ void Cart::Animate()
             roll = -roll;
 
         // Calculate acceleration based on curvature of track
+        // TODO: Fix acceleration calculation
+        // glm::vec3 gravity = glm::vec3(0.0f, GRAVITY, 0.0f);
+        // glm::vec3 acceleration = glm::dot(gravity, tangent) - (CART_FRICTION / CART_MASS) * m_Velocity;
+
+        // Calculate acceleration based on curvature of track
         glm::vec3 acceleration = glm::cross(tangent, glm::cross(point - currentPosition, tangent));
         acceleration *= 1.0f / glm::length(point - currentPosition);
 
-        // Include gravity in acceleration
+        // // Include gravity in acceleration
         acceleration += GRAVITY * TIME_STEP * glm::vec3(0.0f, -1.0f, 0.0f);
 
-        // Update velocity using explicit Euler method
-        m_Velocity += acceleration * TIME_STEP;
+        // // Update velocity using explicit Euler method
+        // m_Velocity += acceleration * TIME_STEP;
 
         // Set rotation and position of cart
-        m_Transform->SetPosition(m_Transform->GetPosition() + (m_Velocity * TIME_STEP));
+        m_Transform->SetPosition(m_Transform->GetPosition() + m_Velocity * TIME_STEP);
         m_Transform->SetRotation(glm::vec3(pitch, yaw, roll));
         Update();
 
